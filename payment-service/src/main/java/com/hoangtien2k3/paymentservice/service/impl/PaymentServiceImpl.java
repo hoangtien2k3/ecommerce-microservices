@@ -53,14 +53,10 @@ public class PaymentServiceImpl implements PaymentService {
         return this.paymentRepository.findAll()
                 .stream()
                 .map(PaymentMappingHelper::map) // Map Payment -> PaymentDto
-                .map(p -> {
-                    p.setOrderDto(restTemplate.getForObject(AppConstant.DiscoveredDomainsApi.ORDER_SERVICE_API_URL + "/" + p.getOrderDto().getOrderId(), OrderDto.class));
-                    return p;
-                })
+                .peek(p -> p.setOrderDto(restTemplate.getForObject(AppConstant.DiscoveredDomainsApi.ORDER_SERVICE_API_URL + "/" + p.getOrderDto().getOrderId(), OrderDto.class)))
                 .distinct()
                 .toList();
     }
-
 
     @Override
     public Mono<List<String>> callServiceB(String serviceBUrl) {
@@ -159,7 +155,6 @@ public class PaymentServiceImpl implements PaymentService {
 //
 //        return orderDtoMono.block(); // Blocking, you may want to use reactive patterns throughout your application
 //    }
-//
 
     @Override
     public PaymentDto save(PaymentDto paymentDto) {
