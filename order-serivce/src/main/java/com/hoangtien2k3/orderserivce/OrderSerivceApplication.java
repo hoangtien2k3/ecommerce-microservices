@@ -8,6 +8,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 
 @SpringBootApplication
 @EnableJpaRepositories
+<<<<<<< HEAD
+=======
+@EnableFeignClients
+@EnableWebSecurity
+@EnableRedisHttpSession
+>>>>>>> 59eb0cc20681e0fdc575684a7cd7a6d1220d661c
 public class OrderSerivceApplication {
 
 	public static void main(String[] args) {
