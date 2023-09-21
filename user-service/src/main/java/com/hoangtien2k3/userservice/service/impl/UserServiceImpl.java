@@ -1,11 +1,20 @@
 package com.hoangtien2k3.userservice.service.impl;
 
+import com.hoangtien2k3.userservice.config.JwtToken;
+import com.hoangtien2k3.userservice.dao.ResponseData;
 import com.hoangtien2k3.userservice.entity.User;
 import com.hoangtien2k3.userservice.entity.UserRole;
 import com.hoangtien2k3.userservice.repository.UserRepository;
 import com.hoangtien2k3.userservice.repository.UserRoleRepository;
 import com.hoangtien2k3.userservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +24,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtToken token;
 
     @Autowired
     private UserRoleRepository userRoleRepository;
@@ -44,4 +59,22 @@ public class UserServiceImpl implements UserService {
 
         return userRepository.save(user);
     }
+
+
+    @Override
+    public ResponseData<String> loginUser(String userName, String userPassword) {
+
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(userName, userPassword)
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String jwt = token.generateToken((UserDetails) authentication.getPrincipal());
+
+        return new ResponseData(HttpStatus.OK, "Login Successfully", jwt);
+
+    }
+
+
 }

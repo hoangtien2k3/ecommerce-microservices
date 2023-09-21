@@ -8,7 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,7 +54,9 @@ public class UserController {
     }
 
     @PostMapping(value = "/users")
-    public ResponseEntity<User> addUser(@RequestBody User user, HttpServletRequest request) {
+    public ResponseEntity<User> addUser(@RequestBody User user,
+
+                                        HttpServletRequest request) {
         if (user != null)
             try {
                 userService.saveUser(user);
@@ -64,5 +67,12 @@ public class UserController {
             }
         return new ResponseEntity<User>(HttpStatus.BAD_REQUEST);
     }
+
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@Valid @RequestBody HashMap<String, String> request){
+        return ResponseEntity.ok(userService.loginUser(request.get("username"), request.get("password")));
+    }
+
 
 }
