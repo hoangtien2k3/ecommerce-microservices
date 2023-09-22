@@ -2,7 +2,7 @@ package com.hoangtien2k3.userservice.controller;
 
 import com.hoangtien2k3.userservice.dto.request.SignUpFrom;
 import com.hoangtien2k3.userservice.dto.response.JwtResponse;
-import com.hoangtien2k3.userservice.dto.response.ResponseMessge;
+import com.hoangtien2k3.userservice.dto.response.ResponseMessage;
 import com.hoangtien2k3.userservice.entity.Role;
 import com.hoangtien2k3.userservice.entity.RoleName;
 import com.hoangtien2k3.userservice.entity.User;
@@ -10,7 +10,6 @@ import com.hoangtien2k3.userservice.security.jwt.JwtProvider;
 import com.hoangtien2k3.userservice.security.userprinciple.UserPrinciple;
 import com.hoangtien2k3.userservice.service.impl.RoleServiceImpl;
 import com.hoangtien2k3.userservice.service.impl.UserServiceImpl;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,11 +49,11 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> register(@Valid @RequestBody SignUpFrom signUpFrom) {
         if (userService.existsByUsername(signUpFrom.getUsername())) {
-            return new ResponseEntity<>(new ResponseMessge("The username existed, please try again."), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseMessage("The username existed, please try again."), HttpStatus.BAD_REQUEST);
         }
 
         if (userService.existsByEmail(signUpFrom.getEmail())) {
-            return new ResponseEntity<>(new ResponseMessge("The email existed, please try again."), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseMessage("The email existed, please try again."), HttpStatus.BAD_REQUEST);
         }
 
         User user = User.builder()
@@ -96,7 +95,7 @@ public class AuthController {
         user.setRoles(roles);
         userService.save(user);
 
-        return new ResponseEntity<>(new ResponseMessge("Create User Successfully."), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessage("Create User Successfully."), HttpStatus.OK);
     }
 
 
