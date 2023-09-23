@@ -49,24 +49,19 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> register(@Valid @RequestBody SignUpFrom signUpFrom) {
         if (userService.existsByUsername(signUpFrom.getUsername())) {
-            return new ResponseEntity<>(new ResponseMessage("The username existed, please try again."), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(
+                    new ResponseMessage("The username " + signUpFrom.getUsername() + " is existed, please try again."),
+                    HttpStatus.BAD_REQUEST
+            );
         }
 
         if (userService.existsByEmail(signUpFrom.getEmail())) {
-            return new ResponseEntity<>(new ResponseMessage("The email existed, please try again."), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseMessage("The email "  + signUpFrom.getEmail() + " is existed, please try again."), HttpStatus.BAD_REQUEST);
         }
 
-        User user = User.builder()
-                .name(signUpFrom.getName())
-                .username(signUpFrom.getUsername())
-                .email(signUpFrom.getEmail())
-                .password(passwordEncoder.encode(signUpFrom.getPassword()))
-                .build();
-
-        Set<String> strRoles = signUpFrom.getRoles();
         Set<Role> roles = new HashSet<>();
 
-        strRoles.forEach(role -> {
+        signUpFrom.getRoles().forEach(role -> {
             switch (role) {
                 case "admin": {
                     Role adminRole = roleService
@@ -92,10 +87,18 @@ public class AuthController {
             }
         });
 
-        user.setRoles(roles);
+        User user = User.builder()
+                .name(signUpFrom.getName())
+                .username(signUpFrom.getUsername())
+                .email(signUpFrom.getEmail())
+                .password(passwordEncoder.encode(signUpFrom.getPassword()))
+                .avatar("https://www.facebook.com/photo/?fbid=723931439407032&set=pob.100053705482952")
+                .roles(roles)
+                .build();
+
         userService.save(user);
 
-        return new ResponseEntity<>(new ResponseMessage("Create User Successfully."), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessage("User: " + signUpFrom.getUsername() + " create successfully."), HttpStatus.OK);
     }
 
 
@@ -110,6 +113,7 @@ public class AuthController {
 
         // generate token by authentication
         String token = jwtProvider.createToken(authentication);
+
         UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
 
         return ResponseEntity.ok(new JwtResponse(token, userPrinciple.getId() , userPrinciple.getName(), userPrinciple.getAuthorities()));

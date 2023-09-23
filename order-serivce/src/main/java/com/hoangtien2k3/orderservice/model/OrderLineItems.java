@@ -26,7 +26,7 @@ public class OrderLineItems {
     @NotBlank
     private String orderNumber;
 
-    @Column(name = "productName")
+    @Column(name = "skuCode")
     @NotBlank
     private String skuCode;
 
