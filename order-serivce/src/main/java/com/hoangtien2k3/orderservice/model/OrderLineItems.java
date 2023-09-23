@@ -1,10 +1,10 @@
 package com.hoangtien2k3.orderservice.model;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import javax.persistence.*;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;

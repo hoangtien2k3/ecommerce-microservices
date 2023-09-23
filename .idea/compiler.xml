@@ -7,23 +7,29 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="discovery-server" />
+        <module name="product-catalog-service" />
         <module name="product-service" />
         <module name="user-service" />
-        <module name="inventory-service" />
-        <module name="product-catalog-service" />
-        <module name="order-serivce" />
+        <module name="inventory-server" />
+        <module name="order-server" />
         <module name="product-recommend-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="inventory-service" target="17" />
+      <module name="order-serivce" target="17" />
       <module name="order-service" target="17" />
       <module name="product-recomment-service" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="discovery-server" options="-parameters" />
+      <module name="inventory-server" options="-parameters" />
       <module name="inventory-service" options="-parameters" />
       <module name="order-serivce" options="-parameters" />
+      <module name="order-server" options="-parameters" />
       <module name="order-service" options="-parameters" />
       <module name="product-catalog-service" options="-parameters" />
       <module name="product-recommend-service" options="-parameters" />
