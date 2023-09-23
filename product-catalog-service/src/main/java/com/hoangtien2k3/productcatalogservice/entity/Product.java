@@ -2,10 +2,7 @@ package com.hoangtien2k3.productcatalogservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -14,6 +11,7 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "products")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -31,8 +29,8 @@ public class Product {
     @NotNull
     private BigDecimal price;
 
-    @Column (name = "discription")
-    private String discription;
+    @Column (name = "description")
+    private String description;
 
     @Column (name = "category")
     @NotNull
