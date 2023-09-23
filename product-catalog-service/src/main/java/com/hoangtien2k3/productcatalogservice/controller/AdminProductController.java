@@ -1,10 +1,10 @@
 package com.hoangtien2k3.productcatalogservice.controller;
 
+import javax.servlet.http.HttpServletRequest;
 import com.hoangtien2k3.productcatalogservice.dto.ProductRequest;
 import com.hoangtien2k3.productcatalogservice.entity.Product;
 import com.hoangtien2k3.productcatalogservice.http.HeaderGenerator;
 import com.hoangtien2k3.productcatalogservice.service.ProductService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
