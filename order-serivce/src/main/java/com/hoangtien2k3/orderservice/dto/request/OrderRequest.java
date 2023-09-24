@@ -1,5 +1,6 @@
-package com.hoangtien2k3.orderservice.dto;
+package com.hoangtien2k3.orderservice.dto.request;
 
+import com.hoangtien2k3.orderservice.dto.OrderLineItemsDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.hoangtien2k3</groupId>
-	<artifactId>discovery-server</artifactId>
+	<artifactId>api-gateway</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>discovery-server</name>
-	<description>Discovery Server</description>
+	<name>api-gateway</name>
+	<description>API Gateway</description>
 	<properties>
 		<java.version>17</java.version>
 		<spring-cloud.version>2021.0.8</spring-cloud.version>
@@ -20,7 +20,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+			<artifactId>spring-cloud-starter-gateway</artifactId>
 		</dependency>
 
 		<dependency>

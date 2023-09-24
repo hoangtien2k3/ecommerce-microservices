@@ -1,8 +1,8 @@
 package com.hoangtien2k3.orderservice.service;
 
-import com.hoangtien2k3.orderservice.dto.InventoryResponse;
+import com.hoangtien2k3.orderservice.dto.response.InventoryResponse;
 import com.hoangtien2k3.orderservice.dto.OrderLineItemsDto;
-import com.hoangtien2k3.orderservice.dto.OrderRequest;
+import com.hoangtien2k3.orderservice.dto.request.OrderRequest;
 import com.hoangtien2k3.orderservice.model.Order;
 import com.hoangtien2k3.orderservice.model.OrderLineItems;
 import com.hoangtien2k3.orderservice.repository.OrderRepository;
@@ -33,7 +33,6 @@ public class OrderService {
                 .stream()
                 .map(this::mapToDto)
                 .toList();
-
         order.setOrderLineItemsList(orderLineItems);
 
         List<String> skuCodes = order.getOrderLineItemsList()
@@ -41,8 +40,7 @@ public class OrderService {
                 .map(OrderLineItems::getSkuCode)
                 .toList();
 
-        // Call inventory-service, and place order if product is in
-        // stock
+        // Call inventory-service, and place order if product is in // stock
         InventoryResponse[] inventoryResponsesArray = webClient.get()
                 .uri("http://localhost:8083/api/inventory",
                         uriBuilder -> uriBuilder.queryParam("skuCode", skuCodes).build())
