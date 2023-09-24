@@ -22,7 +22,6 @@ public class Order {
     private Long id;
 
     @Column(name = "orderNumber")
-    @NotBlank
     private String orderNumber;
 
     @OneToMany(cascade = CascadeType.ALL)

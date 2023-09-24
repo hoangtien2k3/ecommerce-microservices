@@ -23,19 +23,15 @@ public class OrderLineItems {
     private Long id;
 
     @Column(name = "orderNumber")
-    @NotBlank
     private String orderNumber;
 
     @Column(name = "skuCode")
-    @NotBlank
     private String skuCode;
 
     @Column(name = "price")
-    @NotBlank
     private BigDecimal price;
 
     @Column(name = "quantity")
-    @NotBlank
     private Integer quantity;
 
 }
