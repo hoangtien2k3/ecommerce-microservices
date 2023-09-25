@@ -1,10 +1,10 @@
 package com.hoangtien2k3.orderservice.service;
 
 import com.hoangtien2k3.orderservice.dto.response.InventoryResponse;
-import com.hoangtien2k3.orderservice.dto.OrderLineItemsDto;
+import com.hoangtien2k3.orderservice.dto.OrderItemsDto;
 import com.hoangtien2k3.orderservice.dto.request.OrderRequest;
 import com.hoangtien2k3.orderservice.model.Order;
-import com.hoangtien2k3.orderservice.model.OrderLineItems;
+import com.hoangtien2k3.orderservice.model.OrderItems;
 import com.hoangtien2k3.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,25 +29,29 @@ public class OrderService {
         Order order = new Order();
         order.setOrderNumber(UUID.randomUUID().toString());
 
-        List<OrderLineItems> orderLineItems = orderRequest.getOrderLineItemsDtoList()
+        List<OrderItems> orderItems = orderRequest
+                .getOrderItemsDtoList()
                 .stream()
-                .map(this::mapToDto)
+                .map(this::mapToOrderItemsDto)
                 .toList();
-        order.setOrderLineItemsList(orderLineItems);
+        order.setOrderItemsList(orderItems);
 
-        List<String> skuCodes = order.getOrderLineItemsList()
+        List<String> productNameList = order.getOrderItemsList()
                 .stream()
-                .map(OrderLineItems::getSkuCode)
+                .map(OrderItems::getProductName)
                 .toList();
+
 
         // Call inventory-service, and place order if product is in // stock
+        // TODO: Add token
         InventoryResponse[] inventoryResponsesArray = webClient.get()
                 .uri("http://localhost:8083/api/inventory",
-                        uriBuilder -> uriBuilder.queryParam("skuCode", skuCodes).build())
+                        uriBuilder -> uriBuilder.queryParam("productName", productNameList).build())
                 .retrieve()
                 .bodyToMono(InventoryResponse[].class)
                 .block();
 
+        assert inventoryResponsesArray != null;
         boolean allProductsInStock = Arrays.stream(inventoryResponsesArray)
                 .allMatch(InventoryResponse::isInStock);
 
@@ -55,16 +59,16 @@ public class OrderService {
             orderRepository.save(order);
         } else {
             // hết hàng
-            throw new IllegalArgumentException("Product is not in stock, please try again later");
+            throw new IllegalArgumentException("Product is not in store, try again!");
         }
 
     }
 
-    private OrderLineItems mapToDto(OrderLineItemsDto orderLineItemsDto) {
-        OrderLineItems orderLineItems = new OrderLineItems();
+    private OrderItems mapToOrderItemsDto(OrderItemsDto orderLineItemsDto) {
+        OrderItems orderLineItems = new OrderItems();
         orderLineItems.setPrice(orderLineItemsDto.getPrice());
         orderLineItems.setQuantity(orderLineItems.getQuantity());
-        orderLineItems.setSkuCode(orderLineItems.getSkuCode());
+        orderLineItems.setProductName(orderLineItems.getProductName());
         return orderLineItems;
     }
 

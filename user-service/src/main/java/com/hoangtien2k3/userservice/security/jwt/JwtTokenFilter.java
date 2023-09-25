@@ -34,6 +34,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
             // lấy ra token trong request
             String token = getJwt(request);
+            // Or secretkey
             if (token != null && jwtProvider.validateToken(token)) {
                 String username = jwtProvider.getUserNameFromToken(token);
                 UserDetails userDetails = userDetailService.loadUserByUsername(username);

@@ -50,7 +50,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         authenticationManagerBuilder
                 .userDetailsService(userDetailService)
                 .passwordEncoder(passwordEncoder());
-
     }
 
     @Override

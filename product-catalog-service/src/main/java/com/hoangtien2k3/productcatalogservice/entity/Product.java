@@ -30,6 +30,7 @@ public class Product {
     private BigDecimal price;
 
     @Column (name = "description")
+    @NotNull
     private String description;
 
     @Column (name = "category")

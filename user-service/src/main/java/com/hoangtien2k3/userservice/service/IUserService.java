@@ -8,5 +8,7 @@ public interface IUserService {
     Optional<User> findByUsername(String name);
     Boolean existsByUsername(String username);
     Boolean existsByEmail(String email);
+    User getUserByUsername(String username);
     User save(User user);
+
 }

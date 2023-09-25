@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Getter
@@ -25,7 +24,7 @@ public class Order {
     private String orderNumber;
 
     @OneToMany(cascade = CascadeType.ALL)
-    @Column(name = "orderLineItemsList")
-    private List<OrderLineItems> orderLineItemsList;
+    @Column(name = "orderItemsList")
+    private List<OrderItems> orderItemsList;
 
 }

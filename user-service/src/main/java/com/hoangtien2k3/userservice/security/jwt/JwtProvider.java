@@ -18,9 +18,9 @@ public class JwtProvider {
     // ghi log
     private static final Logger logger = LoggerFactory.getLogger(JwtProvider.class);
 
-    @Value("${jwt.secret}")  // thời gian sống của Token
+    @Value("${jwt.secret}")  // Khóa bí mật, token sẽ được mã hóa với khóa này
     private String jwtSecret;
-    @Value("${jwt.expiration}") // thời gian chết trên hệ thống
+    @Value("${jwt.expiration}") // Thời gian hiệu lực của token
     private int jwtExpiration;
 
 
