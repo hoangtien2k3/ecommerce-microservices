@@ -25,9 +25,11 @@ public class OrderService {
     @Autowired
     private final WebClient webClient;
 
+
     public void placeOrder(OrderRequest orderRequest) {
         Order order = new Order();
-        order.setOrderNumber(UUID.randomUUID().toString());
+        // tạo ra một chuỗi UUID ngẫu nhiên: Ví dụ: 54947df8-0e9e-4471-a2f9-9af509fb58892
+        order.setOrderNumber(UUID.randomUUID().toString().replace("-", ""));
 
         List<OrderItems> orderItems = orderRequest
                 .getOrderItemsDtoList()
@@ -47,9 +49,10 @@ public class OrderService {
         InventoryResponse[] inventoryResponsesArray = webClient.get()
                 .uri("http://localhost:8083/api/inventory",
                         uriBuilder -> uriBuilder.queryParam("productName", productNameList).build())
-                .retrieve()
-                .bodyToMono(InventoryResponse[].class)
-                .block();
+                .retrieve() // sen request and return response
+                .bodyToMono(InventoryResponse[].class) // Chuyển đổi phần thân của phản hồi thành một Mono của mảng InventoryResponse.
+                .block();   // Đợi cho Mono hoàn thành và trả về giá trị của nó.
+
 
         assert inventoryResponsesArray != null;
         boolean allProductsInStock = Arrays.stream(inventoryResponsesArray)

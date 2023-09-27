@@ -7,6 +7,6 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class InventoryResponse {
-    private String skuCode;
+    private String productName;
     private boolean isInStock;
 }

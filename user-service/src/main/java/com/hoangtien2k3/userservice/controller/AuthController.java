@@ -56,7 +56,10 @@ public class AuthController {
         }
 
         if (userService.existsByEmail(signUpFrom.getEmail())) {
-            return new ResponseEntity<>(new ResponseMessage("The email " + signUpFrom.getEmail() + " is existed, please try again."), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(
+                    new ResponseMessage("The email " + signUpFrom.getEmail() + " is existed, please try again."),
+                    HttpStatus.BAD_REQUEST
+            );
         }
 
         Set<Role> roles = new HashSet<>();
@@ -109,14 +112,21 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(signUpFrom.getUsername(), signUpFrom.getPassword())
         );
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        SecurityContextHolder
+                .getContext()
+                .setAuthentication(authentication);
 
         // generate token by authentication
         String token = jwtProvider.createToken(authentication);
 
         UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
 
-        return ResponseEntity.ok(new JwtResponse(token, userPrinciple.getId(), userPrinciple.getName(), userPrinciple.getAuthorities()));
+        return ResponseEntity.ok(new JwtResponse(
+                token,
+                userPrinciple.getId(),
+                userPrinciple.getName(),
+                userPrinciple.getAuthorities())
+        );
     }
 
 }
