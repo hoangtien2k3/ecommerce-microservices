@@ -77,6 +77,9 @@ public class OrderService {
             // Xử lý lỗi nếu có lỗi từ API
             throw new RuntimeException("Failed to call inventory service. Status code: " + responseEntity.getStatusCode());
         }
+
+        orderRepository.save(order);
+
     }
 
     private OrderItems mapToOrderItemsDto(OrderItemsDto orderLineItemsDto) {

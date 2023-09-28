@@ -16,7 +16,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/order/**").authenticated() // Các API của order-service yêu cầu xác thực
+                //.antMatchers("/api/order/**").authenticated() // Các API của order-service yêu cầu xác thực
                 .anyRequest().permitAll(); // Các API khác không yêu cầu xác thực
 
         // Thêm bộ lọc để xác thực token

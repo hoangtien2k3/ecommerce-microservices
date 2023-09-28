@@ -1,5 +1,6 @@
 package com.hoangtien2k3.userservice.controller;
 
+import com.hoangtien2k3.userservice.dto.model.TokenManager;
 import com.hoangtien2k3.userservice.dto.request.SignUpFrom;
 import com.hoangtien2k3.userservice.dto.response.JwtResponse;
 import com.hoangtien2k3.userservice.dto.response.ResponseMessage;
@@ -45,6 +46,8 @@ public class AuthController {
     @Autowired
     private JwtProvider jwtProvider;
 
+    @Autowired
+    private TokenManager tokenManager;
 
     @PostMapping("/signup")
     public ResponseEntity<?> register(@Valid @RequestBody SignUpFrom signUpFrom) {
@@ -54,7 +57,6 @@ public class AuthController {
                     HttpStatus.BAD_REQUEST
             );
         }
-
         if (userService.existsByEmail(signUpFrom.getEmail())) {
             return new ResponseEntity<>(
                     new ResponseMessage("The email " + signUpFrom.getEmail() + " is existed, please try again."),
@@ -120,6 +122,9 @@ public class AuthController {
         String token = jwtProvider.createToken(authentication);
 
         UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
+
+        // Lưu trữ tên người dùng và token bằng TokenManager
+        tokenManager.storeToken(userPrinciple.getUsername(), token);
 
         return ResponseEntity.ok(new JwtResponse(
                 token,

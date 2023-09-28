@@ -24,12 +24,12 @@ public class HeaderGenerator {
 
     public HttpHeaders getHeadersForSuccessPostMethod(HttpServletRequest request, Long newResourceId) {
         HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("Content-Type", "application/json; charset=UTF-8");
         try {
             httpHeaders.setLocation(new URI(request.getRequestURI() + "/" + newResourceId));
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        httpHeaders.add("Content-Type", "application/json; charset=UTF-8");
         return httpHeaders;
     }
 

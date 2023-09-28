@@ -16,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.reactive.function.client.WebClient;
 
 
 @Configuration
@@ -32,6 +33,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public JwtTokenFilter jwtTokenFilter() {
         return new JwtTokenFilter();
+    }
+
+    @Bean
+    public WebClient.Builder webClientBuilder() {
+        return WebClient.builder();
     }
 
     @Bean
@@ -59,7 +65,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .cors() // Cross-Origin Resource Sharing (CORS): cho phép các yêu cầu từ các nguồn khác nhau được gửi đến ứng dụng web
                 .and()
                 .csrf().disable()  // Vô hiệu hóa CSRF (Cross-Site Request Forgery)
-                .authorizeRequests().antMatchers("/api/auth/**").permitAll() // Cho phép tất cả các yêu cầu tới /api/auth/** được truy cập mà không cần xác thực.
+                .authorizeRequests()
+                .antMatchers("/api/auth/**").permitAll() // Cho phép tất cả các yêu cầu tới /api/auth/** được truy cập mà không cần xác thực.
+                .antMatchers("/api/manager/token").permitAll()
                 .anyRequest().authenticated()   // Yêu cầu tất cả các yêu cầu khác phải được xác thực.
                 .and()
                 .exceptionHandling().authenticationEntryPoint(jwtEntryPoint) // Xử lý các ngoại lệ liên quan đến xác thực và ủy quyền.
