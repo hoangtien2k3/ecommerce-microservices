@@ -6,9 +6,12 @@ import com.hoangtien2k3.orderservice.dto.request.OrderRequest;
 import com.hoangtien2k3.orderservice.model.Order;
 import com.hoangtien2k3.orderservice.model.OrderItems;
 import com.hoangtien2k3.orderservice.repository.OrderRepository;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Arrays;
@@ -16,19 +19,18 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class OrderService {
 
     @Autowired
     private final OrderRepository orderRepository;
 
     @Autowired
-    private final WebClient webClient;
+    private final RestTemplate restTemplate; // Sử dụng RestTemplate
 
-
-    public void placeOrder(OrderRequest orderRequest) {
+    // Phương thức này thực hiện cuộc gọi tới inventory-service với token
+    public void placeOrderWithToken(OrderRequest orderRequest, String token) {
         Order order = new Order();
-        // tạo ra một chuỗi UUID ngẫu nhiên: Ví dụ: 54947df8-0e9e-4471-a2f9-9af509fb58892
         order.setOrderNumber(UUID.randomUUID().toString().replace("-", ""));
 
         List<OrderItems> orderItems = orderRequest
@@ -43,28 +45,38 @@ public class OrderService {
                 .map(OrderItems::getProductName)
                 .toList();
 
+        // Tạo HttpHeaders và thêm token vào
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + token); // Sử dụng token ở đây
 
-        // Call inventory-service, and place order if product is in // stock
-        // TODO: Add token
-        InventoryResponse[] inventoryResponsesArray = webClient.get()
-                .uri("http://localhost:8083/api/inventory",
-                        uriBuilder -> uriBuilder.queryParam("productName", productNameList).build())
-                .retrieve() // sen request and return response
-                .bodyToMono(InventoryResponse[].class) // Chuyển đổi phần thân của phản hồi thành một Mono của mảng InventoryResponse.
-                .block();   // Đợi cho Mono hoàn thành và trả về giá trị của nó.
+        // Tạo HttpEntity với các headers
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
+        // Gọi API từ inventory-service
+        ResponseEntity<InventoryResponse[]> responseEntity = restTemplate.exchange(
+                "http://localhost:8083/api/inventory",
+                HttpMethod.GET, // Hoặc POST, PUT tùy vào yêu cầu của inventory-service
+                requestEntity,
+                InventoryResponse[].class
+        );
 
-        assert inventoryResponsesArray != null;
-        boolean allProductsInStock = Arrays.stream(inventoryResponsesArray)
-                .allMatch(InventoryResponse::isInStock);
+        // Kiểm tra phản hồi từ API
+        if (responseEntity.getStatusCode() == HttpStatus.OK) {
+            InventoryResponse[] inventoryResponsesArray = responseEntity.getBody();
+            assert inventoryResponsesArray != null;
+            boolean allProductsInStock = Arrays.stream(inventoryResponsesArray)
+                    .allMatch(InventoryResponse::isInStock);
 
-        if (allProductsInStock) {
-            orderRepository.save(order);
+            if (allProductsInStock) {
+                orderRepository.save(order);
+            } else {
+                // Hết hàng
+                throw new IllegalArgumentException("Product is not in store, try again!");
+            }
         } else {
-            // hết hàng
-            throw new IllegalArgumentException("Product is not in store, try again!");
+            // Xử lý lỗi nếu có lỗi từ API
+            throw new RuntimeException("Failed to call inventory service. Status code: " + responseEntity.getStatusCode());
         }
-
     }
 
     private OrderItems mapToOrderItemsDto(OrderItemsDto orderLineItemsDto) {
@@ -74,5 +86,4 @@ public class OrderService {
         orderLineItems.setProductName(orderLineItems.getProductName());
         return orderLineItems;
     }
-
 }

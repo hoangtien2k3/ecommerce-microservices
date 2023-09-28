@@ -3,6 +3,7 @@ package com.hoangtien2k3.orderservice.config;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
@@ -15,9 +16,14 @@ public class WebClientConfig {
     */
 
     // sử dụng WebClient từ Spring WebFlux từ Spring 5 trở lên
+//    @Bean
+//    public WebClient webClient() {
+//        return WebClient.builder().build();
+//    }
+
     @Bean
-    public WebClient webClient() {
-        return WebClient.builder().build();
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 
 }
