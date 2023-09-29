@@ -69,25 +69,31 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>5.3.30</version>
+		</dependency>
+
+		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
-			<version>0.11.5</version> <!-- Phiên bản có thể thay đổi -->
+			<version>0.11.5</version>
 		</dependency>
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-impl</artifactId>
-			<version>0.11.5</version> <!-- Phiên bản có thể thay đổi -->
+			<version>0.11.5</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-jackson</artifactId>
-			<version>0.11.5</version> <!-- Phiên bản có thể thay đổi -->
+			<version>0.11.5</version>
 			<scope>runtime</scope>
 		</dependency>
 
-
 	</dependencies>
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>

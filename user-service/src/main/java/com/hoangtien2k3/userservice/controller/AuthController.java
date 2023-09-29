@@ -2,6 +2,8 @@ package com.hoangtien2k3.userservice.controller;
 
 import com.hoangtien2k3.userservice.dto.model.TokenManager;
 import com.hoangtien2k3.userservice.dto.request.SignUpFrom;
+import com.hoangtien2k3.userservice.dto.request.TokenValidationRequest;
+import com.hoangtien2k3.userservice.dto.request.TokenValidationResponse;
 import com.hoangtien2k3.userservice.dto.response.JwtResponse;
 import com.hoangtien2k3.userservice.dto.response.ResponseMessage;
 import com.hoangtien2k3.userservice.entity.Role;
@@ -9,6 +11,7 @@ import com.hoangtien2k3.userservice.entity.RoleName;
 import com.hoangtien2k3.userservice.entity.User;
 import com.hoangtien2k3.userservice.security.jwt.JwtProvider;
 import com.hoangtien2k3.userservice.security.userprinciple.UserPrinciple;
+import com.hoangtien2k3.userservice.service.TokenValidationService;
 import com.hoangtien2k3.userservice.service.impl.RoleServiceImpl;
 import com.hoangtien2k3.userservice.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +51,9 @@ public class AuthController {
 
     @Autowired
     private TokenManager tokenManager;
+
+    @Autowired
+    private TokenValidationService tokenValidationService;
 
     @PostMapping("/signup")
     public ResponseEntity<?> register(@Valid @RequestBody SignUpFrom signUpFrom) {
@@ -132,6 +138,22 @@ public class AuthController {
                 userPrinciple.getName(),
                 userPrinciple.getAuthorities())
         );
+    }
+
+
+    @PostMapping("/validateToken")
+    public ResponseEntity<?> validateToken(@RequestBody TokenValidationRequest validationRequest) {
+        String accessToken = validationRequest.getAccessToken();
+
+        boolean isValid = tokenValidationService.validateToken(accessToken);
+
+        if (isValid) {
+            // Token hợp lệ, có thể thực hiện các xử lý hoặc trả về thông báo thành công
+            return ResponseEntity.ok(new TokenValidationResponse("Valid token"));
+        } else {
+            // Token không hợp lệ hoặc hết hạn
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new TokenValidationResponse("Invalid token"));
+        }
     }
 
 }

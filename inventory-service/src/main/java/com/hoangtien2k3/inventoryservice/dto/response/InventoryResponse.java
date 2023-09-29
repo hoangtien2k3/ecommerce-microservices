@@ -1,4 +1,4 @@
-package com.hoangtien2k3.inventoryservice.dto;
+package com.hoangtien2k3.inventoryservice.dto.response;
 
 import lombok.*;
 
