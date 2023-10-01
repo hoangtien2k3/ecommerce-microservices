@@ -1,4 +1,4 @@
-package com.hoangtien2k3.productservice.domain;
+package com.hoangtien2k3.productservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
@@ -11,6 +11,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -19,6 +20,7 @@ import java.time.Instant;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Data
 public abstract class AbstractMappedEntity implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @CreatedDate

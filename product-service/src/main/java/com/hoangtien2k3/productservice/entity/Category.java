@@ -1,9 +1,10 @@
-package com.hoangtien2k3.productservice.domain;
+package com.hoangtien2k3.productservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Set;
 
@@ -15,6 +16,7 @@ import java.util.Set;
 @Entity
 @Table(name = "categories")
 public final class Category extends AbstractMappedEntity implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id

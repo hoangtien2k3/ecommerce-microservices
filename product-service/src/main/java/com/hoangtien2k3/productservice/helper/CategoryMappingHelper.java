@@ -1,6 +1,6 @@
 package com.hoangtien2k3.productservice.helper;
 
-import com.hoangtien2k3.productservice.domain.Category;
+import com.hoangtien2k3.productservice.entity.Category;
 import com.hoangtien2k3.productservice.dto.CategoryDto;
 
 import java.util.Optional;
