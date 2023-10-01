@@ -43,6 +43,7 @@ public class UserServiceImpl implements IUserService {
         UserServiceImpl.tokenManager = tokenManager;
     }
 
+    @Override
     public Mono<User> registerUser(SignUpForm signUpForm) {
         return Mono.defer(() -> {
             if (existsByUsername(signUpForm.getUsername())) {
@@ -92,6 +93,7 @@ public class UserServiceImpl implements IUserService {
         });
     }
 
+    @Override
     public Mono<JwtResponse> login(SignUpForm signUpFrom) {
         return Mono.defer(() -> {
             Authentication authentication = authenticationManager.authenticate(
