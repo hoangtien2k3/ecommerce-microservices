@@ -7,7 +7,7 @@ import java.util.Set;
 @Setter
 @Getter
 @RequiredArgsConstructor
-public class SignUpFrom {
+public class SignUpForm {
     private String name;
     private String username;
     private String email;
