@@ -1,5 +1,6 @@
 package com.hoangtien2k3.userservice.controller;
 
+import com.hoangtien2k3.userservice.dto.request.SignInForm;
 import com.hoangtien2k3.userservice.dto.request.SignUpForm;
 import com.hoangtien2k3.userservice.dto.request.TokenValidationRequest;
 import com.hoangtien2k3.userservice.dto.request.TokenValidationResponse;
@@ -33,13 +34,13 @@ public class AuthController {
     @PostMapping("/signup")
     public Mono<ResponseEntity<ResponseMessage>> register(@Valid @RequestBody SignUpForm signUpForm) {
         return userService.registerUser(signUpForm)
-                .map(user -> new ResponseEntity<>(new ResponseMessage("User: " + signUpForm.getUsername() + " create successfully."), HttpStatus.OK))
+                .flatMap(user -> Mono.just(new ResponseEntity<>(new ResponseMessage("User: " + signUpForm.getUsername() + " create successfully."), HttpStatus.OK)))
                 .onErrorResume(error -> Mono.just(new ResponseEntity<>(new ResponseMessage(error.getMessage()), HttpStatus.BAD_REQUEST)));
     }
 
     @PostMapping("/signin")
-    public Mono<ResponseEntity<JwtResponse>> login(@Valid @RequestBody SignUpForm signUpForm) {
-        return userService.login(signUpForm)
+    public Mono<ResponseEntity<JwtResponse>> login(@Valid @RequestBody SignInForm signInForm) {
+        return userService.login(signInForm)
                 .map(ResponseEntity::ok)
                 .onErrorResume(error -> {
                     JwtResponse errorResponse = new JwtResponse(null, null, null, null);
