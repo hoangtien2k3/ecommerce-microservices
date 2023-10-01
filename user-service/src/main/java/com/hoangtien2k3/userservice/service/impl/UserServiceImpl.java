@@ -23,8 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements IUserService {
@@ -45,7 +44,6 @@ public class UserServiceImpl implements IUserService {
         this.tokenManager = tokenManager;
         this.userDetailsService = userDetailsService;
     }
-
 
     // register user
     @Override
@@ -137,6 +135,10 @@ public class UserServiceImpl implements IUserService {
 
             return Mono.just(jwtResponse);
         });
+    }
+
+    public Optional<List<User>> getAllUsers() {
+        return Optional.ofNullable(userRepository.findAll());
     }
 
     public boolean existsByUsername(String username) {

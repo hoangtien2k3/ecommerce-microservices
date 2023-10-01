@@ -29,7 +29,15 @@ public class UserDetailService implements UserDetailsService {
     @Transactional
     public UserDetails loadUserByEmail(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found, email: " + email));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found, email and password: " + email));
+
+        return UserPrinciple.build(user);
+    }
+
+    @Transactional
+    public UserDetails loadUserByPhone(String phone) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(phone)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found, phone and password: " + phone));
 
         return UserPrinciple.build(user);
     }
