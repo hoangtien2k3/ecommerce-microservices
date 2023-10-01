@@ -14,6 +14,9 @@ import com.hoangtien2k3.userservice.security.userprinciple.UserDetailService;
 import com.hoangtien2k3.userservice.security.userprinciple.UserPrinciple;
 import com.hoangtien2k3.userservice.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -137,9 +140,18 @@ public class UserServiceImpl implements IUserService {
         });
     }
 
+    // get all user in list user
     public Optional<List<User>> getAllUsers() {
         return Optional.ofNullable(userRepository.findAll());
     }
+
+
+    // load user by page and size
+    public Page<User> getAllUsers(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return userRepository.findAll(pageable);
+    }
+
 
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
