@@ -50,7 +50,7 @@ public class PaymentServiceImpl implements PaymentService {
         return this.paymentRepository.findById(paymentId)
                 .map(PaymentMappingHelper::map)
                 .map(p -> {
-                    p.setOrderDto(this.restTemplate.getForObject(AppConstant.DiscoveredDomainsApi
+                    p.setOrderDto(restTemplate.getForObject(AppConstant.DiscoveredDomainsApi
                             .ORDER_SERVICE_API_URL + "/" + p.getOrderDto().getOrderId(), OrderDto.class));
                     return p;
                 })

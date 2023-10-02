@@ -1,6 +1,6 @@
 package com.hoangtien2k3.paymentservice.helper;
 
-import com.hoangtien2k3.paymentservice.domain.Payment;
+import com.hoangtien2k3.paymentservice.entity.Payment;
 import com.hoangtien2k3.paymentservice.dto.OrderDto;
 import com.hoangtien2k3.paymentservice.dto.PaymentDto;
 

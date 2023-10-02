@@ -2,7 +2,7 @@ package com.hoangtien2k3.paymentservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.hoangtien2k3.paymentservice.domain.PaymentStatus;
+import com.hoangtien2k3.paymentservice.entity.PaymentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

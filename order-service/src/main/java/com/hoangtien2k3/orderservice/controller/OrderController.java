@@ -1,64 +1,73 @@
 package com.hoangtien2k3.orderservice.controller;
 
-import com.hoangtien2k3.orderservice.dto.request.OrderRequest;
-import com.hoangtien2k3.orderservice.dto.response.LoginResponse;
-import com.hoangtien2k3.orderservice.dto.response.MessageResponse;
+import com.hoangtien2k3.orderservice.dto.OrderDto;
+import com.hoangtien2k3.orderservice.dto.response.collection.DtoCollectionResponse;
 import com.hoangtien2k3.orderservice.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
+@Slf4j
+@RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/order")
+@RequestMapping("/api/orders")
 public class OrderController {
 
-    @Value("${user.service.url}") // URL máy chủ user-service
-    private String userServiceUrl;
-
     @Autowired
-    private OrderService orderService;
+    private final OrderService orderService;
 
-    @Autowired
-    private RestTemplate restTemplate; // Inject RestTemplate
+    @GetMapping
+    public ResponseEntity<DtoCollectionResponse<OrderDto>> findAll() {
+        log.info("OrderDto List, controller; fetch all orders");
+        return ResponseEntity.ok(new DtoCollectionResponse<>(this.orderService.findAll()));
+    }
+
+    @GetMapping("/{orderId}")
+    public ResponseEntity<OrderDto> findById(@PathVariable("orderId")
+                                             @NotBlank(message = "Input must not be blank")
+                                             @Valid final String orderId) {
+        log.info("OrderDto, resource; fetch order by id");
+        return ResponseEntity.ok(this.orderService.findById(Integer.parseInt(orderId)));
+    }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public String placeOrder(@RequestBody OrderRequest orderRequest,
-                             @RequestHeader("Authorization") String authorizationHeader) {
-
-        // Gửi yêu cầu đăng nhập và lấy token từ user-service
-        HttpHeaders loginHeaders = new HttpHeaders();
-        loginHeaders.add("Authorization", authorizationHeader);
-
-        // Thêm các header khác nếu cần
-        HttpEntity<String> loginRequestEntity = new HttpEntity<>(loginHeaders);
-
-        ResponseEntity<LoginResponse> loginResponseEntity = restTemplate.exchange(
-                userServiceUrl + "/api/auth/signin",
-                HttpMethod.POST,
-                loginRequestEntity,
-                LoginResponse.class
-        );
-
-        // Xử lý kết quả từ responseEntity
-        LoginResponse loginResponse = loginResponseEntity.getBody();
-
-        // Kiểm tra xem cuộc gọi đăng nhập đã thành công hay không và bạn có thể sử dụng token được trả về
-        if (loginResponseEntity.getStatusCode() == HttpStatus.OK && loginResponse != null) {
-            String token = loginResponse.getToken();
-
-            // Tiếp tục với việc gọi orderService và truyền token
-            orderService.placeOrderWithToken(orderRequest, token);
-
-            return "Order Placed Successfully";
-        } else {
-            // Xử lý lỗi khi không thể đăng nhập và lấy token
-            throw new RuntimeException("Failed to obtain access token from user-service");
-        }
+    public ResponseEntity<OrderDto> save(@RequestBody
+                                         @NotNull(message = "Input must not be NULL")
+                                         @Valid final OrderDto orderDto) {
+        log.info("OrderDto, resource; save order");
+        return ResponseEntity.ok(this.orderService.save(orderDto));
     }
+
+    @PutMapping
+    public ResponseEntity<OrderDto> update(@RequestBody
+                                           @NotNull(message = "Input must not be NULL")
+                                           @Valid final OrderDto orderDto) {
+        log.info("OrderDto, resource; update order");
+        return ResponseEntity.ok(this.orderService.update(orderDto));
+    }
+
+    @PutMapping("/{orderId}")
+    public ResponseEntity<OrderDto> update(@PathVariable("orderId")
+                                           @NotBlank(message = "Input must not be blank")
+                                           @Valid final String orderId,
+                                           @RequestBody
+                                           @NotNull(message = "Input must not be NULL")
+                                           @Valid final OrderDto orderDto) {
+        log.info("OrderDto, resource; update order with orderId");
+        return ResponseEntity.ok(this.orderService.update(Integer.parseInt(orderId), orderDto));
+    }
+
+    @DeleteMapping("/{orderId}")
+    public ResponseEntity<Boolean> deleteById(@PathVariable("orderId") final String orderId) {
+        log.info("Boolean, resource; delete order by id");
+        this.orderService.deleteById(Integer.parseInt(orderId));
+        return ResponseEntity.ok(true);
+    }
+
 }
