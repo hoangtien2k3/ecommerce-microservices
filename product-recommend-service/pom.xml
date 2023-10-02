@@ -50,7 +50,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/io.specto/hoverfly-java -->
 		<dependency>
 			<groupId>io.specto</groupId>
 			<artifactId>hoverfly-java</artifactId>
@@ -58,13 +57,11 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-openfeign -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
 			<version>4.0.4</version>
 		</dependency>
-
 
 	</dependencies>
 

@@ -35,7 +35,7 @@ public class OrderItemServiceImpl implements OrderItemService {
 
     @Override
     public List<OrderItemDto> findAll() {
-        log.info("*** OrderItemDto List, service; fetch all orderItems *");
+        log.info("OrderItemDto List, service; fetch all orderItems");
         return this.orderItemRepository.findAll()
                 .stream()
                 .map(OrderItemMappingHelper::map)

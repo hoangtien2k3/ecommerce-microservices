@@ -3,19 +3,21 @@ package com.hoangtien2k3.productservice.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
-import javax.persistence.*;
+//import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true, exclude = {"subCategories", "parentCategory", "products"})
 @Data
 @Builder
-@EqualsAndHashCode(callSuper = true, exclude = {"subCategories", "parentCategory", "products"})
 @Entity
 @Table(name = "categories")
 public final class Category extends AbstractMappedEntity implements Serializable {
+
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -34,7 +36,7 @@ public final class Category extends AbstractMappedEntity implements Serializable
     @OneToMany(mappedBy = "parentCategory", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Category> subCategories;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parent_category_id")
     private Category parentCategory;
 

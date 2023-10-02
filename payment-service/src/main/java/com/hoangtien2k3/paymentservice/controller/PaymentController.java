@@ -36,6 +36,7 @@ public class PaymentController {
         return ResponseEntity.ok(this.paymentService.findById(Integer.parseInt(paymentId)));
     }
 
+
     @PostMapping
     public ResponseEntity<PaymentDto> save(@RequestBody
                                            @NotNull(message = "Input must not be NULL")

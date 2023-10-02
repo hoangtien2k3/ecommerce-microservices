@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 
@@ -20,6 +21,7 @@ import java.time.ZonedDateTime;
 @Data
 @Builder
 public class ExceptionMessage implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     //  được sử dụng để chỉ định cách một trường hoặc thuộc tính của một đối tượng Java sẽ được chuyển đổi thành JSON khi sử dụng thư viện Jackson

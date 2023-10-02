@@ -1,5 +1,8 @@
 package com.hoangtien2k3.userservice.dto.request;
 
+import lombok.Getter;
+
+@Getter
 public class TokenValidationRequest {
     private String accessToken;
 
@@ -8,10 +11,6 @@ public class TokenValidationRequest {
 
     public TokenValidationRequest(String accessToken) {
         this.accessToken = accessToken;
-    }
-
-    public String getAccessToken() {
-        return accessToken;
     }
 
     public void setAccessToken(String accessToken) {

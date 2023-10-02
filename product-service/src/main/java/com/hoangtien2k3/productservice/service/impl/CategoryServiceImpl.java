@@ -5,12 +5,15 @@ import com.hoangtien2k3.productservice.exception.wrapper.CategoryNotFoundExcepti
 import com.hoangtien2k3.productservice.helper.CategoryMappingHelper;
 import com.hoangtien2k3.productservice.repository.CategoryRepository;
 import com.hoangtien2k3.productservice.service.CategoryService;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+//import jakarta.transaction.Transactional;
+//import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,8 +32,8 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.findAll()
                 .stream()
                 .map(CategoryMappingHelper::map)
-                .distinct() // loại bỏ phần tử trùng lặp (phần tử duy nhất)
-                .toList();
+                .distinct()
+                .collect(Collectors.toUnmodifiableList());
     }
 
     @Override

@@ -8,6 +8,7 @@ import com.hoangtien2k3.productrecommentservice.model.Recommend;
 import com.hoangtien2k3.productrecommentservice.model.User;
 import com.hoangtien2k3.productrecommentservice.service.RecommentService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
