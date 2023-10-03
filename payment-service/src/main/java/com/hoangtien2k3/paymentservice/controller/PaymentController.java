@@ -32,7 +32,7 @@ public class PaymentController {
     public ResponseEntity<PaymentDto> findById(@PathVariable("paymentId")
                                                @NotBlank(message = "Input must not be blank")
                                                @Valid final String paymentId) {
-        log.info("*** PaymentDto, resource; fetch payment by id *");
+        log.info("PaymentDto, resource; fetch payment by id");
         return ResponseEntity.ok(this.paymentService.findById(Integer.parseInt(paymentId)));
     }
 

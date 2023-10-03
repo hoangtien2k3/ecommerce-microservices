@@ -25,7 +25,7 @@ public class ApiExceptionHandler {
     })
     public <T extends BindException> ResponseEntity<ExceptionMessage> handleValidationException(final T e) {
 
-        log.info("**ApiExceptionHandler controller, handle validation exception*\n");
+        log.info("ApiExceptionHandler controller, handle validation exception\n");
         final var badRequest = HttpStatus.BAD_REQUEST;
 
         return new ResponseEntity<>(
@@ -43,15 +43,16 @@ public class ApiExceptionHandler {
     })
     public <T extends RuntimeException> ResponseEntity<ExceptionMessage> handleApiRequestException(final T e) {
 
-        log.info("**ApiExceptionHandler controller, handle API request*\n");
+        log.info("ApiExceptionHandler controller, handle API request\n");
         final var badRequest = HttpStatus.BAD_REQUEST;
 
         return new ResponseEntity<>(
                 ExceptionMessage.builder()
-                        .message("#### " + e.getMessage() + "! ####")
+                        .message("#### " + e.getMessage() + " ####")
                         .httpStatus(badRequest)
                         .timestamp(ZonedDateTime
                                 .now(ZoneId.systemDefault()))
                         .build(), badRequest);
     }
+
 }
