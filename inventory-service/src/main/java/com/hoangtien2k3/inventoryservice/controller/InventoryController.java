@@ -2,6 +2,7 @@ package com.hoangtien2k3.inventoryservice.controller;
 
 import com.hoangtien2k3.inventoryservice.dto.response.InventoryResponse;
 import com.hoangtien2k3.inventoryservice.exception.UnauthorizedException;
+import com.hoangtien2k3.inventoryservice.security.JwtUtil;
 import com.hoangtien2k3.inventoryservice.service.InventoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,19 +50,26 @@ public class InventoryController {
         // Sử dụng JWT từ tiêu đề "Authorization" của yêu cầu gọi API
         String jwtToken = authorizationHeader.replace("Bearer ", "");
 
-        // Sử dụng JWT trong tiêu đề của yêu cầu gọi API
-        String apiEndpoint = userServiceBaseUrl + "/api/manager"; // URL của API trong user-service
-        String response = webClientBuilder.baseUrl(apiEndpoint)
-                .build()
-                .get()
-                .uri("/token")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken)
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+        // Kiểm tra tính hợp lệ của token trước khi gọi API
+        if (JwtUtil.validateToken(jwtToken)) {
+            // Token hợp lệ, tiếp tục gọi API từ user-service
+            String apiEndpoint = userServiceBaseUrl + "/api/manager"; // URL của API trong user-service
+            String response = webClientBuilder.baseUrl(apiEndpoint)
+                    .build()
+                    .get()
+                    .uri("/token")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
 
-        return response;
+            return response;
+        } else {
+            // Token không hợp lệ, trả về lỗi hoặc xử lý khác
+            return "Unauthorized access";
+        }
     }
+
 
 
     @GetMapping("/list")
