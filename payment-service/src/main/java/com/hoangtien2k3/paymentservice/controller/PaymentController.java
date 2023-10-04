@@ -8,10 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -26,6 +28,27 @@ public class PaymentController {
     public ResponseEntity<DtoCollectionResponse<PaymentDto>> findAll() {
         log.info("PaymentDto List, controller; fetch all payments");
         return ResponseEntity.ok(new DtoCollectionResponse<>(this.paymentService.findAll()));
+    }
+
+//    @GetMapping
+//    public ResponseEntity<DtoCollectionResponse<PaymentDto>> findAll() {
+//        log.info("PaymentDto List, controller; fetch all payments");
+//
+//        // Gọi phương thức findAll() từ PaymentService để lấy danh sách PaymentDto
+//        List<PaymentDto> paymentDtos = this.paymentService.findAll();
+//
+//        // Trả về danh sách PaymentDto trong ResponseEntity
+//        return ResponseEntity.ok(new DtoCollectionResponse<>(paymentDtos));
+//    }
+
+    @GetMapping("/inventory-test")
+    @ResponseBody
+    public Mono<ResponseEntity<List<String>>> callServiceB() {
+        String serviceBUrl = "http://localhost:8083/api/inventory?productName=iphone_13,iphone_13_red";
+
+        return paymentService.callServiceB(serviceBUrl)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{paymentId}")
@@ -59,5 +82,15 @@ public class PaymentController {
         this.paymentService.deleteById(Integer.parseInt(paymentId));
         return ResponseEntity.ok(true);
     }
+
+//    @GetMapping("/webclient/{id}")
+//    public Mono<User> getUserUsingWebClient(@PathVariable Long id) {
+//        return webClientBuilder
+//                .build()
+//                .get()
+//                .uri("http://localhost:8080/api/user/{id}", id)
+//                .retrieve()
+//                .bodyToMono(User.class);
+//    }
 
 }
