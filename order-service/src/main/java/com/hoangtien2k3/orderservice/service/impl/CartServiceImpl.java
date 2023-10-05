@@ -35,11 +35,8 @@ public class CartServiceImpl implements CartService {
         return this.cartRepository.findAll()
                 .stream()
                 .map(CartMappingHelper::map)
-                .map(c -> {
-                    c.setUserDto(this.restTemplate.getForObject(AppConstant.DiscoveredDomainsApi
-                            .USER_SERVICE_API_URL + "/" + c.getUserDto().getUserId(), UserDto.class));
-                    return c;
-                })
+                .peek(c -> c.setUserDto(this.restTemplate.getForObject(AppConstant.DiscoveredDomainsApi
+                        .USER_SERVICE_API_URL + "/" + c.getUserDto().getUserId(), UserDto.class)))
                 .distinct()
                 .toList();
     }

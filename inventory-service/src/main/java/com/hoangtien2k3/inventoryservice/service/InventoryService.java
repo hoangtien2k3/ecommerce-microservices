@@ -4,11 +4,12 @@ package com.hoangtien2k3.inventoryservice.service;
 import com.hoangtien2k3.inventoryservice.dto.request.TokenValidationRequest;
 import com.hoangtien2k3.inventoryservice.dto.response.InventoryResponse;
 import com.hoangtien2k3.inventoryservice.dto.response.TokenValidationResponse;
-import com.hoangtien2k3.inventoryservice.exception.UnauthorizedException;
 import com.hoangtien2k3.inventoryservice.repository.InventoryRepository;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -27,6 +28,10 @@ public class InventoryService {
 
     @Autowired
     private final WebClient.Builder webClientBuilder;
+
+    @Value("${user-service.base-url}")
+    private String userServiceBaseUrl; // URL của user-service
+
 
     // get Token in -> user-service
     public Mono<String> getTokenFromUserService() {
@@ -49,9 +54,27 @@ public class InventoryService {
     }
 
 
+    public String getTokenUserService(String authorizationHeader) {
+        // Sử dụng JWT từ tiêu đề "Authorization" của yêu cầu gọi API
+        String jwtToken = authorizationHeader.replace("Bearer ", "");
+
+        // Token hợp lệ, tiếp tục gọi API từ user-service
+        String responseToken = webClientBuilder.baseUrl(userServiceBaseUrl + "/api/manager")
+                .build()    // chuyển WebClientBuilder -> WebClient
+                .get()      // GET
+                .uri("/token")  // Endpoint
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken)    // title
+                .retrieve() // call HTTP and return ClientResponse
+                .bodyToMono(String.class) // transaction content ClientResponse for Mono.
+                .block();   //  Chờ cho đến khi Mono hoàn thành và trả về giá trị cuối cùng của nó.
+
+        return responseToken;
+    }
+
+
     @Transactional(readOnly = true)
     @SneakyThrows
-    public List<InventoryResponse> isInStockNoAccessToken(List<String> productName) {
+    public List<InventoryResponse> isInStock(List<String> productName) {
         log.info("Checking Inventory"); // còn hàng hay không
         return inventoryRepository.findByProductNameIn(productName)
                 .stream()
@@ -62,36 +85,5 @@ public class InventoryService {
                                 .build()
                 ).toList();
     }
-
-
-    @Transactional(readOnly = true)
-    @SneakyThrows
-    public List<InventoryResponse> isInStock(List<String> productName, String accessToken) {
-        log.info("Checking Inventory");
-
-        // Xác thực access token trước khi thực hiện thao tác
-        return requestTokenValidation(accessToken)
-                .flatMap(validationMessage -> {
-                    if ("Valid token".equals(validationMessage)) {
-                        // Access token hợp lệ, tiếp tục thực hiện các thao tác
-                        return Mono.just(
-                                inventoryRepository.findByProductNameIn(productName)
-                                        .stream()
-                                        .map(inventory ->
-                                                InventoryResponse.builder()
-                                                        .productName(inventory.getProductName())
-                                                        .isInStock(inventory.getQuantity() > 0)
-                                                        .build()
-                                        )
-                                        .toList()
-                        );
-                    } else {
-                        // Access token không hợp lệ hoặc hết hạn
-                        return Mono.error(new UnauthorizedException("Invalid token"));
-                    }
-                })
-                .block(); // Chờ cho đến khi kết quả hoàn thành (lưu ý: block() chỉ được sử dụng trong các tình huống đồng bộ)
-    }
-
 
 }

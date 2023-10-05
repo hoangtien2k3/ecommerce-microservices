@@ -4,19 +4,13 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.hoangtien2k3.orderservice.config.jwt.JwtUtil;
 import com.hoangtien2k3.orderservice.dto.CartDto;
 import com.hoangtien2k3.orderservice.dto.response.collection.DtoCollectionResponse;
 import com.hoangtien2k3.orderservice.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,15 +32,21 @@ public class CartController {
     }
 
     @GetMapping("/{cartId}")
-    public ResponseEntity<CartDto> findById(@PathVariable("cartId")
+    public ResponseEntity<CartDto> findById(@RequestHeader(name = "Authorization") String authorizationHeader,
+                                            @PathVariable("cartId")
                                             @NotBlank(message = "Input must not be blank")
                                             @Valid final String cartId) {
-        log.info("CartDto, resource; fetch cart by id");
-        return ResponseEntity.ok(this.cartService.findById(Integer.parseInt(cartId)));
+
+        if (JwtUtil.validateToken(authorizationHeader)) {
+            log.info("CartDto, resource; fetch cart by id");
+            return ResponseEntity.ok(this.cartService.findById(Integer.parseInt(cartId)));
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping
-    public ResponseEntity<CartDto> save(@RequestBody
+    public ResponseEntity<CartDto> save(@RequestHeader(name = "Authorization") String authorizationHeader,
+                                        @RequestBody
                                         @NotNull(message = "Input must not be NULL!")
                                         @Valid final CartDto cartDto) {
         log.info("CartDto, resource; save cart");

@@ -22,19 +22,29 @@ public class JwtProvider {
     private String jwtSecret;
     @Value("${jwt.expiration}") // Thời gian hiệu  lực của token
     private int jwtExpiration;
+    @Value("${jwt.refreshExpiration}")
+    private int jwtRefreshExpiration;
 
 
     // generate token
     public String createToken(Authentication authentication) {
         UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
-
         return Jwts.builder()
                 .setSubject(userPrinciple.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + jwtExpiration * 1000L))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
+    }
 
+    public String createRefreshToken(Authentication authentication) {
+        UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
+        return Jwts.builder()
+                .setSubject(userPrinciple.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(new Date().getTime() + jwtRefreshExpiration * 1000L)) // jwtRefreshExpiration là thời gian hiệu lực của refresh token
+                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .compact();
     }
 
     // check xem token có hợp lệ hay không

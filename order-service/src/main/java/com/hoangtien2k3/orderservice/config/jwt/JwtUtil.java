@@ -1,14 +1,26 @@
-package com.hoangtien2k3.inventoryservice.security;
+package com.hoangtien2k3.orderservice.config.jwt;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+@Slf4j
+@Component
 public class JwtUtil {
-    private static final String SECRET_KEY = "vip2023"; // Thay thế bằng khoá bí mật của bạn
+
+    private static String SECRET_KEY;
+
+    @Value("${jwt.secret-key}")
+    public void setSecretKey(String secretKey) {
+        SECRET_KEY = secretKey;
+    }
 
     public static boolean validateToken(String token) {
+        if (token.startsWith("Bearer ")) token = token.replace("Bearer ", "");
+
         try {
             // Giải mã token và kiểm tra tính hợp lệ
             Claims claims = Jwts
@@ -19,23 +31,19 @@ public class JwtUtil {
 
             // Kiểm tra thời gian hết hạn của token
             long currentTimeMillis = System.currentTimeMillis();
-            if (claims.getExpiration().getTime() < currentTimeMillis) {
-                // Token đã hết hạn
-                return false;
-            }
+            // Token đã hết hạn
+            return claims.getExpiration().getTime() >= currentTimeMillis;
 
-            // Kiểm tra các điều kiện khác tùy theo yêu cầu của bạn
-            // Ví dụ: Kiểm tra roles hoặc thông tin khác
-
-            // Trả về true nếu token hợp lệ
-            return true;
+            // TODO: SET ROLE ...
         } catch (ExpiredJwtException e) {
             // Token đã hết hạn
             return false;
         } catch (Exception e) {
             // Xảy ra lỗi khi xác thực token
-            e.printStackTrace();
+            log.error("Fail validate token");
             return false;
         }
     }
 }
+
+

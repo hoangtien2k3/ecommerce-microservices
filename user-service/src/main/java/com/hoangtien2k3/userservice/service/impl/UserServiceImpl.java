@@ -12,11 +12,15 @@ import com.hoangtien2k3.userservice.repository.IUserRepository;
 import com.hoangtien2k3.userservice.security.jwt.JwtProvider;
 import com.hoangtien2k3.userservice.security.userprinciple.UserDetailService;
 import com.hoangtien2k3.userservice.security.userprinciple.UserPrinciple;
+import com.hoangtien2k3.userservice.security.validate.JwtValidate;
 import com.hoangtien2k3.userservice.service.IUserService;
+import com.hoangtien2k3.userservice.service.validate.TokenValidate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,6 +28,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
@@ -37,6 +42,10 @@ public class UserServiceImpl implements IUserService {
     private final JwtProvider jwtProvider;
     private final TokenManager tokenManager;
     private final UserDetailService userDetailsService;
+    @Autowired
+    private WebClient.Builder webClientBuilder;
+    @Value("${refresh.token.url}") // Đường dẫn endpoint để refresh token
+    private String refreshTokenUrl;
 
     @Autowired
     public UserServiceImpl(IUserRepository userRepository, IRoleRepository roleRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtProvider jwtProvider, TokenManager tokenManager, UserDetailService userDetailsService) {
@@ -105,7 +114,6 @@ public class UserServiceImpl implements IUserService {
     public Mono<JwtResponse> login(SignInForm signInForm) {
         return Mono.defer(() -> {
             String usernameOrEmail = signInForm.getUsername();
-
             boolean isEmail = usernameOrEmail.contains("@");
 
             UserDetails userDetails;
@@ -121,16 +129,19 @@ public class UserServiceImpl implements IUserService {
                     .getContext()
                     .setAuthentication(authentication);
 
-            // generate token by authentication
-            String token = jwtProvider.createToken(authentication);
+            // Generate token and refresh token using JwtProvider
+            String accessToken = jwtProvider.createToken(authentication);
+            String refreshToken = jwtProvider.createRefreshToken(authentication);
 
             UserPrinciple userPrinciple = (UserPrinciple) userDetails;
 
-            // Lưu trữ tên người dùng và token bằng TokenManager
-            tokenManager.storeToken(userPrinciple.getUsername(), token);
+            // Store the token and refresh token using TokenManager
+            tokenManager.storeToken(userPrinciple.getUsername(), accessToken);
+            tokenManager.storeRefreshToken(userPrinciple.getUsername(), refreshToken);
 
             JwtResponse jwtResponse = new JwtResponse(
-                    token,
+                    accessToken,
+                    refreshToken,
                     userPrinciple.getId(),
                     userPrinciple.getName(),
                     userPrinciple.getAuthorities()
@@ -139,6 +150,24 @@ public class UserServiceImpl implements IUserService {
             return Mono.just(jwtResponse);
         });
     }
+
+    public Mono<String> refreshToken(String refreshToken) {
+        return webClientBuilder.build()
+                .post()
+                .uri(refreshTokenUrl)
+                .header("Refresh-Token", refreshToken)
+                .retrieve()
+                .onStatus(HttpStatus::is4xxClientError, clientResponse -> Mono.error(new IllegalArgumentException("Refresh token không hợp lệ")))
+                .bodyToMono(JwtResponse.class)
+                .map(JwtResponse::getAccessToken); // Sử dụng getAccessToken để lấy token từ JwtResponse
+    }
+
+
+    // validate token -> send RequestHeader
+    public static boolean validateToken(String token) {
+        return TokenValidate.validateToken(token);
+    }
+
 
     // get all user in list user
     public Optional<List<User>> getAllUsers() {

@@ -1,4 +1,4 @@
-package com.hoangtien2k3.userservice.service;
+package com.hoangtien2k3.userservice.service.validate;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -9,15 +9,19 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 
 @Service
-public class TokenValidationService {
+public class TokenValidate {
 
-    @Value("${jwt.secret}")
-    private String secretKey; // Khóa bí mật đã được cấu hình trong application.properties
+    private static String secretKey;
 
-    public boolean validateToken(String token) {
+    @Value("${jwt.secret-key}")
+    public void setSecretKey(String secretKey) {
+        secretKey = secretKey;
+    }
+
+    public static boolean validateToken(String token) {
         try {
             if (secretKey == null || secretKey.isEmpty()) {
-                throw new IllegalArgumentException("Không tìm thấy khóa bí mật trong cấu hình.");
+                throw new IllegalArgumentException("Not found secret key in structure");
             }
 
             // Parse và kiểm tra token bằng khóa bí mật
@@ -31,18 +35,18 @@ public class TokenValidationService {
             Date currentDate = new Date();
 
             if (expirationDate.before(currentDate)) {
-                throw new IllegalArgumentException("Token đã hết hạn.");
+                throw new IllegalArgumentException("Token has expired.");
             }
 
             return true;
         } catch (ExpiredJwtException ex) {
-            throw new IllegalArgumentException("Token đã hết hạn.");
+            throw new IllegalArgumentException("Token has expired.");
         } catch (MalformedJwtException ex) {
-            throw new IllegalArgumentException("Token không hợp lệ.");
+            throw new IllegalArgumentException("Invalid token.");
         } catch (SignatureException ex) {
-            throw new IllegalArgumentException("Lỗi xác thực token.");
+            throw new IllegalArgumentException("Token validation error.");
         } catch (IllegalArgumentException ex) {
-            throw new IllegalArgumentException("Lỗi xác thực token: " + ex.getMessage());
+            throw new IllegalArgumentException("Token validation error: " + ex.getMessage());
         }
     }
 }
