@@ -16,8 +16,8 @@ import java.util.List;
 @RequestMapping("/api/product")
 public class ProductController {
 
-    private ProductServiceImpl productService;
-    private HeaderGenerator headerGenerator;
+    private final ProductServiceImpl productService;
+    private final HeaderGenerator headerGenerator;
 
     @Autowired
     public ProductController(ProductServiceImpl productService, HeaderGenerator headerGenerator) {
@@ -102,5 +102,13 @@ public class ProductController {
         return ResponseEntity.ok(pageResult);
     }
 
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Product>> searchProductsByKeyword(
+            @RequestParam String keyword) {
+
+        List<Product> products = productService.searchProductsByKeyword(keyword);
+        return ResponseEntity.ok(products);
+    }
 
 }

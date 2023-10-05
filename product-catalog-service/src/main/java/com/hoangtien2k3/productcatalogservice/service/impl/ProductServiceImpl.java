@@ -71,4 +71,10 @@ public class ProductServiceImpl implements ProductService {
         return new PageResult(products, totalProducts);
     }
 
+
+    @Override
+    public List<Product> searchProductsByKeyword(String keyword) {
+        return productRepository.searchProductsByKeyword(keyword.toLowerCase());
+    }
+
 }

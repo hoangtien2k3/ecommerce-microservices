@@ -14,10 +14,17 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findAllByCategory(String category);
     List<Product> findAllByProductName(String name);
 
+    // lấy ra danh sách sản phẩm theo page - size
     @Query(value = "SELECT * FROM products LIMIT :offset, :size", nativeQuery = true)
     List<Product> findProductsByPage(@Param("offset") int offset, @Param("size") int size);
 
+    // tổng số lượng sản phẩm
     @Query(value = "SELECT COUNT(*) FROM products", nativeQuery = true)
     int countAllProducts();
+
+
+    @Query("SELECT p FROM Product p WHERE LOWER(p.productName) LIKE %:keyword%")
+    List<Product> searchProductsByKeyword(@Param("keyword") String keyword);
+
 
 }

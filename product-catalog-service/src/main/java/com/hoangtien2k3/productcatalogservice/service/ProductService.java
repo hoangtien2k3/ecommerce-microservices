@@ -15,6 +15,11 @@ public interface ProductService {
     void deleteProduct(Long productId);
     Page<Product> getProducts(int page, int size);
 
+
 //    List<Product> getAllProductsPage(int page, int size);
     PageResult getAllProductsPage(int page, int size);
+
+
+    // tìm kiếm sản phẩm
+    List<Product> searchProductsByKeyword(String keyword);
 }

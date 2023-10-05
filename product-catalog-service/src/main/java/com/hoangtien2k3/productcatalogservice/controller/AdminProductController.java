@@ -1,10 +1,8 @@
 package com.hoangtien2k3.productcatalogservice.controller;
 
-import javax.servlet.http.HttpServletRequest;
 import com.hoangtien2k3.productcatalogservice.dto.ProductRequest;
 import com.hoangtien2k3.productcatalogservice.entity.Product;
 import com.hoangtien2k3.productcatalogservice.http.HeaderGenerator;
-import com.hoangtien2k3.productcatalogservice.service.ProductService;
 import com.hoangtien2k3.productcatalogservice.service.impl.ProductServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +15,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/admin")
 public class AdminProductController {
 
-    @Autowired
-    private ProductServiceImpl productService;
+    private final ProductServiceImpl productService;
+    private final HeaderGenerator headerGenerator;
 
     @Autowired
-    private HeaderGenerator headerGenerator;
+    public AdminProductController(ProductServiceImpl productService, HeaderGenerator headerGenerator) {
+        this.productService = productService;
+        this.headerGenerator = headerGenerator;
+    }
 
     @PostMapping("/products")
     private ResponseEntity<Product> addProduct(@RequestBody ProductRequest productRequest) {
