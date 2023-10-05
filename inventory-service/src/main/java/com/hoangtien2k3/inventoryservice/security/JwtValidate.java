@@ -23,7 +23,7 @@ public class JwtValidate {
     public static boolean validateToken(String token) {
 
         if (SECRET_KEY == null || SECRET_KEY.isEmpty()) {
-            throw new IllegalArgumentException("Không tìm thấy SECRET_KEY.");
+            throw new IllegalArgumentException("Not found secret key in structure");
         }
 
         if (token.startsWith("Bearer ")) token = token.replace("Bearer ", "");
