@@ -1,9 +1,11 @@
 package com.hoangtien2k3.productcatalogservice.controller;
 
+import com.hoangtien2k3.productcatalogservice.dto.PageResult;
 import com.hoangtien2k3.productcatalogservice.entity.Product;
 import com.hoangtien2k3.productcatalogservice.http.HeaderGenerator;
-import com.hoangtien2k3.productcatalogservice.service.ProductService;
+import com.hoangtien2k3.productcatalogservice.service.impl.ProductServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,11 +16,14 @@ import java.util.List;
 @RequestMapping("/api/product")
 public class ProductController {
 
-    @Autowired
-    private ProductService productService;
+    private ProductServiceImpl productService;
+    private HeaderGenerator headerGenerator;
 
     @Autowired
-    private HeaderGenerator headerGenerator;
+    public ProductController(ProductServiceImpl productService, HeaderGenerator headerGenerator) {
+        this.productService = productService;
+        this.headerGenerator = headerGenerator;
+    }
 
     @GetMapping(value = "/products")
     public ResponseEntity<List<Product>> getAllProducts() {
@@ -75,5 +80,27 @@ public class ProductController {
                 headerGenerator.getHeadersForError(),
                 HttpStatus.NOT_FOUND);
     }
+
+
+    @GetMapping
+    public ResponseEntity<Page<Product>> getProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<Product> products = productService.getProducts(page, size);
+        return ResponseEntity.ok(products);
+    }
+
+
+    // thủ công
+    @GetMapping("/page")
+    public ResponseEntity<PageResult> getAllProductsPage(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        PageResult pageResult = productService.getAllProductsPage(page, size);
+        return ResponseEntity.ok(pageResult);
+    }
+
 
 }

@@ -2,13 +2,12 @@ package com.hoangtien2k3.userservice.controller;
 
 import com.hoangtien2k3.userservice.dto.request.SignInForm;
 import com.hoangtien2k3.userservice.dto.request.SignUpForm;
-import com.hoangtien2k3.userservice.dto.request.TokenValidationRequest;
 import com.hoangtien2k3.userservice.dto.request.TokenValidationResponse;
 import com.hoangtien2k3.userservice.dto.response.JwtResponse;
 import com.hoangtien2k3.userservice.dto.response.ResponseMessage;
 import com.hoangtien2k3.userservice.security.jwt.JwtProvider;
 import com.hoangtien2k3.userservice.service.impl.UserServiceImpl;
-import com.hoangtien2k3.userservice.service.validate.TokenValidate;
+import com.hoangtien2k3.userservice.security.validate.TokenValidate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -20,17 +19,11 @@ import javax.validation.Valid;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final UserServiceImpl userService;
-    private final TokenValidate tokenValidate;
+    @Autowired
+    private UserServiceImpl userService;
 
     @Autowired
     private JwtProvider jwtProvider;
-
-    @Autowired
-    public AuthController(UserServiceImpl userService, TokenValidate tokenValidate) {
-        this.userService = userService;
-        this.tokenValidate = tokenValidate;
-    }
 
 
     @PostMapping("/signup")
@@ -63,20 +56,14 @@ public class AuthController {
     }
 
 
-    @PostMapping("/validateToken")
-    public Boolean validateToken(@RequestBody TokenValidationRequest validationRequest) {
-
-        // @RequestHeader(name = "Authorization") String authorizationToken
-
-        String accessToken = validationRequest.getAccessToken();
-        if (TokenValidate.validateToken(accessToken)) {
-            // Token hợp lệ, có thể thực hiện các xử lý hoặc trả về thông báo thành công
+    @GetMapping("/validateToken")
+    public Boolean validateToken( @RequestHeader(name = "Authorization") String authorizationToken) {
+        TokenValidate validate = new TokenValidate();
+        if (validate.validateToken(authorizationToken)) {
             return ResponseEntity.ok(new TokenValidationResponse("Valid token")).hasBody();
         } else {
-            // Token không hợp lệ hoặc hết hạn
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new TokenValidationResponse("Invalid token")).hasBody();
         }
-
     }
 
 }

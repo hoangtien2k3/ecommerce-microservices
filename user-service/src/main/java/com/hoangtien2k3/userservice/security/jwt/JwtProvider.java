@@ -1,6 +1,5 @@
 package com.hoangtien2k3.userservice.security.jwt;
 
-import com.hoangtien2k3.userservice.entity.User;
 import com.hoangtien2k3.userservice.security.userprinciple.UserPrinciple;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.*;
@@ -14,19 +13,15 @@ import java.util.Date;
 
 @Component
 public class JwtProvider {
-
-    // ghi log
     private static final Logger logger = LoggerFactory.getLogger(JwtProvider.class);
 
-    @Value("${jwt.secret}")  // Khóa bí mật, token sẽ được mã hóa với khóa này
+    @Value("${jwt.secret}")
     private String jwtSecret;
-    @Value("${jwt.expiration}") // Thời gian hiệu  lực của token
+    @Value("${jwt.expiration}")
     private int jwtExpiration;
     @Value("${jwt.refreshExpiration}")
     private int jwtRefreshExpiration;
 
-
-    // generate token
     public String createToken(Authentication authentication) {
         UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
         return Jwts.builder()
@@ -47,7 +42,6 @@ public class JwtProvider {
                 .compact();
     }
 
-    // check xem token có hợp lệ hay không
     public Boolean validateToken(String token) {
         try {
 
@@ -71,7 +65,6 @@ public class JwtProvider {
         return false;
     }
 
-    // lấy ra Username từ token
     public String getUserNameFromToken(String token) {
         String userName = Jwts.parser()
                 .setSigningKey(jwtSecret)

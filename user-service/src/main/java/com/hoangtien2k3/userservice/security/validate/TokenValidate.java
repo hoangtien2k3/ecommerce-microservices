@@ -1,37 +1,35 @@
-package com.hoangtien2k3.userservice.service.validate;
+package com.hoangtien2k3.userservice.security.validate;
 
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 public class TokenValidate {
 
-    private static String secretKey;
+//    @Value("${jwt.secret}")
+    private String SECRET_KEY = "vip2023";
 
-    @Value("${jwt.secret-key}")
-    public void setSecretKey(String secretKey) {
-        secretKey = secretKey;
-    }
+    public boolean validateToken(String token) {
+        if (SECRET_KEY == null || SECRET_KEY.isEmpty())
+            throw new IllegalArgumentException("Not found secret key in structure");
 
-    public static boolean validateToken(String token) {
-
-        if (secretKey == null || secretKey.isEmpty()) throw new IllegalArgumentException("Not found secret key in structure");
-
-        if (token.startsWith("Bearer ")) token = token.replace("Bearer ", "");
+        if (token.startsWith("Bearer "))
+            token = token.replace("Bearer ", "");
 
         try {
-            // Giải mã token và kiểm tra tính hợp lệ
             Claims claims = Jwts
                     .parser()
-                    .setSigningKey(secretKey)
+                    .setSigningKey(SECRET_KEY)
                     .parseClaimsJws(token)
                     .getBody();
 
             // Kiểm tra thời gian hết hạn của token
             long currentTimeMillis = System.currentTimeMillis();
+
             // Token đã hết hạn
             return claims.getExpiration().getTime() >= currentTimeMillis;
+
         } catch (ExpiredJwtException ex) {
             throw new IllegalArgumentException("Token has expired.");
         } catch (MalformedJwtException ex) {
@@ -42,4 +40,5 @@ public class TokenValidate {
             throw new IllegalArgumentException("Token validation error: " + ex.getMessage());
         }
     }
+
 }

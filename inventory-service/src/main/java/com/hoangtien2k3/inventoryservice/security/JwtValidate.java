@@ -51,38 +51,5 @@ public class JwtValidate {
         }
     }
 
-
-//    public static boolean validateToken(String token) {
-//        try {
-//            if (SECRET_KEY == null || SECRET_KEY.isEmpty()) {
-//                throw new IllegalArgumentException("Not found secret key in structure");
-//            }
-//
-//            // Parse và kiểm tra token bằng khóa bí mật
-//            SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
-//            Jws<Claims> claims = Jwts.parser()
-//                    .setSigningKey(key)
-//                    .parseClaimsJws(token);
-//
-//            // Kiểm tra xem token có hợp lệ không bằng cách kiểm tra thời gian hết hạn
-//            Date expirationDate = claims.getBody().getExpiration();
-//            Date currentDate = new Date();
-//
-//            if (expirationDate.before(currentDate)) {
-//                throw new IllegalArgumentException("Token has expired.");
-//            }
-//
-//            return true;
-//        } catch (ExpiredJwtException ex) {
-//            throw new IllegalArgumentException("Token has expired.");
-//        } catch (MalformedJwtException ex) {
-//            throw new IllegalArgumentException("Invalid token.");
-//        } catch (SignatureException ex) {
-//            throw new IllegalArgumentException("Token validation error.");
-//        } catch (IllegalArgumentException ex) {
-//            throw new IllegalArgumentException("Token validation error: " + ex.getMessage());
-//        }
-//    }
-
 }
 

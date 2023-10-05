@@ -5,6 +5,7 @@ import com.hoangtien2k3.productcatalogservice.dto.ProductRequest;
 import com.hoangtien2k3.productcatalogservice.entity.Product;
 import com.hoangtien2k3.productcatalogservice.http.HeaderGenerator;
 import com.hoangtien2k3.productcatalogservice.service.ProductService;
+import com.hoangtien2k3.productcatalogservice.service.impl.ProductServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,16 +18,15 @@ import org.springframework.web.bind.annotation.*;
 public class AdminProductController {
 
     @Autowired
-    private ProductService productService;
+    private ProductServiceImpl productService;
 
     @Autowired
     private HeaderGenerator headerGenerator;
 
-    @PostMapping(value = "/products")
-    private ResponseEntity<Product> addProduct(@RequestBody ProductRequest productRequest, HttpServletRequest request) {
+    @PostMapping("/products")
+    private ResponseEntity<Product> addProduct(@RequestBody ProductRequest productRequest) {
         if (productRequest != null) {
             try {
-
                 Product product = Product.builder()
                         .productName(productRequest.getProductName())
                         .price(productRequest.getPrice())
@@ -38,9 +38,8 @@ public class AdminProductController {
 
                 return new ResponseEntity<>(
                         product,
-                        headerGenerator.getHeadersForSuccessPostMethod(request, product.getId()),
+                        headerGenerator.getHeadersForSuccessPostMethod(product.getId()),
                         HttpStatus.CREATED);
-
             } catch (Exception e) {
                 log.error("Product is not add list {}", productRequest.getProductName());
                 return new ResponseEntity<>(

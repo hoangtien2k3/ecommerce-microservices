@@ -12,9 +12,7 @@ import com.hoangtien2k3.userservice.repository.IUserRepository;
 import com.hoangtien2k3.userservice.security.jwt.JwtProvider;
 import com.hoangtien2k3.userservice.security.userprinciple.UserDetailService;
 import com.hoangtien2k3.userservice.security.userprinciple.UserPrinciple;
-import com.hoangtien2k3.userservice.security.validate.JwtValidate;
 import com.hoangtien2k3.userservice.service.IUserService;
-import com.hoangtien2k3.userservice.service.validate.TokenValidate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -160,12 +158,6 @@ public class UserServiceImpl implements IUserService {
                 .onStatus(HttpStatus::is4xxClientError, clientResponse -> Mono.error(new IllegalArgumentException("Refresh token không hợp lệ")))
                 .bodyToMono(JwtResponse.class)
                 .map(JwtResponse::getAccessToken); // Sử dụng getAccessToken để lấy token từ JwtResponse
-    }
-
-
-    // validate token -> send RequestHeader
-    public static boolean validateToken(String token) {
-        return TokenValidate.validateToken(token);
     }
 
 

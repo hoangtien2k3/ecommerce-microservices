@@ -29,8 +29,7 @@ public class InventoryController {
     @ResponseStatus(HttpStatus.OK)
     public List<InventoryResponse> isInStockNoAccessToken(@RequestHeader(name = "Authorization") String authorizationHeader,
                                                           @RequestParam List<String> productName) {
-        String jwtToken = authorizationHeader.replace("Bearer ", "");
-        if (JwtValidate.validateToken(jwtToken)) {
+        if (inventoryService.validateTokenUserService(authorizationHeader)) {
             log.info("Received inventory check request for skuCode: {}", productName);
             return inventoryService.isInStock(productName);
         }
@@ -38,14 +37,15 @@ public class InventoryController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping("/getTokenUserService")
+    @GetMapping("/validateToken")
     public String getOrderDetails(@RequestHeader(name = "Authorization") String authorizationHeader) {
         // Kiểm tra tính hợp lệ của token trước khi gọi API
-        if (JwtValidate.validateToken(authorizationHeader)) {
+        if (inventoryService.validateTokenUserService(authorizationHeader)) {
             return inventoryService.getTokenUserService(authorizationHeader);
         } else {
             return "Unauthorized accessToken";
         }
     }
+
 
 }

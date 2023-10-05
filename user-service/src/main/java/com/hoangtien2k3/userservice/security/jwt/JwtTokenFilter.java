@@ -33,7 +33,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         try {
-
             // lấy ra token trong request
             String token = getJwt(request);
             // Or secretkey

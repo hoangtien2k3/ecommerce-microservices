@@ -10,7 +10,14 @@ import java.util.List;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    @Query(value = "SELECT p FROM Product p where (:category IS NULL or p.category =:category)")
-    List<Product> findAllByCategory(@Param("cateru") String category);
+//    @Query(value = "SELECT p FROM Product p where (:category IS NULL or p.category =:category)")
+    List<Product> findAllByCategory(String category);
     List<Product> findAllByProductName(String name);
+
+    @Query(value = "SELECT * FROM products LIMIT :offset, :size", nativeQuery = true)
+    List<Product> findProductsByPage(@Param("offset") int offset, @Param("size") int size);
+
+    @Query(value = "SELECT COUNT(*) FROM products", nativeQuery = true)
+    int countAllProducts();
+
 }

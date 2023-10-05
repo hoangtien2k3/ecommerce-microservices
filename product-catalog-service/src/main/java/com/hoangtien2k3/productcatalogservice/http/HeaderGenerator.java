@@ -2,6 +2,7 @@ package com.hoangtien2k3.productcatalogservice.http;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
@@ -22,15 +23,31 @@ public class HeaderGenerator {
         return httpHeaders;
     }
 
-    public HttpHeaders getHeadersForSuccessPostMethod(HttpServletRequest request, Long newResourceId) {
+//    public HttpHeaders getHeadersForSuccessPostMethod(HttpServletRequest request, Long newResourceId) {
+//        HttpHeaders httpHeaders = new HttpHeaders();
+//        try {
+//            httpHeaders.setLocation(new URI(request.getRequestURI() + "/" + newResourceId));
+//        } catch (URISyntaxException e) {
+//            e.printStackTrace();
+//        }
+//        httpHeaders.add("Content-Type", "application/json; charset=UTF-8");
+//        return httpHeaders;
+//    }
+
+    public HttpHeaders getHeadersForSuccessPostMethod(Long newResourceId) {
         HttpHeaders httpHeaders = new HttpHeaders();
         try {
-            httpHeaders.setLocation(new URI(request.getRequestURI() + "/" + newResourceId));
-        } catch (URISyntaxException e) {
+            URI locationUri = ServletUriComponentsBuilder.fromCurrentRequest()
+                    .path("/{id}")
+                    .buildAndExpand(newResourceId)
+                    .toUri();
+            httpHeaders.setLocation(locationUri);
+        } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
         httpHeaders.add("Content-Type", "application/json; charset=UTF-8");
         return httpHeaders;
     }
+
 
 }
