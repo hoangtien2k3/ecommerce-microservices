@@ -6,6 +6,10 @@ import com.hoangtien2k3.productcatalogservice.http.HeaderGenerator;
 import com.hoangtien2k3.productcatalogservice.service.impl.ProductServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -108,7 +112,60 @@ public class ProductController {
             @RequestParam String keyword) {
 
         List<Product> products = productService.searchProductsByKeyword(keyword);
+
         return ResponseEntity.ok(products);
     }
 
+//    @GetMapping("/search-and-page")
+//    public ResponseEntity<Page<Product>> searchProducts(@RequestParam(value = "keyword", required = false) String keyword,
+//                                                        @RequestParam(value = "page", defaultValue = "0") int page,
+//                                                        @RequestParam(value = "size", defaultValue = "10") int size) {
+//        if (keyword == null) {
+//            // keyword is null
+//            return ResponseEntity.notFound().build();
+//        }
+//
+//        Pageable pageable = PageRequest.of(page, size);
+//        Page<Product> products = productService.searchProducts(keyword, pageable);
+//        return ResponseEntity.ok(products);
+//
+//    }
+
+
+    @GetMapping("/search-and-page")
+    public ResponseEntity<Page<Product>> searchProducts(
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @PageableDefault(size = 10, sort = "price", direction = Sort.Direction.ASC) Pageable pageable) {
+
+//        if (keyword == null) {
+//            // keyword is null
+//            return ResponseEntity.notFound().build();
+//        }
+
+        Page<Product> products = productService.searchProducts(keyword, pageable);
+        return ResponseEntity.ok(products);
+    }
+
+
+    // http://localhost:8081/searchProducts?keyword=searchKeyword&page=0&size=10&sortField=productName&sortDir=asc
+//    @GetMapping("/searchProducts")
+//    public Page<Product> searchProducts(
+//            @RequestParam("keyword") String keyword,
+//            @RequestParam("page") int page,
+//            @RequestParam("size") int size,
+//            @RequestParam("sortField") String sortField,
+//            @RequestParam("sortDir") String sortDir) {
+//
+//        Sort sort = Sort.by(sortField);
+//        if ("desc".equals(sortDir)) {
+//            sort = sort.descending();
+//        }
+//
+//        Pageable pageable = PageRequest.of(page, size, sort);
+//
+//        return productSearchAndPageRepository.searchByKeywordWithSorting(keyword, pageable, sort);
+//    }
+
 }
+
+

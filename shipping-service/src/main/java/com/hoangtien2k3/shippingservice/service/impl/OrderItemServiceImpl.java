@@ -47,7 +47,7 @@ public class OrderItemServiceImpl implements OrderItemService {
                     return o;
                 })
                 .distinct()
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
     }
 
     @Override

@@ -1,10 +1,14 @@
 package com.hoangtien2k3.paymentservice.controller;
 
+import com.hoangtien2k3.paymentservice.config.webclient.WebClientConfig;
 import com.hoangtien2k3.paymentservice.dto.PaymentDto;
 import com.hoangtien2k3.paymentservice.dto.response.collection.DtoCollectionResponse;
+import com.hoangtien2k3.paymentservice.security.JwtValidate;
 import com.hoangtien2k3.paymentservice.service.PaymentService;
+import com.netflix.discovery.converters.Auto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +27,8 @@ public class PaymentController {
 
     @Autowired
     private final PaymentService paymentService;
+    @Autowired
+    private final JwtValidate jwtValidate;
 
     @GetMapping
     public ResponseEntity<DtoCollectionResponse<PaymentDto>> findAll() {
@@ -60,36 +66,36 @@ public class PaymentController {
     }
 
     @PostMapping
-    public ResponseEntity<PaymentDto> save(@RequestBody
-                                           @NotNull(message = "Input must not be NULL")
+    public ResponseEntity<PaymentDto> save(@RequestHeader(name = "Authorization") String authorizationHeader,
+                                           @RequestBody @NotNull(message = "Input must not be NULL")
                                            @Valid final PaymentDto paymentDto) {
+        if (!jwtValidate.validateTokenUserService(authorizationHeader)) {
+            ResponseEntity.status(HttpStatus.SC_UNAUTHORIZED).build();
+        }
         log.info("PaymentDto, resource; save payment");
         return ResponseEntity.ok(this.paymentService.save(paymentDto));
     }
 
     @PutMapping
-    public ResponseEntity<PaymentDto> update(@RequestBody
-                                             @NotNull(message = "Input must not be NULL")
+    public ResponseEntity<PaymentDto> update(@RequestHeader(name = "Authorization") String authorizationHeader,
+                                             @RequestBody @NotNull(message = "Input must not be NULL")
                                              @Valid final PaymentDto paymentDto) {
+        if (!jwtValidate.validateTokenUserService(authorizationHeader)) {
+            ResponseEntity.status(HttpStatus.SC_UNAUTHORIZED).build();
+        }
         log.info("PaymentDto, resource; update payment");
         return ResponseEntity.ok(this.paymentService.update(paymentDto));
     }
 
     @DeleteMapping("/{paymentId}")
-    public ResponseEntity<Boolean> deleteById(@PathVariable("paymentId") final String paymentId) {
+    public ResponseEntity<Boolean> deleteById(@RequestHeader(name = "Authorization") String authorizationHeader,
+                                              @PathVariable("paymentId") final String paymentId) {
+        if (!jwtValidate.validateTokenUserService(authorizationHeader)) {
+            ResponseEntity.status(HttpStatus.SC_UNAUTHORIZED).build();
+        }
         log.info("Boolean, resource; delete payment by id");
         this.paymentService.deleteById(Integer.parseInt(paymentId));
         return ResponseEntity.ok(true);
     }
-
-//    @GetMapping("/webclient/{id}")
-//    public Mono<User> getUserUsingWebClient(@PathVariable Long id) {
-//        return webClientBuilder
-//                .build()
-//                .get()
-//                .uri("http://localhost:8080/api/user/{id}", id)
-//                .retrieve()
-//                .bodyToMono(User.class);
-//    }
 
 }

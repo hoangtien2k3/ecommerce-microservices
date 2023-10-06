@@ -3,11 +3,13 @@ package com.hoangtien2k3.productcatalogservice.service.impl;
 import com.hoangtien2k3.productcatalogservice.dto.PageResult;
 import com.hoangtien2k3.productcatalogservice.entity.Product;
 import com.hoangtien2k3.productcatalogservice.repository.ProductRepository;
+import com.hoangtien2k3.productcatalogservice.repository.ProductSearchAndPageRepository;
 import com.hoangtien2k3.productcatalogservice.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,10 +20,12 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+    private final ProductSearchAndPageRepository productSearchAndPageRepository;
 
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, ProductSearchAndPageRepository productSearchAndPageRepository) {
         this.productRepository = productRepository;
+        this.productSearchAndPageRepository = productSearchAndPageRepository;
     }
 
     @Override
@@ -71,10 +75,18 @@ public class ProductServiceImpl implements ProductService {
         return new PageResult(products, totalProducts);
     }
 
-
+    // search
     @Override
     public List<Product> searchProductsByKeyword(String keyword) {
         return productRepository.searchProductsByKeyword(keyword.toLowerCase());
+    }
+
+    // search and page and sort by price default asc
+    @Override
+    public Page<Product> searchProducts(String keyword, Pageable pageable) {
+        Sort sort = Sort.by("price").ascending();
+        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        return productSearchAndPageRepository.searchByKeyword(keyword, pageable);
     }
 
 }

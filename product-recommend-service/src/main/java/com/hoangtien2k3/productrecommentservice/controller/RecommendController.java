@@ -47,12 +47,10 @@ public class RecommendController {
     }
 
     @PostMapping(value = "/{userId}/recommends/{productId}")
-    private ResponseEntity<Recommend> saveRecommendations(
-            @PathVariable("userId") Long userId,
-            @PathVariable("productId") Long productId,
-            @RequestParam("rating") int rating,
-            HttpServletRequest request) {
-
+    private ResponseEntity<Recommend> saveRecommendations(@PathVariable("userId") Long userId,
+                                                          @PathVariable("productId") Long productId,
+                                                          @RequestParam("rating") int rating,
+                                                          HttpServletRequest request) {
         Product product = productClient.getProductById(productId);
         User user = userClient.getUserById(userId);
 
