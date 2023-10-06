@@ -69,26 +69,38 @@ public class CartController {
     }
 
     @PutMapping
-    public ResponseEntity<CartDto> update(@RequestBody
+    public ResponseEntity<CartDto> update(@RequestHeader(name = "Authorization") String authorizationHeader,
+                                          @RequestBody
                                           @NotNull(message = "Input must not be NULL")
                                           @Valid final CartDto cartDto) {
+        if (!jwtValidate.validateTokenUserService(authorizationHeader)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         log.info("CartDto, resource; update cart");
         return ResponseEntity.ok(this.cartService.update(cartDto));
     }
 
     @PutMapping("/{cartId}")
-    public ResponseEntity<CartDto> update(@PathVariable("cartId")
+    public ResponseEntity<CartDto> update(@RequestHeader(name = "Authorization") String authorizationHeader,
+                                          @PathVariable("cartId")
                                           @NotBlank(message = "Input must not be blank")
                                           @Valid final Integer cartId,
                                           @RequestBody
                                           @NotNull(message = "Input must not be NULL")
                                           @Valid final CartDto cartDto) {
+        if (!jwtValidate.validateTokenUserService(authorizationHeader)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         log.info("CartDto, resource; update cart with cartId");
         return ResponseEntity.ok(this.cartService.update(cartId, cartDto));
     }
 
     @DeleteMapping("/{cartId}")
-    public ResponseEntity<Boolean> deleteById(@PathVariable("cartId") final Integer cartId) {
+    public ResponseEntity<Boolean> deleteById(@RequestHeader(name = "Authorization") String authorizationHeader,
+                                              @PathVariable("cartId") final Integer cartId) {
+        if (!jwtValidate.validateTokenUserService(authorizationHeader)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         log.info("Boolean, resource; delete cart by id");
         this.cartService.deleteById(cartId);
         return ResponseEntity.ok(true);
