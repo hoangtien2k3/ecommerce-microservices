@@ -7,7 +7,7 @@ import com.hoangtien2k3.shippingservice.dto.ProductDto;
 
 public interface OrderItemMappingHelper {
 
-    public static OrderItemDto map(final OrderItem orderItem) {
+    static OrderItemDto map(final OrderItem orderItem) {
         return OrderItemDto.builder()
                 .productId(orderItem.getProductId())
                 .orderId(orderItem.getOrderId())
@@ -23,7 +23,7 @@ public interface OrderItemMappingHelper {
                 .build();
     }
 
-    public static OrderItem map(final OrderItemDto orderItemDto) {
+    static OrderItem map(final OrderItemDto orderItemDto) {
         return OrderItem.builder()
                 .productId(orderItemDto.getProductId())
                 .orderId(orderItemDto.getOrderId())

@@ -24,6 +24,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -158,6 +159,11 @@ public class UserServiceImpl implements IUserService {
                 .onStatus(HttpStatus::is4xxClientError, clientResponse -> Mono.error(new IllegalArgumentException("Refresh token không hợp lệ")))
                 .bodyToMono(JwtResponse.class)
                 .map(JwtResponse::getAccessToken); // Sử dụng getAccessToken để lấy token từ JwtResponse
+    }
+
+    public Optional<User> findById(Long id) {
+        return Optional.ofNullable(userRepository.findById(id))
+                .orElseThrow(() -> new UsernameNotFoundException("User not found."));
     }
 
 

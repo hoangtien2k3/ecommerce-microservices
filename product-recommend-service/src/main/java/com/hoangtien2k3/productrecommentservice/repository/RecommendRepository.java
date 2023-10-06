@@ -11,9 +11,9 @@ import java.util.List;
 
 @Transactional
 @Repository
-public interface RecommentRepository extends JpaRepository<Recommend, Long> {
+public interface RecommendRepository extends JpaRepository<Recommend, Long> {
 
-    @Query("SELECT r FROM Recomment r WHERE r.product.productName = :productName")
+    @Query("SELECT r FROM Recommend r WHERE r.product.productName = :productName")
     public List<Recommend> findAllRatingByProductName(@Param("productName") String productName);
 
 }

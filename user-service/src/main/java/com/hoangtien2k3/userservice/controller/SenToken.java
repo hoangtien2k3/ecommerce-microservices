@@ -43,7 +43,6 @@ public class SenToken {
         }
     }
 
-
     @GetMapping("/token")
     public ResponseEntity<String> getToken() {
 

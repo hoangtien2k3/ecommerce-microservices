@@ -6,10 +6,10 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @ComponentScan(basePackages = "com.hoangtien2k3")
-public class ProductRecommentServiceApplication {
+public class ProductRecommendServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ProductRecommentServiceApplication.class, args);
+		SpringApplication.run(ProductRecommendServiceApplication.class, args);
 	}
 
 }

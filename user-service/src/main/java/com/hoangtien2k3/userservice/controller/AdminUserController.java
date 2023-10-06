@@ -19,6 +19,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/admin")
@@ -55,6 +56,22 @@ public class AdminUserController {
                 headerGenerator.getHeadersForError(),
                 HttpStatus.NOT_FOUND);
     }
+
+    //   users/{id}
+    @GetMapping(value = "/user/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable("id") Long id) {
+
+        if (userService.findById(id).isPresent()) {
+            User user = userService.findById(id).get();
+            return new ResponseEntity<>(user,
+                    headerGenerator.getHeadersForSuccessGetMethod(),
+                    HttpStatus.OK);
+        }
+        return new ResponseEntity<>(null,
+                headerGenerator.getHeadersForError(),
+                HttpStatus.NOT_FOUND);
+    }
+
 
     @GetMapping("/user/all")
     public ResponseEntity<?> getAllUsers() {

@@ -6,9 +6,9 @@ import com.hoangtien2k3.productrecommentservice.http.HeaderGenerator;
 import com.hoangtien2k3.productrecommentservice.model.Product;
 import com.hoangtien2k3.productrecommentservice.model.Recommend;
 import com.hoangtien2k3.productrecommentservice.model.User;
-import com.hoangtien2k3.productrecommentservice.service.RecommentService;
+import com.hoangtien2k3.productrecommentservice.service.RecommendService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,25 +16,30 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/recommend")
 public class RecommendController {
 
-    @Autowired
-    private RecommentService recommentService;
+    private final RecommendService recommendService;
+    private final ProductClient productClient;
+    private final UserClient userClient;
+    private final HeaderGenerator headerGenerator;
 
     @Autowired
-    private ProductClient productClient;
-
-    @Autowired
-    private UserClient userClient;
-
-    @Autowired
-    private HeaderGenerator headerGenerator;
+    public RecommendController(RecommendService recommendService,
+                               ProductClient productClient,
+                               UserClient userClient,
+                               HeaderGenerator headerGenerator) {
+        this.recommendService = recommendService;
+        this.productClient = productClient;
+        this.userClient = userClient;
+        this.headerGenerator = headerGenerator;
+    }
 
     @GetMapping(value = "/recommends")
     private ResponseEntity<List<Recommend>> getAllRating(@RequestParam("name") String productName) {
-        List<Recommend> recommendations = recommentService.getAllRecommendationByProductName(productName);
+        List<Recommend> recommendations = recommendService.getAllRecommendationByProductName(productName);
         if (!recommendations.isEmpty()) {
             return new ResponseEntity<List<Recommend>>(
                     recommendations,
@@ -60,13 +65,13 @@ public class RecommendController {
                 recommendation.setProduct(product);
                 recommendation.setUser(user);
                 recommendation.setRating(rating);
-                recommentService.saveRecommendation(recommendation);
+                recommendService.saveRecommendation(recommendation);
                 return new ResponseEntity<Recommend>(
                         recommendation,
                         headerGenerator.getHeadersForSuccessPostMethod(request, recommendation.getId()),
                         HttpStatus.CREATED);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Error is " + e);
                 return new ResponseEntity<Recommend>(
                         headerGenerator.getHeadersForError(),
                         HttpStatus.INTERNAL_SERVER_ERROR);
@@ -79,15 +84,15 @@ public class RecommendController {
 
     @DeleteMapping(value = "/recommends/{id}")
     private ResponseEntity<Void> deleteRecommendations(@PathVariable("id") Long id) {
-        Recommend recommendation = recommentService.getRecommendationById(id);
+        Recommend recommendation = recommendService.getRecommendationById(id);
         if (recommendation != null) {
             try {
-                recommentService.deleteRecommendation(id);
+                recommendService.deleteRecommendation(id);
                 return new ResponseEntity<Void>(
                         headerGenerator.getHeadersForSuccessGetMethod(),
                         HttpStatus.OK);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Error is " + e);
                 return new ResponseEntity<Void>(
                         headerGenerator.getHeadersForError(),
                         HttpStatus.INTERNAL_SERVER_ERROR);
@@ -97,6 +102,5 @@ public class RecommendController {
                 headerGenerator.getHeadersForError(),
                 HttpStatus.NOT_FOUND);
     }
-
 
 }
