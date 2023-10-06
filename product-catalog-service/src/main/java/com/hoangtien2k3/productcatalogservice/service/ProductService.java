@@ -13,6 +13,8 @@ public interface ProductService {
     List<Product> getAllProductsByName(String name);
     Product addProduct(Product product);
     void deleteProduct(Long productId);
+
+
     Page<Product> getProducts(int page, int size);
 
 

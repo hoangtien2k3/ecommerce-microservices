@@ -14,6 +14,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -25,18 +26,26 @@ import javax.transaction.Transactional;
 
 @Transactional
 @Slf4j
-@RequiredArgsConstructor
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
     @Autowired
-    private final PaymentRepository paymentRepository;
-    @Autowired
-    private final RestTemplate restTemplate;
+    private RestTemplate restTemplate;
 //    @Autowired
 //    private final WebClient webClient;
-    @Autowired
+
+    private final PaymentRepository paymentRepository;
+    private final DiscoveryClient discoveryClient;
     private final WebClient.Builder webClientBuilder;
+
+    @Autowired
+    public PaymentServiceImpl(PaymentRepository paymentRepository,
+                              DiscoveryClient discoveryClient,
+                              WebClient.Builder webClientBuilder) {
+        this.paymentRepository = paymentRepository;
+        this.discoveryClient = discoveryClient;
+        this.webClientBuilder = webClientBuilder;
+    }
 
 
     @Override
@@ -52,7 +61,6 @@ public class PaymentServiceImpl implements PaymentService {
                 .distinct()
                 .toList();
     }
-
 
 
     @Override
@@ -100,7 +108,6 @@ public class PaymentServiceImpl implements PaymentService {
 //                .collect(Collectors.toList());
 //    }
 
-
     @Override
     public PaymentDto findById(Integer paymentId) {
         log.info("PaymentDto, service; fetch payment by id");
@@ -113,6 +120,47 @@ public class PaymentServiceImpl implements PaymentService {
                 })
                 .orElseThrow(() -> new PaymentNotFoundException(String.format("Payment with id[%d] not found", paymentId)));
     }
+
+
+//    @Override
+//    public PaymentDto findById(Integer paymentId) {
+//        log.info("PaymentDto, service; fetch payment by id");
+//        return this.paymentRepository.findById(paymentId)
+//                .map(PaymentMappingHelper::map)
+//                .map(p -> {
+//                    OrderDto orderDto = retrieveOrderDetails(p.getOrderDto().getOrderId());
+//                    p.setOrderDto(orderDto);
+//                    return p;
+//                })
+//                .orElseThrow(() -> new PaymentNotFoundException(String.format("Payment with id[%d] not found", paymentId)));
+//    }
+//
+//
+//    private OrderDto retrieveOrderDetails(Integer orderId) {
+//        String orderServiceUrl = Objects.requireNonNull(discoveryClient.getInstances("ORDER-SERVICE"))
+//                .stream()
+//                .findFirst()
+//                .map(serviceInstance -> serviceInstance.getUri().toString())
+//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Order service not available"));
+//
+//        WebClient orderServiceClient = webClientBuilder.baseUrl(orderServiceUrl).build();
+//
+//        Mono<OrderDto> orderDtoMono = orderServiceClient
+//                .method(HttpMethod.GET)
+//                .uri("/" + orderId)
+//                .accept(MediaType.APPLICATION_JSON)
+//                .retrieve()
+//                .onStatus(
+//                        HttpStatus::is4xxClientError,
+//                        response -> Mono.error(new ResponseStatusException(response.statusCode(), "Order service responded with error")))
+//                .onStatus(
+//                        HttpStatus::is5xxServerError,
+//                        response -> Mono.error(new ResponseStatusException(response.statusCode(), "Order service encountered an error")))
+//                .bodyToMono(OrderDto.class);
+//
+//        return orderDtoMono.block(); // Blocking, you may want to use reactive patterns throughout your application
+//    }
+//
 
     @Override
     public PaymentDto save(PaymentDto paymentDto) {

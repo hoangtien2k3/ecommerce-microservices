@@ -20,6 +20,9 @@ public class InventoryController {
     @Autowired
     private final InventoryService inventoryService;
 
+    @Autowired
+    private final JwtValidate jwtValidate;
+
 
     // http://localhost:8083/api/inventory/iphone_13,iphone13_red
 
@@ -29,7 +32,7 @@ public class InventoryController {
     @ResponseStatus(HttpStatus.OK)
     public List<InventoryResponse> isInStockNoAccessToken(@RequestHeader(name = "Authorization") String authorizationHeader,
                                                           @RequestParam List<String> productName) {
-        if (inventoryService.validateTokenUserService(authorizationHeader)) {
+        if (jwtValidate.validateTokenUserService(authorizationHeader)) {
             log.info("Received inventory check request for skuCode: {}", productName);
             return inventoryService.isInStock(productName);
         }
@@ -40,7 +43,7 @@ public class InventoryController {
     @GetMapping("/validateToken")
     public String getOrderDetails(@RequestHeader(name = "Authorization") String authorizationHeader) {
         // Kiểm tra tính hợp lệ của token trước khi gọi API
-        if (inventoryService.validateTokenUserService(authorizationHeader)) {
+        if (jwtValidate.validateTokenUserService(authorizationHeader)) {
             return inventoryService.getTokenUserService(authorizationHeader);
         } else {
             return "Unauthorized accessToken";

@@ -31,9 +31,9 @@ public class OrderController {
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderDto> findById(@PathVariable("orderId")
                                              @NotBlank(message = "Input must not be blank")
-                                             @Valid final String orderId) {
+                                             @Valid final Integer orderId) {
         log.info("OrderDto, resource; fetch order by id");
-        return ResponseEntity.ok(this.orderService.findById(Integer.parseInt(orderId)));
+        return ResponseEntity.ok(this.orderService.findById(orderId));
     }
 
     @PostMapping
@@ -55,18 +55,18 @@ public class OrderController {
     @PutMapping("/{orderId}")
     public ResponseEntity<OrderDto> update(@PathVariable("orderId")
                                            @NotBlank(message = "Input must not be blank")
-                                           @Valid final String orderId,
+                                           @Valid final Integer orderId,
                                            @RequestBody
                                            @NotNull(message = "Input must not be NULL")
                                            @Valid final OrderDto orderDto) {
         log.info("OrderDto, resource; update order with orderId");
-        return ResponseEntity.ok(this.orderService.update(Integer.parseInt(orderId), orderDto));
+        return ResponseEntity.ok(this.orderService.update(orderId, orderDto));
     }
 
     @DeleteMapping("/{orderId}")
-    public ResponseEntity<Boolean> deleteById(@PathVariable("orderId") final String orderId) {
+    public ResponseEntity<Boolean> deleteById(@PathVariable("orderId") final Integer orderId) {
         log.info("Boolean, resource; delete order by id");
-        this.orderService.deleteById(Integer.parseInt(orderId));
+        this.orderService.deleteById(orderId);
         return ResponseEntity.ok(true);
     }
 

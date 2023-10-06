@@ -54,11 +54,10 @@ public class PaymentController {
     @GetMapping("/{paymentId}")
     public ResponseEntity<PaymentDto> findById(@PathVariable("paymentId")
                                                @NotBlank(message = "Input must not be blank")
-                                               @Valid final String paymentId) {
+                                               @Valid final Integer paymentId) {
         log.info("PaymentDto, resource; fetch payment by id");
-        return ResponseEntity.ok(this.paymentService.findById(Integer.parseInt(paymentId)));
+        return ResponseEntity.ok(this.paymentService.findById(paymentId));
     }
-
 
     @PostMapping
     public ResponseEntity<PaymentDto> save(@RequestBody

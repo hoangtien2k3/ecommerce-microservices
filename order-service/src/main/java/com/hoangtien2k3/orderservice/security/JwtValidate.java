@@ -1,4 +1,4 @@
-package com.hoangtien2k3.inventoryservice.security;
+package com.hoangtien2k3.orderservice.security;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
