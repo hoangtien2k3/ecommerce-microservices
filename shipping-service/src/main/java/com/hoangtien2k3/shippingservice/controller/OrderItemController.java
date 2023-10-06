@@ -51,34 +51,34 @@ public class OrderItemController {
     }
 
     @PostMapping
-    public ResponseEntity<OrderItemDto> save(@RequestParam(name = "Authorization") String authorizationToken,
+    public ResponseEntity<OrderItemDto> save(@RequestHeader(name = "Authorization") String authorizationHeader,
                                              @RequestBody @NotNull(message = "Input must not be NULL")
                                              @Valid final OrderItemDto orderItemDto) {
-        if (!jwtValidate.validateTokenUserService(authorizationToken)) {
-            ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (!jwtValidate.validateTokenUserService(authorizationHeader)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         log.info("OrderItemDto, resource; save orderItem");
         return ResponseEntity.ok(this.orderItemService.save(orderItemDto));
     }
 
     @PutMapping
-    public ResponseEntity<OrderItemDto> update(@RequestParam(name = "Authorization") String authorizationToken,
+    public ResponseEntity<OrderItemDto> update(@RequestHeader(name = "Authorization") String authorizationHeader,
                                                @RequestBody
                                                @NotNull(message = "Input must not be NULL")
                                                @Valid final OrderItemDto orderItemDto) {
-        if (!jwtValidate.validateTokenUserService(authorizationToken)) {
-            ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (!jwtValidate.validateTokenUserService(authorizationHeader)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         log.info("OrderItemDto, resource; update orderItem");
         return ResponseEntity.ok(this.orderItemService.update(orderItemDto));
     }
 
     @DeleteMapping("/{orderId}/{productId}")
-    public ResponseEntity<Boolean> deleteById(@RequestParam(name = "Authorization") String authorizationToken,
+    public ResponseEntity<Boolean> deleteById(@RequestHeader(name = "Authorization") String authorizationHeader,
                                               @PathVariable("orderId") final String orderId,
                                               @PathVariable("productId") final String productId) {
-        if (!jwtValidate.validateTokenUserService(authorizationToken)) {
-            ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (!jwtValidate.validateTokenUserService(authorizationHeader)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         log.info("Boolean, resource; delete orderItem by id");
         this.orderItemService.deleteById(new OrderItemId(Integer.parseInt(orderId), Integer.parseInt(productId)));
@@ -86,12 +86,12 @@ public class OrderItemController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Boolean> deleteById(@RequestParam(name = "Authorization") String authorizationToken,
+    public ResponseEntity<Boolean> deleteById(@RequestHeader(name = "Authorization") String authorizationHeader,
                                               @RequestBody
                                               @NotNull(message = "Input must not be NULL")
                                               @Valid final OrderItemId orderItemId) {
-        if (!jwtValidate.validateTokenUserService(authorizationToken)) {
-            ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (!jwtValidate.validateTokenUserService(authorizationHeader)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         log.info("Boolean, resource; delete orderItem by id");
         this.orderItemService.deleteById(orderItemId);
