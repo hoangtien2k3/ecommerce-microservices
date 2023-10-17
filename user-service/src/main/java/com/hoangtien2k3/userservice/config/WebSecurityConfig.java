@@ -56,20 +56,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception {
 
         httpSecurity
-                .cors() // Cross-Origin Resource Sharing (CORS): cho phép các yêu cầu từ các nguồn khác nhau được gửi đến ứng dụng web
+                .cors() // Cross-Origin Resource Sharing (CORS):
                 .and()
-                .csrf().disable()  // Vô hiệu hóa CSRF (Cross-Site Request Forgery)
+                .csrf().disable()  // CSRF (Cross-Site Request Forgery)
                 .authorizeRequests()
-                .antMatchers("/api/auth/**").permitAll() // Cho phép tất cả các yêu cầu tới /api/auth/** được truy cập mà không cần xác thực.
+                .antMatchers("/api/auth/**").permitAll()
                 .antMatchers("/api/manager/token").permitAll()
-                .anyRequest().authenticated()   // Yêu cầu tất cả các yêu cầu khác phải được xác thực.
+                .anyRequest().authenticated()
                 .and()
-                .exceptionHandling().authenticationEntryPoint(jwtEntryPoint) // Xử lý các ngoại lệ liên quan đến xác thực và ủy quyền.
+                .exceptionHandling().authenticationEntryPoint(jwtEntryPoint)
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        httpSecurity.addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class); // để xác thực và ủy quyền yêu cầu sử dụng JWT (JSON Web Token).
+        httpSecurity.addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
     }
 

@@ -18,16 +18,20 @@ public interface ProductService {
 
     Page<Product> getProducts(int page, int size);
 
-
     //    List<Product> getAllProductsPage(int page, int size);
     PageResult getAllProductsPage(int page, int size);
-
 
     //  search and paging product
     List<Product> searchProductsByKeyword(String keyword);
 
+
+
     // search and paging product
     Page<Product> searchProducts(String keyword, Pageable pageable);
+
+
+    // search and paging
+    Page<Product> searchProducts(String keyword, Pageable pageable, String orderBy, String orderDirection);
 
 }
 

@@ -31,5 +31,10 @@ public interface ProductSearchAndPageRepository extends PagingAndSortingReposito
     )
     Page<Product> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
+
+    Page<Product> findByKeyword(@Param("keyword") String keyword, Pageable pageable,
+                                @Param("orderBy") String orderBy,
+                                @Param("orderDirection") String orderDirection
+    );
 }
 

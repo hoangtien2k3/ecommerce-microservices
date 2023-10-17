@@ -81,12 +81,33 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.searchProductsByKeyword(keyword.toLowerCase());
     }
 
+
     // search and page and sort by price default asc
     @Override
     public Page<Product> searchProducts(String keyword, Pageable pageable) {
         Sort sort = Sort.by("price").ascending();
         pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
         return productSearchAndPageRepository.searchByKeyword(keyword, pageable);
+    }
+
+
+    @Override
+    public Page<Product> searchProducts(String keyword, Pageable pageable, String orderBy, String orderDirection) {
+        if (keyword == null) {
+            keyword = "";
+        }
+        if (orderBy == null) {
+            orderBy = "price"; // Sắp xếp theo giá mặc định
+        }
+        if (orderDirection == null) {
+            orderDirection = "asc"; // Sắp xếp tăng dần mặc định
+        }
+
+        // Xử lý sự thay đổi sắp xếp dựa trên orderBy và orderDirection
+        Sort sort = Sort.by(orderDirection.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, orderBy);
+        pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+
+        return productSearchAndPageRepository.findByKeyword(keyword, pageable, orderBy, orderDirection);
     }
 
 }

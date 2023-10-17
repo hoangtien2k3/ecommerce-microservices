@@ -137,34 +137,14 @@ public class ProductController {
             @RequestParam(value = "keyword", required = false) String keyword,
             @PageableDefault(size = 10, sort = "price", direction = Sort.Direction.ASC) Pageable pageable) {
 
-//        if (keyword == null) {
-//            // keyword is null
-//            return ResponseEntity.notFound().build();
-//        }
+        if (keyword == null) {
+            // keyword is null
+            return ResponseEntity.notFound().build();
+        }
 
         Page<Product> products = productService.searchProducts(keyword, pageable);
         return ResponseEntity.ok(products);
     }
-
-
-    // http://localhost:8081/searchProducts?keyword=searchKeyword&page=0&size=10&sortField=productName&sortDir=asc
-//    @GetMapping("/searchProducts")
-//    public Page<Product> searchProducts(
-//            @RequestParam("keyword") String keyword,
-//            @RequestParam("page") int page,
-//            @RequestParam("size") int size,
-//            @RequestParam("sortField") String sortField,
-//            @RequestParam("sortDir") String sortDir) {
-//
-//        Sort sort = Sort.by(sortField);
-//        if ("desc".equals(sortDir)) {
-//            sort = sort.descending();
-//        }
-//
-//        Pageable pageable = PageRequest.of(page, size, sort);
-//
-//        return productSearchAndPageRepository.searchByKeywordWithSorting(keyword, pageable, sort);
-//    }
 
 }
 
