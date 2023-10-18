@@ -25,14 +25,12 @@ public class AuthController {
     @Autowired
     private JwtProvider jwtProvider;
 
-
     @PostMapping("/signup")
     public Mono<ResponseEntity<ResponseMessage>> register(@Valid @RequestBody SignUpForm signUpForm) {
         return userService.registerUser(signUpForm)
                 .flatMap(user -> Mono.just(new ResponseEntity<>(new ResponseMessage("User: " + signUpForm.getUsername() + " create successfully."), HttpStatus.OK)))
                 .onErrorResume(error -> Mono.just(new ResponseEntity<>(new ResponseMessage(error.getMessage()), HttpStatus.BAD_REQUEST)));
     }
-
 
     @PostMapping("/signin")
     public Mono<ResponseEntity<JwtResponse>> login(@Valid @RequestBody SignInForm signInForm) {
@@ -44,7 +42,6 @@ public class AuthController {
                 });
     }
 
-
     @PostMapping("/refresh")
     public Mono<ResponseEntity<JwtResponse>> refresh(@RequestHeader("Refresh-Token") String refreshToken) {
         return userService.refreshToken(refreshToken)
@@ -54,7 +51,6 @@ public class AuthController {
                 })
                 .onErrorResume(error -> Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()));
     }
-
 
     @GetMapping("/validateToken")
     public Boolean validateToken( @RequestHeader(name = "Authorization") String authorizationToken) {
