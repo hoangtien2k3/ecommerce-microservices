@@ -28,7 +28,10 @@ public class AuthController {
     @PostMapping("/signup")
     public Mono<ResponseEntity<ResponseMessage>> register(@Valid @RequestBody SignUpForm signUpForm) {
         return userService.registerUser(signUpForm)
-                .flatMap(user -> Mono.just(new ResponseEntity<>(new ResponseMessage("User: " + signUpForm.getUsername() + " create successfully."), HttpStatus.OK)))
+                .flatMap(user -> Mono.just(new ResponseEntity<>(
+                        new ResponseMessage("User: " + signUpForm.getUsername() + " create successfully."),
+                        HttpStatus.OK))
+                )
                 .onErrorResume(error -> Mono.just(new ResponseEntity<>(new ResponseMessage(error.getMessage()), HttpStatus.BAD_REQUEST)));
     }
 

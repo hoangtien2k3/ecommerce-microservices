@@ -70,26 +70,44 @@ public class UserServiceImpl implements IUserService {
             Set<Role> roles = new HashSet<>();
 
             signUpForm.getRoles().forEach(role -> {
-                switch (role) {
-                    case "admin" -> {
-                        Role adminRole = roleRepository
-                                .findByName(RoleName.ADMIN)
-                                .orElseThrow(() -> new RuntimeException("Role not found."));
-                        roles.add(adminRole);
+//                switch (role) {
+//                    case "ADMIN" -> {
+//                        Role adminRole = roleRepository
+//                                .findByName(RoleName.ADMIN)
+//                                .orElseThrow(() -> new RuntimeException("Role not found."));
+//                        roles.add(adminRole);
+//                    }
+//                    case "PM" -> {
+//                        Role pmRole = roleRepository
+//                                .findByName(RoleName.PM)
+//                                .orElseThrow(() -> new RuntimeException("Role not found."));
+//                        roles.add(pmRole);
+//                    }
+//                    default -> {
+//                        Role userRole = roleRepository
+//                                .findByName(RoleName.USER)
+//                                .orElseThrow(() -> new RuntimeException("Role not found."));
+//                        roles.add(userRole);
+//                    }
+
+
+                    RoleName roleName = null;
+                    switch (role) {
+                        case "admin": case "ADMIN":
+                            roleName = RoleName.ADMIN;
+                            break;
+                        case "PM": case "pm":
+                            roleName = RoleName.PM;
+                            break;
+                        case "USER": case "user":
+                            roleName = RoleName.USER;
+                            break;
                     }
-                    case "pm" -> {
-                        Role pmRole = roleRepository
-                                .findByName(RoleName.PM)
-                                .orElseThrow(() -> new RuntimeException("Role not found."));
-                        roles.add(pmRole);
-                    }
-                    default -> {
-                        Role userRole = roleRepository
-                                .findByName(RoleName.USER)
-                                .orElseThrow(() -> new RuntimeException("Role not found."));
-                        roles.add(userRole);
-                    }
-                }
+
+                    Role userRole = roleRepository.findByName(roleName)
+                            .orElseThrow(() -> new RuntimeException("Role not found."));
+                    roles.add(userRole);
+
             });
 
             User user = User.builder()

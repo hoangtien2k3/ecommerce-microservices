@@ -27,7 +27,6 @@ public class AdminProductController {
         this.jwtValidate = jwtValidate;
     }
 
-
     @PostMapping("/products")
     private ResponseEntity<Product> addProduct(@RequestHeader(name = "Authorization") String authorizationHeader,
                                                @RequestBody ProductRequest productRequest) {

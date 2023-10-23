@@ -36,6 +36,8 @@ dependencies {
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+//	implementation(org.springframework.boot:spring-boot-starter-mail)
+//	testImplementation(org.springframework.boot:spring-boot-starter-test)
 }
 
 tasks.withType<KotlinCompile> {
