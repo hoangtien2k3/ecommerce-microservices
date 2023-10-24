@@ -16,10 +16,15 @@ import org.springframework.data.mongodb.core.mapping.Document
 @Setter
 @Document(collation = "message")
 class Message {
-    private val id: Long = 0
+    var id: Long = 0
     private val subject: String? = null
     private val from: String? = null
     private val to: String? = null
     private val body: String? = null
     private val sentTime: String? = null
+
+    override fun toString(): String {
+        return "Message(id=$id, subject=$subject, from=$from, to=$to, body=$body, sentTime=$sentTime)"
+    }
+
 }

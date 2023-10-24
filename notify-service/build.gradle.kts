@@ -36,6 +36,17 @@ dependencies {
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+	implementation("io.springfox:springfox-swagger2:2.6.1")
+	implementation("io.springfox:springfox-swagger-ui:2.6.1")
+
+	implementation("com.ullink.slack:simpleslackapi:1.2.0")
+	implementation("it.ozimov:spring-boot-email-core:0.6.3")
+
+	implementation("org.slf4j:slf4j-api:1.7.32")
+	implementation("ch.qos.logback:logback-classic:1.2.6")
+
+
 //	implementation(org.springframework.boot:spring-boot-starter-mail)
 //	testImplementation(org.springframework.boot:spring-boot-starter-test)
 }
