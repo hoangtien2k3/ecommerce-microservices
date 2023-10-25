@@ -28,21 +28,21 @@ class NotificationService {
     private val notificationId = AtomicInteger(1)
 
 
-    fun notifyAll(msg: Message): Long {
-        for (c in factory!!.getChannels()!!) {
-            msg.id = notificationId.getAndIncrement().toLong()
-            c.notify(msg)
-            LOG.debug("ID = $notificationId, Message sent = $msg")
-        }
-        return notificationId.toLong()
-    }
-
-    fun notify(channelType: ChannelType?, msg: Message): Long {
-        msg.id = notificationId.getAndIncrement().toLong()
-        factory!![channelType!!].notify(msg)
-        LOG.debug("ID = $notificationId, Message sent = $msg")
-        return notificationId.toLong()
-    }
+//    fun notifyAll(msg: Message): Long {
+//        for (c in factory!!.getChannels()!!) {
+//            msg.id = notificationId.getAndIncrement().toLong()
+//            c.notify(msg)
+//            LOG.debug("ID = $notificationId, Message sent = $msg")
+//        }
+//        return notificationId.toLong()
+//    }
+//
+//    fun notify(channelType: ChannelType?, msg: Message): Long {
+//        msg.id = notificationId.getAndIncrement().toLong()
+//        factory!![channelType!!].notify(msg)
+//        LOG.debug("ID = $notificationId, Message sent = $msg")
+//        return notificationId.toLong()
+//    }
 
 
 }

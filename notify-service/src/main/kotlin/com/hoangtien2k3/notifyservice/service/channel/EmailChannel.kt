@@ -21,9 +21,9 @@ class EmailChannel : Channel{
     @Value("\${spring.mail.username}")
     var fromEmail: String? = null
 
-    fun notify(msg: Message) {
-
-        println(emailValidator.hashCode())
+//    fun notify(msg: Message) {
+//
+//        println(emailValidator.hashCode())
 
 //        if (this::emailValidator.isInitialized && emailValidator.isValid("abc")) {
 //
@@ -52,7 +52,7 @@ class EmailChannel : Channel{
 //        } catch (e: Exception) {
 //            throw RuntimeException("Failed to send message using email channel, exception : " + e.message, e)
 //        }
-    }
+//    }
 
 }
 

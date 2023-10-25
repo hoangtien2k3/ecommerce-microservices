@@ -12,19 +12,16 @@ import org.springframework.data.mongodb.core.mapping.Document
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
 @Document(collation = "message")
-class Message {
-    var id: Long = 0
-    private val subject: String? = null
-    private val from: String? = null
-    private val to: String? = null
-    private val body: String? = null
-    private val sentTime: String? = null
+data class Message constructor(
+    val id: Long = 0,
+    val subject: String,
+    val from: String,
+    val to: String,
+    val body: String,
+    val sentTime: String
+) {
+    val checkId : Boolean get() = id > 10
 
-    override fun toString(): String {
-        return "Message(id=$id, subject=$subject, from=$from, to=$to, body=$body, sentTime=$sentTime)"
-    }
 
 }

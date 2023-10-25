@@ -8,17 +8,15 @@ import org.springframework.stereotype.Component
 @Component
 class ChannelFactory {
 
-    @Autowired
-    private var channelList: List<Channel>? = null
+//    @Autowired
+    private val channelList = mutableListOf<Channel>()
 
     operator fun get(c: ChannelType): Channel {
-        return channelList
-            ?.filter { service -> service.supports(c) }
-            ?.firstOrNull() ?: throw RuntimeException("No channel found with type: $c")
+        return channelList.firstOrNull { service -> service.supports(c) } ?: throw RuntimeException("No channel found with type: $c")
     }
 
     fun notifyAll(msg: Message?) {
-        channelList?.forEach { c -> c.notify(msg) }
+        channelList.forEach { c -> c.notify(msg) }
     }
 
     fun getChannels(): List<Channel>? {
