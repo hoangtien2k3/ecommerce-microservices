@@ -16,8 +16,6 @@ public class NotifyServiceSendEmailApplication {
 	public static void main(String[] args) throws MessagingException {
 //		SpringApplication.run(NotifyServiceSendEmailApplication.class, args);
 
-
-//
 //		Properties props = new Properties();
 //		props.put("mail.smtp.host", "smtp.gmail.com"); //SMTP Host
 //		props.put("mail.smtp.socketFactory.port", "587"); //SSL Port
@@ -44,8 +42,7 @@ public class NotifyServiceSendEmailApplication {
 		String subject = "subject";
 		String msg ="email text....";
 		final String from ="hoangtien2k3dev@gmail.com";
-		final  String password ="Aa";
-
+		final  String password ="123456#";
 
 		Properties props = new Properties();
 		props.setProperty("mail.transport.protocol", "smtp");
@@ -59,7 +56,7 @@ public class NotifyServiceSendEmailApplication {
 		Session session = Session.getDefaultInstance(props,
 				new javax.mail.Authenticator() {
 					protected PasswordAuthentication getPasswordAuthentication() {
-						return new PasswordAuthentication(from,password);
+						return new PasswordAuthentication(from, password);
 					}
 				});
 
@@ -77,7 +74,6 @@ public class NotifyServiceSendEmailApplication {
 		Transport.send(message);
 		transport.close();
 	}
-
 
 
 	public static void sendEmail(Session session, String toEmail, String subject, String body) {
