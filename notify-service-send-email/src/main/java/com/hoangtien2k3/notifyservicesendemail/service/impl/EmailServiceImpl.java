@@ -105,7 +105,7 @@ public class EmailServiceImpl implements EmailService {
 
             javaMailSender.send(mimeMessage);
 
-            return "Email send successfully";
+            return "Email send success to " + cc;
 
         } catch (Exception e) {
             throw new RuntimeException(e);
