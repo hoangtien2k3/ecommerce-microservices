@@ -23,14 +23,14 @@ public abstract class AppConstant {
         public static final String ORDER_SERVICE_HOST = "http://ORDER-SERVICE/order-service";
         public static final String ORDER_SERVICE_API_URL = "http://ORDER-SERVICE/order-service/api/orders";
 
-//        public static final String FAVOURITE_SERVICE_HOST = "http://FAVOURITE-SERVICE/favourite-service";
-//        public static final String FAVOURITE_SERVICE_API_URL = "http://FAVOURITE-SERVICE/favourite-service/api/favourites";
+        public static final String FAVOURITE_SERVICE_HOST = "http://FAVOURITE-SERVICE/favourite-service";
+        public static final String FAVOURITE_SERVICE_API_URL = "http://FAVOURITE-SERVICE/favourite-service/api/favourites";
 
         public static final String PAYMENT_SERVICE_HOST = "http://PAYMENT-SERVICE/payment-service";
         public static final String PAYMENT_SERVICE_API_URL = "http://PAYMENT-SERVICE/payment-service/api/payments";
 
-//        public static final String SHIPPING_SERVICE_HOST = "http://SHIPPING-SERVICE/shipping-service";
-//        public static final String SHIPPING_SERVICE_API_URL = "http://SHIPPING-SERVICE/shipping-service/api/shippings";
+        public static final String SHIPPING_SERVICE_HOST = "http://SHIPPING-SERVICE/shipping-service";
+        public static final String SHIPPING_SERVICE_API_URL = "http://SHIPPING-SERVICE/shipping-service/api/shippings";
 
     }
 

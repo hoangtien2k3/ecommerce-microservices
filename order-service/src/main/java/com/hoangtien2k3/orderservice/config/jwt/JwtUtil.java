@@ -33,8 +33,6 @@ public class JwtUtil {
             long currentTimeMillis = System.currentTimeMillis();
             // Token đã hết hạn
             return claims.getExpiration().getTime() >= currentTimeMillis;
-
-            // TODO: SET ROLE ...
         } catch (ExpiredJwtException e) {
             // Token đã hết hạn
             return false;
