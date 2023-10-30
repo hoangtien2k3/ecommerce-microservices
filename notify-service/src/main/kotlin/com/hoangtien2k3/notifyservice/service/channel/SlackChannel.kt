@@ -32,6 +32,7 @@ class SlackChannel : Channel {
 //            try {
 //                session?.disconnect()
 //            } catch (ignore: IOException) {
+//
 //            }
 //        }
     }

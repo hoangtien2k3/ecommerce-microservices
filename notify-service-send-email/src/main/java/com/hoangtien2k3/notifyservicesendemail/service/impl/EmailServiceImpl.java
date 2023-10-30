@@ -4,11 +4,13 @@ import com.hoangtien2k3.notifyservicesendemail.entity.EmailDetails;
 import com.hoangtien2k3.notifyservicesendemail.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -21,7 +23,7 @@ public class EmailServiceImpl implements EmailService {
     private JavaMailSender javaMailSender; // spring-boot-starter-mail
 
     @Value("${spring.mail.username}")
-    private String sender;
+    private String fromEmail;
 
     @Override
     public String sendSimpleMail(EmailDetails details) {
@@ -33,7 +35,7 @@ public class EmailServiceImpl implements EmailService {
             SimpleMailMessage mailMessage = new SimpleMailMessage();
 
             // Setting up necessary details
-            mailMessage.setFrom(sender);
+            mailMessage.setFrom(fromEmail);
             mailMessage.setTo(details.getRecipient());
             mailMessage.setText(details.getMsgBody());
             mailMessage.setSubject(details.getSubject());
@@ -59,7 +61,7 @@ public class EmailServiceImpl implements EmailService {
         try {
 
             mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-            mimeMessageHelper.setFrom(sender);
+            mimeMessageHelper.setFrom(fromEmail);
             mimeMessageHelper.setTo(details.getRecipient());
             mimeMessageHelper.setText(details.getMsgBody());
             mimeMessageHelper.setSubject(details.getSubject());
@@ -81,4 +83,36 @@ public class EmailServiceImpl implements EmailService {
             return "Error while sending mail!!!";
         }
     }
+
+    @Override
+    public String sendMail(MultipartFile[] file, String to, String[] cc, String subject, String body) {
+        try {
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+
+            mimeMessageHelper.setFrom(fromEmail);
+            mimeMessageHelper.setTo(to);
+            mimeMessageHelper.setCc(cc);
+            mimeMessageHelper.setSubject(subject);
+            mimeMessageHelper.setText(body);
+
+            for (int i = 0; i < file.length; i++) {
+                mimeMessageHelper.addAttachment(
+                        file[i].getOriginalFilename(),
+                        new ByteArrayResource(file[i].getBytes()));
+            }
+
+            javaMailSender.send(mimeMessage);
+
+            return "mail send successfully";
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
+
 }
