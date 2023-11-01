@@ -2,19 +2,32 @@ package com.hoangtien2k3.orderservice.controller;
 
 import com.hoangtien2k3.orderservice.dto.OrderDto;
 import com.hoangtien2k3.orderservice.dto.response.collection.DtoCollectionResponse;
+import com.hoangtien2k3.orderservice.entity.RoleName;
+import com.hoangtien2k3.orderservice.security.Authorities;
+import com.hoangtien2k3.orderservice.security.AuthorityTokenUtil;
 import com.hoangtien2k3.orderservice.security.JwtValidate;
+import com.hoangtien2k3.orderservice.security.RoleAuthorities;
 import com.hoangtien2k3.orderservice.service.OrderService;
+import io.jsonwebtoken.Jwt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.management.relation.Role;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,7 +40,8 @@ public class OrderController {
 
     @Autowired
     private final JwtValidate jwtValidate;
-
+    @Autowired
+    private final RoleAuthorities roleAuthorities;
 
     @GetMapping
     public ResponseEntity<DtoCollectionResponse<OrderDto>> findAll() {
@@ -46,16 +60,49 @@ public class OrderController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize(value = "hasAuthority('ADMIN')")
     public ResponseEntity<OrderDto> save(@RequestHeader(name = "Authorization") String authorization,
                                          @RequestBody @NotNull(message = "Input must not be NULL")
                                          @Valid final OrderDto orderDto) {
 
-        if (jwtValidate.validateTokenUserService(authorization)) {
-            log.info("OrderDto, resource; save order");
-            return ResponseEntity.ok(this.orderService.save(orderDto));
+//        if (jwtValidate.validateTokenUserService(authorization)) {
+//            log.info("OrderDto, resource; save order");
+//            return ResponseEntity.ok(this.orderService.save(orderDto));
+//        }
+//        return ResponseEntity.status(HttpStatus.SC_UNAUTHORIZED).build();
+
+
+        List<String> listRoleAuthorities = roleAuthorities.hasAuthority(authorization);
+
+        System.out.println(listRoleAuthorities.size());
+        for(String auth : listRoleAuthorities) {
+            if (auth.equals("ADMIN")) {
+                return ResponseEntity.ok(this.orderService.save(orderDto));
+            }
         }
-        return ResponseEntity.status(HttpStatus.SC_UNAUTHORIZED).build();
+        return ResponseEntity.status(HttpStatus.SC_FORBIDDEN).build();
+
+
+//
+//        if () {
+//            // log.info("OrderDto, resource; save order");
+//            return ResponseEntity.ok(this.orderService.save(orderDto));
+//        } else {
+//            return ResponseEntity.status(HttpStatus.SC_FORBIDDEN).build();
+//        }
+
+    }
+
+    @PostMapping("/user/{username}")
+    @PreAuthorize("isAuthenticated() and #username == authentication.principal.username")
+    public List<String> getMyRoles(@PathVariable("username") String username) {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        return securityContext
+                .getAuthentication()
+                .getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
     }
 
     @PutMapping

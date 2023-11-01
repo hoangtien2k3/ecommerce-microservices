@@ -20,7 +20,6 @@ public class JwtUtil {
 
     public static boolean validateToken(String token) {
         if (token.startsWith("Bearer ")) token = token.replace("Bearer ", "");
-
         try {
             // Giải mã token và kiểm tra tính hợp lệ
             Claims claims = Jwts
@@ -29,16 +28,12 @@ public class JwtUtil {
                     .parseClaimsJws(token)
                     .getBody();
 
-            // Kiểm tra thời gian hết hạn của token
-            long currentTimeMillis = System.currentTimeMillis();
-            // Token đã hết hạn
-            return claims.getExpiration().getTime() >= currentTimeMillis;
+            long currentTimeMillis = System.currentTimeMillis(); // Kiểm tra thời gian hết hạn của token
+            return claims.getExpiration().getTime() >= currentTimeMillis; // Token đã hết hạn
         } catch (ExpiredJwtException e) {
-            // Token đã hết hạn
-            return false;
+            return false; // Token đã hết hạn
         } catch (Exception e) {
-            // Xảy ra lỗi khi xác thực token
-            log.error("Fail validate token");
+            log.error("Fail validate token"); // Xảy ra lỗi khi xác thực token
             return false;
         }
     }
