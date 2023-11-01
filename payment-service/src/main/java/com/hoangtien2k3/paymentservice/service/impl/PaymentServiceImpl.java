@@ -32,7 +32,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private RestTemplate restTemplate;
 //    @Autowired
-//    private final WebClient webClient;
+//    private WebClient webClient;
 
     private final PaymentRepository paymentRepository;
     private final DiscoveryClient discoveryClient;
@@ -46,7 +46,6 @@ public class PaymentServiceImpl implements PaymentService {
         this.discoveryClient = discoveryClient;
         this.webClientBuilder = webClientBuilder;
     }
-
 
     @Override
     public List<PaymentDto> findAll() {

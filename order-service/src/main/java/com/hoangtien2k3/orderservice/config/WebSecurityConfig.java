@@ -1,6 +1,7 @@
 //package com.hoangtien2k3.orderservice.config;
 //
 //import org.springframework.context.annotation.Configuration;
+//import org.springframework.http.HttpMethod;
 //import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 //import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 //import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -25,9 +26,10 @@
 //                .authorizeRequests()
 //                .antMatchers("/api/orders").hasAuthority("USER")
 //                .antMatchers("/api/carts").hasAnyAuthority("ADMIN", "USER")
+//                .antMatchers(HttpMethod.POST, "/api/orders/**").hasAnyAuthority("ADMIN", "USER")
 //                .anyRequest().authenticated()
 //                .and()
 //                .exceptionHandling();
 //    }
 //}
-
+//

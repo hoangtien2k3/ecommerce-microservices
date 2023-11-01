@@ -73,6 +73,9 @@ public class OrderController {
 
 
         List<String> listRoleAuthorities = roleAuthorities.hasAuthority(authorization);
+        log.info("Size listRoleAuthorities: " + listRoleAuthorities.size());
+        System.out.println("1. listRoleAuthorities: " + listRoleAuthorities.size());
+
         boolean isAdmin = listRoleAuthorities.stream()
                 .anyMatch(auth -> auth.equals("ADMIN"));
         if (isAdmin) {
