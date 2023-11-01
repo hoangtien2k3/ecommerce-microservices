@@ -60,7 +60,7 @@ public class OrderController {
     }
 
     @PostMapping
-    @PreAuthorize(value = "hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<OrderDto> save(@RequestHeader(name = "Authorization") String authorization,
                                          @RequestBody @NotNull(message = "Input must not be NULL")
                                          @Valid final OrderDto orderDto) {
@@ -73,29 +73,20 @@ public class OrderController {
 
 
         List<String> listRoleAuthorities = roleAuthorities.hasAuthority(authorization);
-
-        System.out.println(listRoleAuthorities.size());
-        for(String auth : listRoleAuthorities) {
-            if (auth.equals("ADMIN")) {
-                return ResponseEntity.ok(this.orderService.save(orderDto));
-            }
+        boolean isAdmin = listRoleAuthorities.stream()
+                .anyMatch(auth -> auth.equals("ADMIN"));
+        if (isAdmin) {
+            return ResponseEntity.ok(this.orderService.save(orderDto));
+        } else {
+            return ResponseEntity.status(HttpStatus.SC_FORBIDDEN).build();
         }
-        return ResponseEntity.status(HttpStatus.SC_FORBIDDEN).build();
-
-
-//
-//        if () {
-//            // log.info("OrderDto, resource; save order");
-//            return ResponseEntity.ok(this.orderService.save(orderDto));
-//        } else {
-//            return ResponseEntity.status(HttpStatus.SC_FORBIDDEN).build();
-//        }
 
     }
 
-    @PostMapping("/user/{username}")
+    @GetMapping("/user/{username}")
     @PreAuthorize("isAuthenticated() and #username == authentication.principal.username")
     public List<String> getMyRoles(@PathVariable("username") String username) {
+
         SecurityContext securityContext = SecurityContextHolder.getContext();
         return securityContext
                 .getAuthentication()
@@ -103,6 +94,7 @@ public class OrderController {
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
+
     }
 
     @PutMapping
