@@ -36,6 +36,7 @@ public class CartController {
         return ResponseEntity.ok(new DtoCollectionResponse<>(this.cartService.findAll()));
     }
 
+
     @GetMapping("/{cartId}")
     public ResponseEntity<CartDto> findById(@RequestHeader(name = "Authorization") String authorizationHeader,
                                             @PathVariable("cartId")

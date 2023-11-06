@@ -21,7 +21,6 @@ public interface ProductSearchAndPageRepository extends PagingAndSortingReposito
 //    @Query("SELECT p FROM Product p WHERE p.productName LIKE %:keyword%")
 //    Page<Product> findByNameContaining(@Param("keyword") String keyword, Pageable pageable);
 
-
     @Query("SELECT p FROM Product p " +
             "WHERE p.productName LIKE %:keyword% " +
             "OR p.price LIKE %:keyword% " +

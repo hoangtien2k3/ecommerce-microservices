@@ -22,6 +22,5 @@ data class Message constructor(
     val sentTime: String
 ) {
     val checkId : Boolean get() = id > 10
-
-
+    
 }

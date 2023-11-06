@@ -1,0 +1,14 @@
+
+    +-----------------+         +-----------------+
+    |   categories    |         |    products     |
+    +-----------------+         +-----------------+
+    | category_id (PK)|         | product_id (PK) |
+    | parent_category_+---------| category_id (FK)|
+    | category_title  |         | product_title   |
+    | image_url       |         | image_url       |
+    | created_at      |         | sku             |
+    | updated_at      |         | price_unit      |
+    +-----------------+         | quantity        |
+                                | created_at      |
+                                | updated_at      |
+                                +-----------------+

@@ -1,0 +1,12 @@
+
+    +-----------------+         +----------------------+
+    |      carts      |         |       orders         |
+    +-----------------+         +----------------------+
+    | cart_id (PK)    |         | order_id (PK)        |
+    | user_id (FK)    |---|     | cart_id (FK)         |
+    | created_at      |   +-----| order_date           |
+    | updated_at      |         | order_desc           |
+    +-----------------+         | order_fee            |
+                                | created_at           |
+                                | updated_at           |
+                                +----------------------+ß

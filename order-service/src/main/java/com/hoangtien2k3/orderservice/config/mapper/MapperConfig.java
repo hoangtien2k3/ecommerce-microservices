@@ -16,6 +16,7 @@ public class MapperConfig {
         return new JsonMapper().enable(SerializationFeature.INDENT_OUTPUT);
     }
 
+    // using ModelMapper
     @Bean
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
@@ -23,4 +24,5 @@ public class MapperConfig {
                 .setMatchingStrategy(MatchingStrategies.STRICT);
         return modelMapper;
     }
+
 }

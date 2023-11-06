@@ -1,0 +1,10 @@
+
+    +------------------+
+    |   order_items    |
+    +------------------+
+    | product_id (PK)  |
+    | order_id (PK)    |
+    | ordered_quantity |
+    | created_at       |
+    | updated_at       |
+    +------------------+

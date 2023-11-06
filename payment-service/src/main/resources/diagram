@@ -1,0 +1,11 @@
+
+    +-----------------+
+    |    payments     |
+    +-----------------+
+    | payment_id (PK) |
+    | order_id (FK)   |
+    | is_payed        |
+    | payment_status  |
+    | created_at      |
+    | updated_at      |
+    +-----------------+
