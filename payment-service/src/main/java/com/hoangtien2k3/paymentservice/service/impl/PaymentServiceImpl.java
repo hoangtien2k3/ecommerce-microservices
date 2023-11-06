@@ -3,6 +3,7 @@ package com.hoangtien2k3.paymentservice.service.impl;
 import com.hoangtien2k3.paymentservice.constant.AppConstant;
 import com.hoangtien2k3.paymentservice.dto.OrderDto;
 import com.hoangtien2k3.paymentservice.dto.PaymentDto;
+import com.hoangtien2k3.paymentservice.entity.Payment;
 import com.hoangtien2k3.paymentservice.exception.wrapper.PaymentNotFoundException;
 import com.hoangtien2k3.paymentservice.helper.PaymentMappingHelper;
 import com.hoangtien2k3.paymentservice.repository.PaymentRepository;
@@ -10,6 +11,7 @@ import com.hoangtien2k3.paymentservice.service.PaymentService;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -72,36 +74,38 @@ public class PaymentServiceImpl implements PaymentService {
                 .map(responseList -> responseList != null ? responseList : Collections.emptyList());
     }
 
-//    @Override
-//    public List<PaymentDto> findAll() {
-//        List<Payment> payments = paymentRepository.findAll();
-//
-//        // Sử dụng Flux để tạo một luồng các Mono<OrderDto> từ WebClient
-//        Flux<Mono<OrderDto>> orderDtos = Flux.fromIterable(payments)
-//                .map(payment -> webClientBuilder.get()
-//                        .uri("/{orderId}", payment.getOrderId())
-//                        .retrieve()
-//                        .bodyToMono(OrderDto.class));
-//
-//        // Sử dụng flatMapSequential để chạy các yêu cầu đồng thời và chờ tất cả hoàn thành
-//        Flux<OrderDto> orderDtoFlux = Flux.mergeSequential(orderDtos);
-//
-//        // Chuyển đổi Flux<OrderDto> thành danh sách
-//        List<OrderDto> orderDtoList = orderDtoFlux.collectList().block();
-//
-//        // Map thông tin từ Payment và OrderDto vào PaymentDto
-//        return payments.stream()
-//                .map(payment -> {
-//                    PaymentDto paymentDto = PaymentMappingHelper.map(payment);
-//                    OrderDto orderDto = orderDtoList.stream()
-//                            .filter(o -> o.getOrderId().equals(payment.getOrderId()))
-//                            .findFirst()
-//                            .orElse(null);
-//                    paymentDto.setOrderDto(orderDto);
-//                    return paymentDto;
-//                })
-//                .collect(Collectors.toList());
-//    }
+    // set list payment
+/*    @Override
+    public List<PaymentDto> findAll() {
+        List<Payment> payments = paymentRepository.findAll();
+
+        // Sử dụng Flux để tạo một luồng các Mono<OrderDto> từ WebClient
+        Flux<Mono<OrderDto>> orderDtos = Flux.fromIterable(payments)
+                .map(payment -> webClientBuilder.get()
+                        .uri("/{orderId}", payment.getOrderId())
+                        .retrieve()
+                        .bodyToMono(OrderDto.class));
+
+        // Sử dụng flatMapSequential để chạy các yêu cầu đồng thời và chờ tất cả hoàn thành
+        Flux<OrderDto> orderDtoFlux = Flux.mergeSequential(orderDtos);
+
+        // Chuyển đổi Flux<OrderDto> thành danh sách
+        List<OrderDto> orderDtoList = orderDtoFlux.collectList().block();
+
+        // Map thông tin từ Payment và OrderDto vào PaymentDto
+        return payments.stream()
+                .map(payment -> {
+                    PaymentDto paymentDto = PaymentMappingHelper.map(payment);
+                    assert orderDtoList != null;
+                    OrderDto orderDto = orderDtoList.stream()
+                            .filter(o -> o.getOrderId().equals(payment.getOrderId()))
+                            .findFirst()
+                            .orElse(null);
+                    paymentDto.setOrderDto(orderDto);
+                    return paymentDto;
+                })
+                .collect(Collectors.toList());
+    }*/
 
     @Override
     public PaymentDto findById(Integer paymentId) {
