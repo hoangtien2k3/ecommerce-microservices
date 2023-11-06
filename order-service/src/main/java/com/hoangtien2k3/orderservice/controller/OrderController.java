@@ -65,14 +65,14 @@ public class OrderController {
                                          @RequestBody @NotNull(message = "Input must not be NULL")
                                          @Valid final OrderDto orderDto) {
 
-//        if (jwtValidate.validateTokenUserService(authorization)) {
-//            log.info("OrderDto, resource; save order");
-//            return ResponseEntity.ok(this.orderService.save(orderDto));
-//        }
-//        return ResponseEntity.status(HttpStatus.SC_UNAUTHORIZED).build();
+        if (jwtValidate.validateTokenUserService(authorization)) {
+            log.info("OrderDto, resource; save order");
+            return ResponseEntity.ok(this.orderService.save(orderDto));
+        }
+        return ResponseEntity.status(HttpStatus.SC_UNAUTHORIZED).build();
 
 
-        List<String> listRoleAuthorities = roleAuthorities.hasAuthority(authorization);
+/*        List<String> listRoleAuthorities = roleAuthorities.hasAuthority(authorization);
         log.info("Size listRoleAuthorities: " + listRoleAuthorities.size());
         System.out.println("1. listRoleAuthorities: " + listRoleAuthorities.size());
 
@@ -82,10 +82,12 @@ public class OrderController {
             return ResponseEntity.ok(this.orderService.save(orderDto));
         } else {
             return ResponseEntity.status(HttpStatus.SC_FORBIDDEN).build();
-        }
+        }*/
 
     }
 
+
+    // get my role user access token
     @GetMapping("/user/{username}")
     @PreAuthorize("isAuthenticated() and #username == authentication.principal.username")
     public List<String> getMyRoles(@PathVariable("username") String username) {

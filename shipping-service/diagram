@@ -8,3 +8,5 @@
     | created_at       |
     | updated_at       |
     +------------------+
+
+# order_items: status, delete product_id (PK)

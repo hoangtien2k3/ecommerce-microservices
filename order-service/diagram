@@ -9,4 +9,10 @@
     +-----------------+         | order_fee            |
                                 | created_at           |
                                 | updated_at           |
-                                +----------------------+ß
+                                +----------------------+
+
+=> update again
+# cart: product_id, price_unit, price, quantity, order_id
+# order: user_id, order_fee   -> order_tutal
+# order_code
+
