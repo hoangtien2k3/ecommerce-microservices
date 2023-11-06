@@ -30,7 +30,6 @@ import javax.transaction.Transactional;
 @Slf4j
 @Service
 public class PaymentServiceImpl implements PaymentService {
-
     @Autowired
     private RestTemplate restTemplate;
 //    @Autowired
