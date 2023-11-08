@@ -1,6 +1,5 @@
 package com.hoangtien2k3.inventoryservice.service;
 
-
 import com.hoangtien2k3.inventoryservice.dto.request.TokenValidationRequest;
 import com.hoangtien2k3.inventoryservice.dto.response.InventoryResponse;
 import com.hoangtien2k3.inventoryservice.dto.response.TokenValidationResponse;
@@ -32,7 +31,6 @@ public class InventoryService {
     @Value("${user-service.base-url}")
     private String userServiceBaseUrl; // URL của user-service
 
-
     // get Token in -> user-service
     public Mono<String> getTokenFromUserService() {
         return webClientBuilder.build()
@@ -41,7 +39,6 @@ public class InventoryService {
                 .retrieve()
                 .bodyToMono(String.class);
     }
-
 
     public Mono<String> requestTokenValidation(String accessToken) {
         return webClientBuilder.build()
@@ -52,7 +49,6 @@ public class InventoryService {
                 .bodyToMono(TokenValidationResponse.class)
                 .map(TokenValidationResponse::getMessage);
     }
-
 
     public String getTokenUserService(String authorizationHeader) {
         // Sử dụng JWT từ tiêu đề "Authorization" của yêu cầu gọi API
@@ -70,7 +66,6 @@ public class InventoryService {
 
         return responseToken;
     }
-
 
     @Transactional(readOnly = true)
     @SneakyThrows

@@ -1,18 +1,18 @@
-package com.hoangtien2k3.discoveryserver;
+package com.hoangtien2k3qx1.favouriteservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
 import java.util.TimeZone;
 
 @SpringBootApplication
-@EnableEurekaServer
-public class DiscoveryServerApplication {
+@EnableEurekaClient
+public class FavouriteServiceApplication {
 
 	public static void main(String[] args) {
 		TimeZone.setDefault(TimeZone.getTimeZone("GMT +0:00"));
-		SpringApplication.run(DiscoveryServerApplication.class, args);
+		SpringApplication.run(FavouriteServiceApplication.class, args);
 	}
 
 }

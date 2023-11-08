@@ -1,0 +1,10 @@
+
+    +-----------------+       +------------------+
+    |    favourites   |       |     products     |
+    +-----------------+       +------------------+
+    |   user_id (PK)  |<----->|   product_id (PK)|
+    |   product_id    |       |   product_name   |
+    |   like_date     |       |   description    |
+    |   created_at    |       |   price          |
+    |   updated_at    |       +------------------+
+    +-----------------+
