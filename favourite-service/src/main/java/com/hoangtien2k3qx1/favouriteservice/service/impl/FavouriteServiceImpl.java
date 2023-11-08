@@ -11,6 +11,7 @@ import com.hoangtien2k3qx1.favouriteservice.repository.FavouriteRepository;
 import com.hoangtien2k3qx1.favouriteservice.service.FavouriteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -24,21 +25,26 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class FavouriteServiceImpl implements FavouriteService {
 
+    @Autowired
     private final FavouriteRepository favouriteRepository;
+    @Autowired
     private final RestTemplate restTemplate;
 
     @Override
     public List<FavouriteDto> findAll() {
-        log.info("*** FavouriteDto List, service; fetch all favourites *");
         return this.favouriteRepository.findAll()
                 .stream()
                 .map(FavouriteMappingHelper::map)
                 .map(f -> {
                     f.setUserDto(this.restTemplate
-                            .getForObject(ConfigConstant.DiscoveredDomainsApi.USER_SERVICE_API_URL + "/" + f.getUserId(), UserDto.class)
+                            .getForObject(
+                                    ConfigConstant.DiscoveredDomainsApi.USER_SERVICE_API_URL + "/" + f.getUserId(),
+                                    UserDto.class)
                     );
                     f.setProductDto(this.restTemplate
-                            .getForObject(ConfigConstant.DiscoveredDomainsApi.PRODUCT_SERVICE_API_URL + "/" + f.getProductId(), ProductDto.class)
+                            .getForObject(
+                                    ConfigConstant.DiscoveredDomainsApi.PRODUCT_SERVICE_API_URL + "/" + f.getProductId(),
+                                    ProductDto.class)
                     );
                     return f;
                 })
@@ -48,7 +54,6 @@ public class FavouriteServiceImpl implements FavouriteService {
 
     @Override
     public FavouriteDto findById(final FavouriteId favouriteId) {
-        log.info("*** FavouriteDto, service; fetch favourite by id *");
         return this.favouriteRepository.findById(favouriteId)
                 .map(FavouriteMappingHelper::map)
                 .map(f -> {

@@ -57,3 +57,4 @@ public final class Favourite extends AbstractMappedEntity implements Serializabl
         private LocalDateTime likeDate;
 
 }
+

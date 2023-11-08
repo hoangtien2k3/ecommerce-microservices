@@ -28,7 +28,6 @@ public class ApiExceptionHandler {
             HttpMessageNotReadableException.class,
     })
     public <T extends BindException> ResponseEntity<ExceptionMessage> handleValidationException(final T exception) {
-        log.info("ApiExceptionHandler controller, validation exception");
         return new ResponseEntity<>(
                 ExceptionMessage.builder()
                         .timestamp(
@@ -44,7 +43,6 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(value = {FavouriteNotFoundException.class})
     public <T extends RuntimeException> ResponseEntity<ExceptionMessage> handleApiRequestException(final T exception) {
-        log.info("ApiExceptionHandler controller, handle API request");
         final var badRequest = HttpStatus.BAD_REQUEST;
         return new ResponseEntity<>(
                 ExceptionMessage.builder()

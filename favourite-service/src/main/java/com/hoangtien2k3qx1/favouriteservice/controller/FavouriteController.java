@@ -31,61 +31,52 @@ public class FavouriteController {
     }
 
     @GetMapping("/{userId}/{productId}/{likeDate}")
-    public ResponseEntity<FavouriteDto> findById(
-            @PathVariable("userId") final String userId,
-            @PathVariable("productId") final String productId,
-            @PathVariable("likeDate") final String likeDate) {
-
+    public ResponseEntity<FavouriteDto> findById(@PathVariable("userId") final String userId,
+                                                 @PathVariable("productId") final String productId,
+                                                 @PathVariable("likeDate") final String likeDate) {
         return ResponseEntity.ok(this.favouriteService.findById(
                 new FavouriteId(Integer.parseInt(userId), Integer.parseInt(productId),
                         LocalDateTime.parse(likeDate, DateTimeFormatter.ofPattern(ConfigConstant.LOCAL_DATE_TIME_FORMAT)))));
     }
 
     @GetMapping("/find")
-    public ResponseEntity<FavouriteDto> findById(
-            @RequestBody
-            @NotNull(message = "Input must not be NULL")
-            @Valid final FavouriteId favouriteId) {
-
+    public ResponseEntity<FavouriteDto> findById(@RequestBody
+                                                 @NotNull(message = "Input must not be NULL")
+                                                 @Valid final FavouriteId favouriteId) {
         return ResponseEntity.ok(this.favouriteService.findById(favouriteId));
     }
 
     @PostMapping
-    public ResponseEntity<FavouriteDto> save(
-            @RequestBody
-            @NotNull(message = "Input must not be NULL")
-            @Valid final FavouriteDto favouriteDto) {
-
+    public ResponseEntity<FavouriteDto> save(@RequestBody
+                                             @NotNull(message = "Input must not be NULL")
+                                             @Valid final FavouriteDto favouriteDto) {
         return ResponseEntity.ok(this.favouriteService.save(favouriteDto));
     }
 
     @PutMapping
-    public ResponseEntity<FavouriteDto> update(
-            @RequestBody
-            @NotNull(message = "Input must not be NULL")
-            @Valid final FavouriteDto favouriteDto) {
-
+    public ResponseEntity<FavouriteDto> update(@RequestBody
+                                               @NotNull(message = "Input must not be NULL")
+                                               @Valid final FavouriteDto favouriteDto) {
         return ResponseEntity.ok(this.favouriteService.update(favouriteDto));
     }
 
     @DeleteMapping("/{userId}/{productId}/{likeDate}")
-    public ResponseEntity<Boolean> deleteById(
-            @PathVariable("userId") final String userId,
-            @PathVariable("productId") final String productId,
-            @PathVariable("likeDate") final String likeDate) {
-
-        this.favouriteService.deleteById(new FavouriteId(Integer.parseInt(userId), Integer.parseInt(productId),
-                LocalDateTime.parse(likeDate, DateTimeFormatter.ofPattern(ConfigConstant.LOCAL_DATE_TIME_FORMAT))));
+    public ResponseEntity<Boolean> deleteById(@PathVariable("userId") final String userId,
+                                              @PathVariable("productId") final String productId,
+                                              @PathVariable("likeDate") final String likeDate) {
+        favouriteService.deleteById(
+                new FavouriteId(Integer.parseInt(userId), Integer.parseInt(productId),
+                        LocalDateTime.parse(likeDate, DateTimeFormatter.ofPattern(ConfigConstant.LOCAL_DATE_TIME_FORMAT)))
+        );
         return ResponseEntity.ok(true);
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Boolean> deleteById(
-            @RequestBody
-            @NotNull(message = "Input must not be NULL")
-            @Valid final FavouriteId favouriteId) {
-
-        this.favouriteService.deleteById(favouriteId);
+    public ResponseEntity<Boolean> deleteById(@RequestBody
+                                              @NotNull(message = "Input must not be NULL")
+                                              @Valid final FavouriteId favouriteId) {
+        favouriteService.deleteById(favouriteId);
         return ResponseEntity.ok(true);
     }
+
 }
