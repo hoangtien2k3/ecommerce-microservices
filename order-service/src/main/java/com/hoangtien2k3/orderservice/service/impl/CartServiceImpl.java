@@ -35,7 +35,8 @@ public class CartServiceImpl implements CartService {
         return this.cartRepository.findAll()
                 .stream()
                 .map(CartMappingHelper::map)
-                .peek(c -> c.setUserDto(this.restTemplate.getForObject(AppConstant.DiscoveredDomainsApi
+                .peek(c -> c.setUserDto(
+                        restTemplate.getForObject(AppConstant.DiscoveredDomainsApi
                         .USER_SERVICE_API_URL + "/" + c.getUserDto().getUserId(), UserDto.class)))
                 .distinct()
                 .toList();
@@ -47,7 +48,8 @@ public class CartServiceImpl implements CartService {
         return this.cartRepository.findById(cartId)
                 .map(CartMappingHelper::map)
                 .map(c -> {
-                    c.setUserDto(this.restTemplate.getForObject(AppConstant.DiscoveredDomainsApi
+                    c.setUserDto(
+                            restTemplate.getForObject(AppConstant.DiscoveredDomainsApi
                             .USER_SERVICE_API_URL + "/" + c.getUserDto().getUserId(), UserDto.class));
                     return c;
                 })
@@ -58,21 +60,24 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartDto save(final CartDto cartDto) {
         log.info("CartDto, service; save cart");
-        return CartMappingHelper.map(this.cartRepository
+        return CartMappingHelper.map(
+                cartRepository
                 .save(CartMappingHelper.map(cartDto)));
     }
 
     @Override
     public CartDto update(final CartDto cartDto) {
         log.info("CartDto, service; update cart");
-        return CartMappingHelper.map(this.cartRepository
+        return CartMappingHelper.map(
+                cartRepository
                 .save(CartMappingHelper.map(cartDto)));
     }
 
     @Override
     public CartDto update(final Integer cartId, final CartDto cartDto) {
         log.info("CartDto, service; update cart with cartId");
-        return CartMappingHelper.map(this.cartRepository
+        return CartMappingHelper.map(
+                cartRepository
                 .save(CartMappingHelper.map(this.findById(cartId))));
     }
 

@@ -23,7 +23,8 @@ public class ProductServiceImpl implements ProductService {
     private final ProductSearchAndPageRepository productSearchAndPageRepository;
 
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository, ProductSearchAndPageRepository productSearchAndPageRepository) {
+    public ProductServiceImpl(ProductRepository productRepository,
+                              ProductSearchAndPageRepository productSearchAndPageRepository) {
         this.productRepository = productRepository;
         this.productSearchAndPageRepository = productSearchAndPageRepository;
     }

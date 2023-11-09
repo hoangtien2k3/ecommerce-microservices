@@ -1,4 +1,4 @@
-package com.hoangtien2k3.paymentservice.config.webclient;
+package com.hoangtien2k3.paymentservice.config.client;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.reactive.function.client.WebClient;

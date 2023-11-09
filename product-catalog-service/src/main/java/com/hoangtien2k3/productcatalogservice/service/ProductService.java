@@ -24,11 +24,8 @@ public interface ProductService {
     //  search and paging product
     List<Product> searchProductsByKeyword(String keyword);
 
-
-
     // search and paging product
     Page<Product> searchProducts(String keyword, Pageable pageable);
-
 
     // search and paging
     Page<Product> searchProducts(String keyword, Pageable pageable, String orderBy, String orderDirection);

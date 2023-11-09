@@ -10,16 +10,16 @@ import java.util.List;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long>  {
-    //    @Query(value = "SELECT p FROM Product p where (:category IS NULL or p.category =:category)")
+    // @Query(value = "SELECT p FROM Product p where (:category IS NULL or p.category =:category)")
     List<Product> findAllByCategory(String category);
     List<Product> findAllByProductName(String name);
 
-    // lấy ra danh sách sản phẩm theo page - size
+    // get list product the page and size
     @Query(value = "SELECT * FROM products LIMIT :offset, :size", nativeQuery = true)
     List<Product> findProductsByPage(@Param("offset") int offset, @Param("size") int size);
 
 
-    // tổng số lượng sản phẩm
+    // total products
     @Query(value = "SELECT COUNT(*) FROM products", nativeQuery = true)
     int countAllProducts();
 

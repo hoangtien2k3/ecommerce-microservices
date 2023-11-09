@@ -3,10 +3,12 @@ package com.hoangtien2k3.productcatalogservice.controller;
 import com.hoangtien2k3.productcatalogservice.dto.PageResult;
 import com.hoangtien2k3.productcatalogservice.entity.Product;
 import com.hoangtien2k3.productcatalogservice.http.HeaderGenerator;
+import com.hoangtien2k3.productcatalogservice.service.ProductService;
 import com.hoangtien2k3.productcatalogservice.service.impl.ProductServiceImpl;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -17,17 +19,15 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/api/product")
 public class ProductController {
 
-    private final ProductServiceImpl productService;
-    private final HeaderGenerator headerGenerator;
-
     @Autowired
-    public ProductController(ProductServiceImpl productService, HeaderGenerator headerGenerator) {
-        this.productService = productService;
-        this.headerGenerator = headerGenerator;
-    }
+    private final ProductService productService;
+    @Autowired
+    private final HeaderGenerator headerGenerator;
 
     @GetMapping(value = "/products")
     public ResponseEntity<List<Product>> getAllProducts() {

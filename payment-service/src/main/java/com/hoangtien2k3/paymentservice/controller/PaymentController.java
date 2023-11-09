@@ -1,11 +1,9 @@
 package com.hoangtien2k3.paymentservice.controller;
 
-import com.hoangtien2k3.paymentservice.config.webclient.WebClientConfig;
 import com.hoangtien2k3.paymentservice.dto.PaymentDto;
 import com.hoangtien2k3.paymentservice.dto.response.collection.DtoCollectionResponse;
 import com.hoangtien2k3.paymentservice.security.JwtValidate;
 import com.hoangtien2k3.paymentservice.service.PaymentService;
-import com.netflix.discovery.converters.Auto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;

@@ -1,4 +1,4 @@
-package com.hoangtien2k3.productcatalogservice.config;
+package com.hoangtien2k3.productcatalogservice.config.client;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

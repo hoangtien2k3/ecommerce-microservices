@@ -23,16 +23,16 @@ public class HeaderGenerator {
         return httpHeaders;
     }
 
-//    public HttpHeaders getHeadersForSuccessPostMethod(HttpServletRequest request, Long newResourceId) {
-//        HttpHeaders httpHeaders = new HttpHeaders();
-//        try {
-//            httpHeaders.setLocation(new URI(request.getRequestURI() + "/" + newResourceId));
-//        } catch (URISyntaxException e) {
-//            e.printStackTrace();
-//        }
-//        httpHeaders.add("Content-Type", "application/json; charset=UTF-8");
-//        return httpHeaders;
-//    }
+    public HttpHeaders getHeadersForSuccessPostMethod(HttpServletRequest request, Long newResourceId) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        try {
+            httpHeaders.setLocation(new URI(request.getRequestURI() + "/" + newResourceId));
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        httpHeaders.add("Content-Type", "application/json; charset=UTF-8");
+        return httpHeaders;
+    }
 
     public HttpHeaders getHeadersForSuccessPostMethod(Long newResourceId) {
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -48,6 +48,5 @@ public class HeaderGenerator {
         httpHeaders.add("Content-Type", "application/json; charset=UTF-8");
         return httpHeaders;
     }
-
 
 }

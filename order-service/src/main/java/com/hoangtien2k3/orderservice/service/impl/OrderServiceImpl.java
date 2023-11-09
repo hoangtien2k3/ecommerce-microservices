@@ -26,7 +26,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderDto> findAll() {
         log.info("OrderDto List, service; fetch all orders");
-        return this.orderRepository.findAll()
+        return orderRepository.findAll()
                 .stream()
                 .map(OrderMappingHelper::map)
                 .distinct()
@@ -38,25 +38,26 @@ public class OrderServiceImpl implements OrderService {
         log.info("OrderDto, service; fetch order by id");
         return this.orderRepository.findById(orderId)
                 .map(OrderMappingHelper::map)
-                .orElseThrow(() -> new OrderNotFoundException(String.format("Order with id[%d] not found", orderId)));
+                .orElseThrow(() ->
+                        new OrderNotFoundException(String.format("Order with id[%d] not found", orderId)));
     }
 
     @Override
     public OrderDto save(final OrderDto orderDto) {
         log.info("OrderDto, service; save order");
-        return OrderMappingHelper.map(this.orderRepository.save(OrderMappingHelper.map(orderDto)));
+        return OrderMappingHelper.map(orderRepository.save(OrderMappingHelper.map(orderDto)));
     }
 
     @Override
     public OrderDto update(final OrderDto orderDto) {
         log.info("OrderDto, service; update order");
-        return OrderMappingHelper.map(this.orderRepository.save(OrderMappingHelper.map(orderDto)));
+        return OrderMappingHelper.map(orderRepository.save(OrderMappingHelper.map(orderDto)));
     }
 
     @Override
     public OrderDto update(final Integer orderId, final OrderDto orderDto) {
         log.info("OrderDto, service; update order with orderId");
-        return OrderMappingHelper.map(this.orderRepository.save(OrderMappingHelper.map(this.findById(orderId))));
+        return OrderMappingHelper.map(orderRepository.save(OrderMappingHelper.map(this.findById(orderId))));
     }
 
     @Override

@@ -21,40 +21,29 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
+@Builder
 @Entity
 @Table(name = "favourites")
-@IdClass(FavouriteId.class)
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-@Data
-@Builder
-public final class Favourite extends AbstractMappedEntity implements Serializable {
-
-        @Serial
-        private static final long serialVersionUID = 1L;
-
+@IdClass(FavouriteId.class) // Id Favourite
+public record Favourite(
         @Id
         @Column(name = "user_id", nullable = false)
-        private Integer userId;
-
+        Integer userId,
         @Id
         @Column(name = "product_id", nullable = false)
-        private Integer productId;
-
+        Integer productId,
         @Id
         @Column(name = "like_date", nullable = false)
         @JsonSerialize(using = LocalDateTimeSerializer.class)
         @JsonDeserialize(using = LocalDateTimeDeserializer.class)
         @JsonFormat(pattern = ConfigConstant.LOCAL_DATE_TIME_FORMAT, shape = Shape.STRING)
         @DateTimeFormat(pattern = ConfigConstant.LOCAL_DATE_TIME_FORMAT)
-        private LocalDateTime likeDate;
-
+        LocalDateTime likeDate
+) implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
 }
-

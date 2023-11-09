@@ -1,6 +1,5 @@
 package com.hoangtien2k3qx1.favouriteservice.exception;
 
-
 import com.hoangtien2k3qx1.favouriteservice.exception.payload.ExceptionMessage;
 import com.hoangtien2k3qx1.favouriteservice.exception.wrapper.FavouriteNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -30,33 +29,24 @@ public class ApiExceptionHandler {
     public <T extends BindException> ResponseEntity<ExceptionMessage> handleValidationException(final T exception) {
         return new ResponseEntity<>(
                 ExceptionMessage.builder()
-                        .timestamp(
-                                ZonedDateTime.now(ZoneId.systemDefault())
-                        )
+                        .timestamp(ZonedDateTime.now(ZoneId.systemDefault())) // ZonedDateTime Id default
                         .httpStatus(HttpStatus.BAD_REQUEST)
-                        .message(
-                                Objects.requireNonNull(exception.getBindingResult().getFieldError()).getDefaultMessage()
-                        )
+                        .message(Objects.requireNonNull(exception.getBindingResult().getFieldError()).getDefaultMessage())
                         .throwable(exception)
-                        .build(), HttpStatus.BAD_REQUEST);
+                        .build(),
+                HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = {FavouriteNotFoundException.class})
     public <T extends RuntimeException> ResponseEntity<ExceptionMessage> handleApiRequestException(final T exception) {
-        final var badRequest = HttpStatus.BAD_REQUEST;
         return new ResponseEntity<>(
                 ExceptionMessage.builder()
-                        .message(
-                                String.valueOf(
-                                        Optional.ofNullable(exception.getMessage())
-                                )
-                        )
-                        .httpStatus(badRequest)
-                        .timestamp(
-                                ZonedDateTime.now(ZoneId.systemDefault())
-                        )
+                        .message(String.valueOf(Optional.ofNullable(exception.getMessage())))
+                        .httpStatus(HttpStatus.BAD_REQUEST)
+                        .timestamp(ZonedDateTime.now(ZoneId.systemDefault()))
                         .throwable(exception)
-                        .build(), badRequest);
+                        .build(),
+                HttpStatus.BAD_REQUEST);
     }
 
 }

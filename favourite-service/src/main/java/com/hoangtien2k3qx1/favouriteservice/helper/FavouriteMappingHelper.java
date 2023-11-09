@@ -10,21 +10,21 @@ public class FavouriteMappingHelper {
     // mapping Favourite -> FavouriteDto
     public static FavouriteDto map(final Favourite favourite) {
         return FavouriteDto.builder()
-                .userId(favourite.getUserId())
-                .productId(favourite.getProductId())
-                .likeDate(favourite.getLikeDate())
+                .userId(favourite.userId())
+                .productId(favourite.productId())
+                .likeDate(favourite.likeDate())
                 .userDto(
                         UserDto.builder()
-                                .userId(favourite.getUserId())
+                                .userId(favourite.userId())
                                 .build())
                 .productDto(
                         ProductDto.builder()
-                                .productId(favourite.getProductId())
+                                .productId(favourite.productId())
                                 .build())
                 .build();
     }
 
-    // mapping FavouriteDto -> Favourite
+    // mapping FavouriteDto -> Favourites
     public static Favourite map(final FavouriteDto favouriteDto) {
         return Favourite.builder()
                 .userId(favouriteDto.getUserId())
@@ -32,6 +32,8 @@ public class FavouriteMappingHelper {
                 .likeDate(favouriteDto.getLikeDate())
                 .build();
     }
+
+
 
 }
 

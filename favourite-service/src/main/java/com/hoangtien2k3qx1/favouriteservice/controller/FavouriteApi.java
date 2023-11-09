@@ -20,7 +20,7 @@ import java.time.format.DateTimeFormatter;
 @RestController
 @RequestMapping("/api/favourites")
 @RequiredArgsConstructor
-public class FavouriteController {
+public class FavouriteApi {
 
     @Autowired
     private final FavouriteService favouriteService;

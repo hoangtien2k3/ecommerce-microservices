@@ -3,6 +3,5 @@ package com.hoangtien2k3.orderservice.repository;
 import com.hoangtien2k3.orderservice.entity.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface OrderRepository extends JpaRepository<Order, Integer> {
-
-}
+// using JpaRepository in Hibernate
+public interface OrderRepository extends JpaRepository<Order, Integer> {}

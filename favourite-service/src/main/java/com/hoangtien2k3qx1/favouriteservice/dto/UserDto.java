@@ -11,10 +11,13 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Set;
 
-@NoArgsConstructor
-@AllArgsConstructor
+/*
+*  User defined using system properties
+* */
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserDto implements Serializable {
 
     @Serial

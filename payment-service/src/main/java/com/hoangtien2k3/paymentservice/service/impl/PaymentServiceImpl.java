@@ -80,18 +80,15 @@ public class PaymentServiceImpl implements PaymentService {
 
         // Sử dụng Flux để tạo một luồng các Mono<OrderDto> từ WebClient
         Flux<Mono<OrderDto>> orderDtos = Flux.fromIterable(payments)
-                .map(payment -> webClientBuilder.get()
+                .map(payment -> webClientBuilder.baseUrl("/api/payment")
                         .uri("/{orderId}", payment.getOrderId())
                         .retrieve()
                         .bodyToMono(OrderDto.class));
 
-        // Sử dụng flatMapSequential để chạy các yêu cầu đồng thời và chờ tất cả hoàn thành
         Flux<OrderDto> orderDtoFlux = Flux.mergeSequential(orderDtos);
 
-        // Chuyển đổi Flux<OrderDto> thành danh sách
         List<OrderDto> orderDtoList = orderDtoFlux.collectList().block();
 
-        // Map thông tin từ Payment và OrderDto vào PaymentDto
         return payments.stream()
                 .map(payment -> {
                     PaymentDto paymentDto = PaymentMappingHelper.map(payment);
@@ -119,45 +116,6 @@ public class PaymentServiceImpl implements PaymentService {
                 .orElseThrow(() -> new PaymentNotFoundException(String.format("Payment with id[%d] not found", paymentId)));
     }
 
-
-//    @Override
-//    public PaymentDto findById(Integer paymentId) {
-//        log.info("PaymentDto, service; fetch payment by id");
-//        return this.paymentRepository.findById(paymentId)
-//                .map(PaymentMappingHelper::map)
-//                .map(p -> {
-//                    OrderDto orderDto = retrieveOrderDetails(p.getOrderDto().getOrderId());
-//                    p.setOrderDto(orderDto);
-//                    return p;
-//                })
-//                .orElseThrow(() -> new PaymentNotFoundException(String.format("Payment with id[%d] not found", paymentId)));
-//    }
-//
-//
-//    private OrderDto retrieveOrderDetails(Integer orderId) {
-//        String orderServiceUrl = Objects.requireNonNull(discoveryClient.getInstances("ORDER-SERVICE"))
-//                .stream()
-//                .findFirst()
-//                .map(serviceInstance -> serviceInstance.getUri().toString())
-//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Order service not available"));
-//
-//        WebClient orderServiceClient = webClientBuilder.baseUrl(orderServiceUrl).build();
-//
-//        Mono<OrderDto> orderDtoMono = orderServiceClient
-//                .method(HttpMethod.GET)
-//                .uri("/" + orderId)
-//                .accept(MediaType.APPLICATION_JSON)
-//                .retrieve()
-//                .onStatus(
-//                        HttpStatus::is4xxClientError,
-//                        response -> Mono.error(new ResponseStatusException(response.statusCode(), "Order service responded with error")))
-//                .onStatus(
-//                        HttpStatus::is5xxServerError,
-//                        response -> Mono.error(new ResponseStatusException(response.statusCode(), "Order service encountered an error")))
-//                .bodyToMono(OrderDto.class);
-//
-//        return orderDtoMono.block(); // Blocking, you may want to use reactive patterns throughout your application
-//    }
 
     @Override
     public PaymentDto save(PaymentDto paymentDto) {

@@ -4,7 +4,8 @@ import com.hoangtien2k3.productcatalogservice.dto.ProductRequest;
 import com.hoangtien2k3.productcatalogservice.entity.Product;
 import com.hoangtien2k3.productcatalogservice.http.HeaderGenerator;
 import com.hoangtien2k3.productcatalogservice.security.JwtValidate;
-import com.hoangtien2k3.productcatalogservice.service.impl.ProductServiceImpl;
+import com.hoangtien2k3.productcatalogservice.service.ProductService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,22 +14,19 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/admin")
 public class AdminProductController {
 
-    private final ProductServiceImpl productService;
+    @Autowired
+    private final ProductService productService;
+    @Autowired
     private final HeaderGenerator headerGenerator;
+    @Autowired
     private final JwtValidate jwtValidate;
 
-    @Autowired
-    public AdminProductController(ProductServiceImpl productService, HeaderGenerator headerGenerator, JwtValidate jwtValidate) {
-        this.productService = productService;
-        this.headerGenerator = headerGenerator;
-        this.jwtValidate = jwtValidate;
-    }
-
     @PostMapping("/products")
-    private ResponseEntity<Product> addProduct(@RequestHeader(name = "Authorization") String authorizationHeader,
+    public ResponseEntity<Product> addProduct(@RequestHeader(name = "Authorization") String authorizationHeader,
                                                @RequestBody ProductRequest productRequest) {
 
         if (!jwtValidate.validateTokenUserService(authorizationHeader)) {
@@ -64,7 +62,7 @@ public class AdminProductController {
 
 
     @DeleteMapping(value = "/products/{id}")
-    private ResponseEntity<Void> deleteProduct(@RequestHeader(name = "Authorization") String authorizationHeader,
+    public ResponseEntity<Void> deleteProduct(@RequestHeader(name = "Authorization") String authorizationHeader,
                                                @PathVariable("id") Long id) {
 
         if (!jwtValidate.validateTokenUserService(authorizationHeader)) {
@@ -72,7 +70,6 @@ public class AdminProductController {
         }
 
         Product product = productService.getProductById(id);
-
         if (product == null) {
             return new ResponseEntity<>(headerGenerator.getHeadersForError(), HttpStatus.NOT_FOUND);
         }
@@ -89,6 +86,5 @@ public class AdminProductController {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
 }

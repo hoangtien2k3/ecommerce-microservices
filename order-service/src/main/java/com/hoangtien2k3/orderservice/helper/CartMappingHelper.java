@@ -5,18 +5,18 @@ import com.hoangtien2k3.orderservice.dto.CartDto;
 import com.hoangtien2k3.orderservice.dto.UserDto;
 
 public interface CartMappingHelper {
-    public static CartDto map(final Cart cart) {
+    static CartDto map( Cart cart) {
         return CartDto.builder()
-                .cartId(cart.getCartId())
-                .userId(cart.getUserId())
+                .cartId(cart.cartId())
+                .userId(cart.userId())
                 .userDto(
                         UserDto.builder()
-                                .userId(cart.getUserId())
+                                .userId(cart.userId())
                                 .build())
                 .build();
     }
 
-    public static Cart map(final CartDto cartDto) {
+    static Cart map(final CartDto cartDto) {
         return Cart.builder()
                 .cartId(cartDto.getCartId())
                 .userId(cartDto.getUserId())
