@@ -10,9 +10,13 @@ import java.util.TimeZone;
 @EnableEurekaServer
 public class DiscoveryServerApplication {
 
-	public static void main(String[] args) {
-		TimeZone.setDefault(TimeZone.getTimeZone("GMT +0:00"));
-		SpringApplication.run(DiscoveryServerApplication.class, args);
-	}
+    public static void main(String[] args) {
+        TimeZone.setDefault(TimeZone.getTimeZone("GMT +0:00"));
+        SpringApplication.run(DiscoveryServerApplication.class, args);
+    }
 
 }
+
+
+
+
