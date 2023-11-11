@@ -1,41 +1,66 @@
-## Key Features:
-- [Microservices Architecture]()
-- [E-commerce Functionality]():
-  - Api Gateway
-  - Discovery Service
-  - Inventory Service
-  - Product Service
-  - Shipping Service
-  - Payment Service
-  - Product Service
-  - Order Service
-  - Notify Service
-  - Product Catalog Service
-  - Product Recommend Service
-  - User Service
-- [Service Discovery with Eureka]()
-- [Open Source]() 
-    
-## Technology Stack:
-- [Microservices](): built on a microservices architecture using Spring Boot and communicate REST APIs
-- [Database]():
-  - MySql
-  - MongoDB 
-- [Containerization](): Docker
-- [Authentication]():
-  - JWT (JSON Web Tokens)
-  - Spring Security
+# Ecommerce-Microservice (Backend Java)
 
-## Contributing:
-- Contributions from the open-source community. 
+## Introduction
+Welcome to the backend component of `ecommerce-microservice`. This Java backend is designed to handle the server-side logic and data processing for my application.
 
-## License:
-- This project is licensed under the MIT License - see the LICENSE.md file for details.
+## Prerequisites
+Before you begin, ensure you have met the following requirements:
+
+- Java Development Kit (JDK) 17 or higher installed.
+- Build tool (e.g., `Maven` or `Gradle`) installed.
+- Database system (e.g., `MySQL`, `PostgreSQL`, `MongoDB`...vv) set up and configured.
+
+## Getting Started
+Follow these steps to set up and run the backend:
+
+1. Clone the repository:
+
+```bash
+   git clone https://github.com/hoangtien2k3qx1/ecommerce-microservices.git
+```
+
+#### 1. Navigate to the project directory:
+```bash
+  cd project-name-backend
+```
+
+#### 2. Build the project:
+```bash
+  # Using Maven
+  mvn clean install
+  
+  # Using Gradle
+  gradle build
+```
+
+#### 3. Configure the database:
+  - Update application.properties or application.yml with your database connection details.
+
+
+#### 4. Run the application:
+```bash
+  # Using Maven
+  mvn spring-boot:run
+  
+  # Using Gradle
+  gradle bootRun
+```
+
+## Technologies Used
+- `Java`: The primary programming language.
+- `Spring Boot`: Framework for building Java-based enterprise applications.
+- `Maven/Gradle`: Build tools for managing dependencies and building the project.
+- `Database`: Choose and specify the database system used (e.g., MySQL, PostgreSQL).
+- `Other Dependencies`: List any additional dependencies or libraries used.
+
+## API Documentation
+Document the API endpoints and their functionalities. You can use tools like `Swagger` for automated `API documentation`.
+
+## Contributing
+If you would like to contribute to the development of this project, please follow our contribution guidelines.
+
+## License
+This project is licensed under the `[MIT License](LICENSE.md)`.
 
 ## Contact:
 - feel free to contact us at [hoangtien2k3qx1@gmail.com]().
-
-![image](https://github.com/hoangtien2k3qx1/ecommerce-microservices/assets/122768076/4cabeafd-a130-4598-be06-40739fa6814d)
-![image](https://github.com/hoangtien2k3qx1/ecommerce-microservices/assets/122768076/5e55058c-ce40-49b2-a1c6-9975a9239d91)
-
-
