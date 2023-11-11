@@ -6,7 +6,7 @@ Welcome to the backend component of `ecommerce-microservice`. This Java backend 
 ## Prerequisites
 Before you begin, ensure you have met the following requirements:
 
-- Java Development Kit (JDK) 17 or higher installed.
+- Java Development Kit `(JDK) 17` or higher installed.
 - Build tool (e.g., `Maven` or `Gradle`) installed.
 - Database system (e.g., `MySQL`, `PostgreSQL`, `MongoDB`...vv) set up and configured.
 
@@ -34,7 +34,7 @@ Follow these steps to set up and run the backend:
 ```
 
 #### 3. Configure the database:
-  - Update application.properties or application.yml with your database connection details.
+  - Update `application.properties` or `application.yml` with your database connection details.
 
 
 #### 4. Run the application:
@@ -60,5 +60,5 @@ Document the API endpoints and their functionalities. You can use tools like `Sw
 If you would like to contribute to the development of this project, please follow our contribution guidelines.
 
 ## License
-This project is licensed under the `[MIT License](LICENSE.md)`.
+This project is licensed under the [`MIT License`](LICENSE.md).
 
