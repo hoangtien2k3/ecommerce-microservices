@@ -62,5 +62,3 @@ If you would like to contribute to the development of this project, please follo
 ## License
 This project is licensed under the `[MIT License](LICENSE.md)`.
 
-## Contact:
-- feel free to contact us at [hoangtien2k3qx1@gmail.com]().
