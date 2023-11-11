@@ -60,5 +60,5 @@ Document the API endpoints and their functionalities. You can use tools like `Sw
 If you would like to contribute to the development of this project, please follow our contribution guidelines.
 
 ## License
-This project is licensed under the [`MIT License`](LICENSE.md).
+This project is licensed under the [`MIT License`](LICENSE).
 
