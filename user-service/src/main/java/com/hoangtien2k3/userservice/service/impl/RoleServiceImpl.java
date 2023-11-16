@@ -12,7 +12,6 @@ import java.util.Optional;
 @Service
 public class RoleServiceImpl implements IRoleService {
 
-    @Autowired
     IRoleRepository roleRepository;
 
     @Override

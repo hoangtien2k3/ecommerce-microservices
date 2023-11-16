@@ -30,9 +30,9 @@ create table hibernate_sequence (
 )
 
 insert into userservice.roles (id, name)
-values	('1', 'USER'),
-		('2', 'PM'),
-		('3', 'ADMIN');
+values	('1', 'ROLE_USER'),
+		('2', 'ROLE_PM'),
+		('3', 'ROLE_ADMIN');
 
 alter table roles
        add constraint UK_nb4h0p6txrmfc0xbrd1kglp9t unique (name);

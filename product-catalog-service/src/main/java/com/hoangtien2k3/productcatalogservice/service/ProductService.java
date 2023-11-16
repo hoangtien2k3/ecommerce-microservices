@@ -18,7 +18,7 @@ public interface ProductService {
 
     Page<Product> getProducts(int page, int size);
 
-    //    List<Product> getAllProductsPage(int page, int size);
+    // List<Product> getAllProductsPage(int page, int size);
     PageResult getAllProductsPage(int page, int size);
 
     //  search and paging product
@@ -28,7 +28,7 @@ public interface ProductService {
     Page<Product> searchProducts(String keyword, Pageable pageable);
 
     // search and paging
-    Page<Product> searchProducts(String keyword, Pageable pageable, String orderBy, String orderDirection);
+//    Page<Product> searchProducts(String keyword, Pageable pageable, String orderBy, String orderDirection);
 
 }
 

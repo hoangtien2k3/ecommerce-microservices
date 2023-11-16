@@ -20,17 +20,14 @@ public interface ProductSearchAndPageRepository extends PagingAndSortingReposito
 
     @Query("SELECT p FROM Product p " +
             "WHERE p.productName LIKE %:keyword% " +
-            "OR p.price LIKE %:keyword% " +
             "OR p.description LIKE %:keyword% " +
             "OR p.category LIKE %:keyword% " +
             "OR :keyword IS NULL"
     )
     Page<Product> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
-
-    Page<Product> findByKeyword(@Param("keyword") String keyword, Pageable pageable,
-                                @Param("orderBy") String orderBy,
-                                @Param("orderDirection") String orderDirection
-    );
+//    Page<Product> findByKeyword(@Param("keyword") String keyword, Pageable pageable,
+//                                @Param("orderBy") String orderBy,
+//                                @Param("orderDirection") String orderDirection);
 }
 

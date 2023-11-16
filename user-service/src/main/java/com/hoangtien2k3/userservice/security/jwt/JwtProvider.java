@@ -54,12 +54,10 @@ public class JwtProvider {
 
     public Boolean validateToken(String token) {
         try {
-
             Jwts.parser()
                     .setSigningKey(jwtSecret)
                     .parseClaimsJws(token);
             return true;
-
         } catch (SignatureException e) {
             logger.error("Invalid JWT signature -> Message: ", e);
         } catch (MalformedJwtException e) {

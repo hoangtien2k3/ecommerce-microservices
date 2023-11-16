@@ -34,15 +34,16 @@ import java.util.*;
 
 @Service
 public class UserServiceImpl implements IUserService {
-
     private final IUserRepository userRepository;
     private final IRoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final TokenManager tokenManager;
     private final UserDetailService userDetailsService;
+
     @Autowired
     private WebClient.Builder webClientBuilder;
+
     @Value("${refresh.token.url}") // Đường dẫn endpoint để refresh token
     private String refreshTokenUrl;
 
@@ -68,25 +69,18 @@ public class UserServiceImpl implements IUserService {
             }
 
             Set<Role> roles = new HashSet<>();
-
             signUpForm.getRoles().forEach(role -> {
-                    RoleName roleName = null;
-                    switch (role) {
-                        case "admin": case "ADMIN":
-                            roleName = RoleName.ADMIN;
-                            break;
-                        case "PM": case "pm":
-                            roleName = RoleName.PM;
-                            break;
-                        case "USER": case "user":
-                            roleName = RoleName.USER;
-                            break;
-                    }
+                    RoleName roleName = switch (role) {
+                        case "admin", "ADMIN", "ROLE_ADMIN", "role_admin" -> RoleName.ROLE_ADMIN;
+                        case "PM", "pm", "ROLE_PM", "role_pm" -> RoleName.ROLE_PM;
+                        case "USER", "user", "ROLE_USER", "role_user" -> RoleName.ROLE_USER;
+                        default -> null;
+                    };
 
-                    Role userRole = roleRepository.findByName(roleName)
-                            .orElseThrow(() -> new RuntimeException("Role not found."));
+                Role userRole = roleRepository.findByName(roleName)
+                            .orElseThrow(() -> new RuntimeException("Role not found database."));
+
                     roles.add(userRole);
-
             });
 
             User user = User.builder()

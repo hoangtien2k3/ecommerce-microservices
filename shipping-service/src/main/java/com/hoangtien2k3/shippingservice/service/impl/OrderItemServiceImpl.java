@@ -27,10 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class OrderItemServiceImpl implements OrderItemService {
 
-    @Autowired
     private final OrderItemRepository orderItemRepository;
-
-    @Autowired
     private final RestTemplate restTemplate;
 
     @Override

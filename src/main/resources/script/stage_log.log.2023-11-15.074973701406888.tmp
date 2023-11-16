@@ -1,0 +1,10 @@
+2023-11-16T00:22:08.210+07:00  WARN 12248 --- [HikariPool-2 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Thread starvation or clock leap detected (housekeeper delta=1m57s53ms).
+2023-11-16T05:58:14.735+07:00  WARN 12248 --- [HikariPool-2 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Thread starvation or clock leap detected (housekeeper delta=3h1m5s658ms).
+2023-11-16T06:59:29.998+07:00  WARN 12248 --- [HikariPool-2 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Thread starvation or clock leap detected (housekeeper delta=1h1m15s451ms).
+2023-11-16T08:00:35.551+07:00  WARN 12248 --- [HikariPool-2 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Thread starvation or clock leap detected (housekeeper delta=1h1m5s553ms).
+2023-11-16T10:02:36.538+07:00  WARN 12248 --- [HikariPool-2 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Thread starvation or clock leap detected (housekeeper delta=2h2m988ms).
+2023-11-16T10:24:38.162+07:00  WARN 12248 --- [HikariPool-2 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Thread starvation or clock leap detected (housekeeper delta=22m1s624ms).
+2023-11-16T13:05:37.266+07:00  WARN 12248 --- [HikariPool-2 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Thread starvation or clock leap detected (housekeeper delta=36m28s643ms).
+2023-11-16T13:21:26.206+07:00  WARN 12248 --- [HikariPool-2 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Thread starvation or clock leap detected (housekeeper delta=15m18s931ms).
+2023-11-16T13:36:13.071+07:00  WARN 12248 --- [HikariPool-2 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Thread starvation or clock leap detected (housekeeper delta=14m46s864ms).
+2023-11-16T13:37:33.310+07:00  WARN 12248 --- [HikariPool-2 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Thread starvation or clock leap detected (housekeeper delta=1m20s240ms).

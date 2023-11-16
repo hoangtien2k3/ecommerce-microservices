@@ -20,10 +20,8 @@ public class SenToken {
 
     @Autowired
     private IUserService userService;
-
     @Autowired
     private IUserRepository userRepository;
-
     @Autowired
     private TokenManager tokenManager;
 

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -24,9 +25,7 @@ import java.util.List;
 @RequestMapping("/api/product")
 public class ProductController {
 
-    @Autowired
     private final ProductService productService;
-    @Autowired
     private final HeaderGenerator headerGenerator;
 
     @GetMapping(value = "/products")
@@ -98,9 +97,8 @@ public class ProductController {
 
     // thủ công
     @GetMapping("/page")
-    public ResponseEntity<PageResult> getAllProductsPage(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<PageResult> getAllProductsPage(@RequestParam(defaultValue = "0") int page,
+                                                         @RequestParam(defaultValue = "10") int size) {
 
         PageResult pageResult = productService.getAllProductsPage(page, size);
         return ResponseEntity.ok(pageResult);
@@ -108,43 +106,41 @@ public class ProductController {
 
 
     @GetMapping("/search")
-    public ResponseEntity<List<Product>> searchProductsByKeyword(
-            @RequestParam String keyword) {
+    public ResponseEntity<List<Product>> searchProductsByKeyword(@RequestParam String keyword) {
 
         List<Product> products = productService.searchProductsByKeyword(keyword);
 
         return ResponseEntity.ok(products);
     }
 
-//    @GetMapping("/search-and-page")
-//    public ResponseEntity<Page<Product>> searchProducts(@RequestParam(value = "keyword", required = false) String keyword,
-//                                                        @RequestParam(value = "page", defaultValue = "0") int page,
-//                                                        @RequestParam(value = "size", defaultValue = "10") int size) {
-//        if (keyword == null) {
-//            // keyword is null
-//            return ResponseEntity.notFound().build();
-//        }
-//
-//        Pageable pageable = PageRequest.of(page, size);
-//        Page<Product> products = productService.searchProducts(keyword, pageable);
-//        return ResponseEntity.ok(products);
-//
-//    }
-
-
     @GetMapping("/search-and-page")
-    public ResponseEntity<Page<Product>> searchProducts(
-            @RequestParam(value = "keyword", required = false) String keyword,
-            @PageableDefault(size = 10, sort = "price", direction = Sort.Direction.ASC) Pageable pageable) {
-
+    public ResponseEntity<Page<Product>> searchProducts(@RequestParam(value = "keyword", required = false) String keyword,
+                                                        @RequestParam(value = "page", defaultValue = "0") int page,
+                                                        @RequestParam(value = "size", defaultValue = "10") int size) {
         if (keyword == null) {
             // keyword is null
             return ResponseEntity.notFound().build();
         }
 
+        Pageable pageable = PageRequest.of(page, size);
         Page<Product> products = productService.searchProducts(keyword, pageable);
         return ResponseEntity.ok(products);
+
     }
+
+
+//    @GetMapping("/search-and-page")
+//    public ResponseEntity<Page<Product>> searchProducts(@RequestParam(value = "keyword", required = false) String keyword,
+//                                                        @PageableDefault(size = 10, sort = "price", direction = Sort.Direction.ASC) Pageable pageable) {
+//
+//        if (keyword == null) {
+//            // keyword is null
+//            return ResponseEntity.notFound().build();
+//        }
+//
+//        Page<Product> products = productService.searchProducts(keyword, pageable);
+//        return ResponseEntity.ok(products);
+//    }
 
 }
 

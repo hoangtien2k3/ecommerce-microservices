@@ -19,11 +19,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/auth")
-public class AuthController {
+public class UserController {
 
     @Autowired
     private UserServiceImpl userService;
-
     @Autowired
     private JwtProvider jwtProvider;
 
@@ -66,7 +65,6 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new TokenValidationResponse("Invalid token")).hasBody();
         }
     }
-
 
     // check role token authorities
     @GetMapping("/hasAuthority")

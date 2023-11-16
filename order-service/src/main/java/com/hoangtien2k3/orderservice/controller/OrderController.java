@@ -50,7 +50,7 @@ public class OrderController {
     }
 
     @GetMapping("/{orderId}")
-    @PreAuthorize("hasAuthority('USER')")
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     public ResponseEntity<OrderDto> findById(@PathVariable("orderId")
                                              @NotBlank(message = "Input must not be blank")
                                              @Valid final Integer orderId) {
@@ -60,7 +60,7 @@ public class OrderController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<OrderDto> save(@RequestHeader(name = "Authorization") String authorization,
                                          @RequestBody @NotNull(message = "Input must not be NULL")
                                          @Valid final OrderDto orderDto) {

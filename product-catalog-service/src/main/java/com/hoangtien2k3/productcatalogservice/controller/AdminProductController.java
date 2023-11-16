@@ -18,11 +18,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/admin")
 public class AdminProductController {
 
-    @Autowired
     private final ProductService productService;
-    @Autowired
     private final HeaderGenerator headerGenerator;
-    @Autowired
     private final JwtValidate jwtValidate;
 
     @PostMapping("/products")
@@ -59,7 +56,6 @@ public class AdminProductController {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
     @DeleteMapping(value = "/products/{id}")
     public ResponseEntity<Void> deleteProduct(@RequestHeader(name = "Authorization") String authorizationHeader,

@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,22 +19,22 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("api/admin")
-public class AdminUserController {
+@RequestMapping("api/information")
+public class InformationUserController {
 
     private final IUserRepository userRepository;
     private final HeaderGenerator headerGenerator;
     private final JwtProvider jwtProvider;
     private final AuthenticationManager authenticationManager;
     private final UserServiceImpl userService;
+
     @Value("${jwt.secret}")
     private String jwtSecret;
 
     @Autowired
-    public AdminUserController(IUserRepository userRepository, HeaderGenerator headerGenerator, JwtProvider jwtProvider, AuthenticationManager authenticationManager, UserServiceImpl userService) {
+    public InformationUserController(IUserRepository userRepository, HeaderGenerator headerGenerator, JwtProvider jwtProvider, AuthenticationManager authenticationManager, UserServiceImpl userService) {
         this.userRepository = userRepository;
         this.headerGenerator = headerGenerator;
         this.jwtProvider = jwtProvider;
@@ -47,7 +46,6 @@ public class AdminUserController {
     @GetMapping(value = "/user/{username}")
 //    @PreAuthorize(value = "hasAuthority('ADMIN')")
     public ResponseEntity<?> getUserByUsername(@PathVariable("username") String username) {
-
         User user = userRepository.getUserByUsername(username);
         if (user != null) {
             return new ResponseEntity<>(user,
@@ -59,7 +57,7 @@ public class AdminUserController {
                 HttpStatus.NOT_FOUND);
     }
 
-    //   users/{id}
+    // users/{id}
     @GetMapping(value = "/user/{id}")
     public ResponseEntity<?> getUserById(@PathVariable("id") Long id) {
 
@@ -73,7 +71,6 @@ public class AdminUserController {
                 headerGenerator.getHeadersForError(),
                 HttpStatus.NOT_FOUND);
     }
-
 
     @GetMapping("/user/all")
     public ResponseEntity<?> getAllUsers() {
@@ -101,7 +98,7 @@ public class AdminUserController {
         );
 
         // Đoạn mã ở đây để lấy token từ hệ thống xác thực (nếu cần)
-         String token = jwtProvider.createToken(authentication);
+        String token = jwtProvider.createToken(authentication);
 
         // Trả về token trong phản hồi
         return ResponseEntity.ok(token);

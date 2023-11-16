@@ -18,11 +18,9 @@ public interface ProductRepository extends JpaRepository<Product, Long>  {
     @Query(value = "SELECT * FROM products LIMIT :offset, :size", nativeQuery = true)
     List<Product> findProductsByPage(@Param("offset") int offset, @Param("size") int size);
 
-
     // total products
     @Query(value = "SELECT COUNT(*) FROM products", nativeQuery = true)
     int countAllProducts();
-
 
     // search
     @Query("SELECT p FROM Product p WHERE LOWER(p.productName) LIKE %:keyword%")
