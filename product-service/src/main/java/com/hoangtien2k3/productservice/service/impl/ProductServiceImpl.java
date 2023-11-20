@@ -31,7 +31,7 @@ public class ProductServiceImpl implements ProductService {
                 .stream()
                 .map(ProductMappingHelper::map)
                 .distinct()
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toUnmodifiableList()); // immutable list
     }
 
     @Override
