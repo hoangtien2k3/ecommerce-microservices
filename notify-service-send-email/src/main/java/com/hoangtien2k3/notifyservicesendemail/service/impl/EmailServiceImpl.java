@@ -15,6 +15,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
+import java.util.Arrays;
+import java.util.Objects;
 
 @Service
 public class EmailServiceImpl implements EmailService {
@@ -69,7 +71,7 @@ public class EmailServiceImpl implements EmailService {
             // Adding the attachment
             FileSystemResource file = new FileSystemResource(new File(details.getAttachment()));
 
-            mimeMessageHelper.addAttachment(file.getFilename(), file);
+            mimeMessageHelper.addAttachment(Objects.requireNonNull(file.getFilename()), file);
 
             // Sending the mail
             javaMailSender.send(mimeMessage);
@@ -97,22 +99,19 @@ public class EmailServiceImpl implements EmailService {
             mimeMessageHelper.setSubject(subject);
             mimeMessageHelper.setText(body);
 
-            for (int i = 0; i < file.length; i++) {
+            for (MultipartFile multipartFile : file) {
                 mimeMessageHelper.addAttachment(
-                        file[i].getOriginalFilename(),
-                        new ByteArrayResource(file[i].getBytes()));
+                        Objects.requireNonNull(multipartFile.getOriginalFilename()),
+                        new ByteArrayResource(multipartFile.getBytes()));
             }
 
             javaMailSender.send(mimeMessage);
 
-            return "Email send success to " + cc;
+            return "Email send success to " + Arrays.toString(cc);
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-
-
-
 
 }
