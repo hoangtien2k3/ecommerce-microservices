@@ -40,7 +40,6 @@ public class InventoryService {
                 .bodyToMono(String.class);
     }
 
-
     public Mono<String> requestTokenValidation(String accessToken) {
         return webClientBuilder.build()
                 .post()
@@ -58,7 +57,7 @@ public class InventoryService {
         // Token hợp lệ, tiếp tục gọi API từ user-service
         String responseToken = webClientBuilder.baseUrl(userServiceBaseUrl + "/api/manager")
                 .build()    // chuyển WebClientBuilder -> WebClient
-                .get()      // GET
+                .get()
                 .uri("/token")  // Endpoint
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken)    // title
                 .retrieve() // call HTTP and return ClientResponse
