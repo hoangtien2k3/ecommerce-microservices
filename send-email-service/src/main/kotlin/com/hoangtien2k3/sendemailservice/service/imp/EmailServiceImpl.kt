@@ -12,7 +12,6 @@ import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
-import java.util.*
 import javax.mail.MessagingException
 
 @Service
@@ -23,9 +22,7 @@ class EmailServiceImpl(
 
     override fun sendSimpleMail(details: EmailDetails?): String? {
         return try {
-
             val mailMessage = SimpleMailMessage()
-
             mailMessage.from = fromEmail
             mailMessage.setTo(details?.recipient)
             mailMessage.text = details?.msgBody
