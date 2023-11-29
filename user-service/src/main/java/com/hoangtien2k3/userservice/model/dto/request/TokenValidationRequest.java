@@ -1,4 +1,4 @@
-package com.hoangtien2k3.userservice.dto.request;
+package com.hoangtien2k3.userservice.model.dto.request;
 
 import lombok.Getter;
 

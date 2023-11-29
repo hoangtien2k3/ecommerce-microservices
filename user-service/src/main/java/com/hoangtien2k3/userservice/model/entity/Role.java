@@ -1,9 +1,7 @@
-package com.hoangtien2k3.userservice.entity;
+package com.hoangtien2k3.userservice.model.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.Accessors;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
@@ -12,6 +10,9 @@ import javax.persistence.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
+@With
+@Accessors(fluent = true)
 @Entity
 @Table(name = "roles")
 public class Role {

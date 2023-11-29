@@ -1,4 +1,4 @@
-package com.hoangtien2k3.userservice.dto.request;
+package com.hoangtien2k3.userservice.model.dto.request;
 
 import lombok.*;
 
@@ -12,5 +12,6 @@ public class SignUpForm {
     private String username;
     private String email;
     private String password;
+    private String gender;
     private Set<String> roles;
 }

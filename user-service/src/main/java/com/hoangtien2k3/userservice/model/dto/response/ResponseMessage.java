@@ -1,14 +1,13 @@
-package com.hoangtien2k3.userservice.dto.response;
+package com.hoangtien2k3.userservice.model.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 public class ResponseMessage {
     @Size(min = 10, max = 500)

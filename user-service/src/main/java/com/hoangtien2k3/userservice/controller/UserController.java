@@ -1,10 +1,11 @@
 package com.hoangtien2k3.userservice.controller;
 
-import com.hoangtien2k3.userservice.dto.request.SignInForm;
-import com.hoangtien2k3.userservice.dto.request.SignUpForm;
-import com.hoangtien2k3.userservice.dto.request.TokenValidationResponse;
-import com.hoangtien2k3.userservice.dto.response.JwtResponse;
-import com.hoangtien2k3.userservice.dto.response.ResponseMessage;
+import com.hoangtien2k3.userservice.model.dto.request.SignInForm;
+import com.hoangtien2k3.userservice.model.dto.request.SignUpForm;
+import com.hoangtien2k3.userservice.model.dto.request.TokenValidationResponse;
+import com.hoangtien2k3.userservice.model.dto.response.InformationMessage;
+import com.hoangtien2k3.userservice.model.dto.response.JwtResponseMessage;
+import com.hoangtien2k3.userservice.model.dto.response.ResponseMessage;
 import com.hoangtien2k3.userservice.security.jwt.JwtProvider;
 import com.hoangtien2k3.userservice.security.validate.AuthorityTokenUtil;
 import com.hoangtien2k3.userservice.service.impl.UserServiceImpl;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -26,37 +28,43 @@ public class UserController {
     @Autowired
     private JwtProvider jwtProvider;
 
-    @PostMapping("/signup")
+    @PostMapping({"/signup", "/register"})
     public Mono<ResponseEntity<ResponseMessage>> register(@Valid @RequestBody SignUpForm signUpForm) {
         return userService.registerUser(signUpForm)
                 .flatMap(user -> Mono.just(new ResponseEntity<>(
-                        new ResponseMessage("User: " + signUpForm.getUsername() + " create successfully."),
+                        new ResponseMessage("Create user: " + signUpForm.getUsername() + " successfully."),
                         HttpStatus.OK))
                 )
-                .onErrorResume(error -> Mono.just(new ResponseEntity<>(new ResponseMessage(error.getMessage()), HttpStatus.BAD_REQUEST)));
+                .onErrorResume(
+                        error -> Mono.just(new ResponseEntity<>(new ResponseMessage(error.getMessage()), HttpStatus.BAD_REQUEST))
+                );
     }
 
-    @PostMapping("/signin")
-    public Mono<ResponseEntity<JwtResponse>> login(@Valid @RequestBody SignInForm signInForm) {
+    @PostMapping({"/signin", "/login"})
+    public Mono<ResponseEntity<JwtResponseMessage>> login(@Valid @RequestBody SignInForm signInForm) {
         return userService.login(signInForm)
                 .map(ResponseEntity::ok)
                 .onErrorResume(error -> {
-                    JwtResponse errorResponse = new JwtResponse(null,null, null, null, null);
-                    return Mono.just(new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED));
+                    JwtResponseMessage errorjwtResponseMessage = new JwtResponseMessage(
+                            null,
+                            null,
+                            new InformationMessage()
+                    );
+                    return Mono.just(new ResponseEntity<>(errorjwtResponseMessage, HttpStatus.UNAUTHORIZED));
                 });
     }
 
-    @PostMapping("/refresh")
-    public Mono<ResponseEntity<JwtResponse>> refresh(@RequestHeader("Refresh-Token") String refreshToken) {
+    @PostMapping({"/refresh", "/refresh-token"})
+    public Mono<ResponseEntity<JwtResponseMessage>> refresh(@RequestHeader("Refresh-Token") String refreshToken) {
         return userService.refreshToken(refreshToken)
                 .map(newAccessToken -> {
-                    JwtResponse jwtResponse = new JwtResponse(newAccessToken, null, null, null, null);
-                    return ResponseEntity.ok(jwtResponse);
+                    JwtResponseMessage jwtResponseMessage = new JwtResponseMessage(newAccessToken, null, null);
+                    return ResponseEntity.ok(jwtResponseMessage);
                 })
                 .onErrorResume(error -> Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()));
     }
 
-    @GetMapping("/validateToken")
+    @GetMapping({"/validateToken", "/validate-token"})
     public Boolean validateToken(@RequestHeader(name = "Authorization") String authorizationToken) {
         TokenValidate validate = new TokenValidate();
         if (validate.validateToken(authorizationToken)) {
@@ -67,7 +75,7 @@ public class UserController {
     }
 
     // check role token authorities
-    @GetMapping("/hasAuthority")
+    @GetMapping({"/hasAuthority", "/authorization"})
     public Boolean getAuthority(@RequestHeader(name = "Authorization") String authorizationToken,
                                 String requiredRole) {
         AuthorityTokenUtil authorityTokenUtil = new AuthorityTokenUtil();
@@ -78,7 +86,6 @@ public class UserController {
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new TokenValidationResponse("Invalid token")).hasBody();
         }
-
     }
 
 }

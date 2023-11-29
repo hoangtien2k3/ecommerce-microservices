@@ -1,8 +1,12 @@
 ## start with a base image
-FROM openjdk:17
-## volumes
+FROM maven:latest
 VOLUME /tmp
-## add the application jar to the container
+ARG PROJECT_VERSION=0.0.1
+RUN mkdir -p /home/app
+WORKDIR /home/app
+ENV SPRING_PROFILES_ACTIVE application
+COPY ./ .
 ADD target/order-service-0.0.1-SNAPSHOT.jar order-service-0.0.1-SNAPSHOT.jar
-## extract the application jar entry to the container
+EXPOSE 8888
 ENTRYPOINT ["java", "-jar", "order-service-0.0.1-SNAPSHOT.jar"]
+CMD ["mvn", "spring-boot:run"]

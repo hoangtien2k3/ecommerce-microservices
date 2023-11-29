@@ -1,13 +1,16 @@
-package com.hoangtien2k3.userservice.dto.model;
+package com.hoangtien2k3.userservice.model.dto.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
+@Setter
 @Component
 public class TokenManager {
-
     public String TOKEN;
     public String REFRESHTOKEN;
     private Map<String, String> tokenStore = new HashMap<>();
@@ -24,7 +27,6 @@ public class TokenManager {
         REFRESHTOKEN = refreshToken;
     }
 
-
     // Lấy token dựa trên tên người dùng
     public String getTokenByUsername(String username) {
         return tokenStore.get(username);
@@ -35,35 +37,4 @@ public class TokenManager {
         tokenStore.remove(username);
     }
 
-    public String getTOKEN() {
-        return TOKEN;
-    }
-
-    public void setTOKEN(String TOKEN) {
-        this.TOKEN = TOKEN;
-    }
-
-    public String getREFRESHTOKEN() {
-        return REFRESHTOKEN;
-    }
-
-    public void setREFRESHTOKEN(String REFRESHTOKEN) {
-        this.REFRESHTOKEN = REFRESHTOKEN;
-    }
-
-    public Map<String, String> getTokenStore() {
-        return tokenStore;
-    }
-
-    public void setTokenStore(Map<String, String> tokenStore) {
-        this.tokenStore = tokenStore;
-    }
-
-    public Map<String, String> getRefreshTokenStore() {
-        return refreshTokenStore;
-    }
-
-    public void setRefreshTokenStore(Map<String, String> refreshTokenStore) {
-        this.refreshTokenStore = refreshTokenStore;
-    }
 }

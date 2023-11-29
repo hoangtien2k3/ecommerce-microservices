@@ -1,6 +1,9 @@
 package com.hoangtien2k3.productservice.exception.wrapper;
 
+import java.io.Serial;
+
 public class CategoryNotFoundException extends RuntimeException {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public CategoryNotFoundException() {

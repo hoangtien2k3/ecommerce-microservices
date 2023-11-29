@@ -1,6 +1,6 @@
 package com.hoangtien2k3.userservice.security.userprinciple;
 
-import com.hoangtien2k3.userservice.entity.User;
+import com.hoangtien2k3.userservice.model.entity.User;
 import com.hoangtien2k3.userservice.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

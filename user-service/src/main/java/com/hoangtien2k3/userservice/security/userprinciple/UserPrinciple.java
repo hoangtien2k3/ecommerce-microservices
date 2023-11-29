@@ -1,13 +1,9 @@
 package com.hoangtien2k3.userservice.security.userprinciple;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.hoangtien2k3.userservice.entity.User;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
+import com.hoangtien2k3.userservice.model.entity.User;
+import lombok.*;
+import lombok.experimental.Accessors;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,8 +12,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Getter
-@Setter
+@Data
+@With
+@Builder
+@Accessors(fluent = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserPrinciple implements UserDetails {
@@ -26,26 +24,35 @@ public class UserPrinciple implements UserDetails {
     private String name;
     private String username;
     private String email;
-    @JsonIgnore
-    private String password;
+    @JsonIgnore private String password;
     private String avatar;
     private Collection<? extends GrantedAuthority> roles;
 
     public static UserPrinciple build(User user) {
         List<GrantedAuthority> authorityList = user.getRoles()
                 .stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName().name()))
+                .map(role -> new SimpleGrantedAuthority(role.name().name()))
                 .collect(Collectors.toList());
 
-        return new UserPrinciple(
-                user.getId(),
-                user.getName(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getPassword(),
-                user.getAvatar(),
-                authorityList
-        );
+//        return new UserPrinciple(
+//                user.getId(),
+//                user.getName(),
+//                user.getUsername(),
+//                user.getEmail(),
+//                user.getPassword(),
+//                user.getAvatar(),
+//                authorityList
+//        );
+
+        return UserPrinciple.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .avatar(user.getAvatar())
+                .roles(authorityList)
+                .build();
     }
 
     @Override

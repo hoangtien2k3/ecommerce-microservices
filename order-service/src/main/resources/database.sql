@@ -6,14 +6,12 @@ CREATE TABLE carts (
 	updated_at TIMESTAMP
 );
 
-
 INSERT INTO carts
 (user_id) VALUES
 (1),
 (2),
 (3),
 (4);
-
 
 CREATE TABLE orders (
 	order_id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,

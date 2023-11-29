@@ -33,7 +33,7 @@ public class CategoryServiceImpl implements CategoryService {
                 .stream()
                 .map(CategoryMappingHelper::map)
                 .distinct()
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
     }
 
     @Override

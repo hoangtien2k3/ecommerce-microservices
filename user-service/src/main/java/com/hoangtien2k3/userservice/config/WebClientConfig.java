@@ -8,7 +8,6 @@ import reactor.netty.http.client.HttpClient;
 
 @Configuration
 public class WebClientConfig {
-
     @Bean
     public WebClient.Builder webClientBuilder() {
         return WebClient.builder()
@@ -17,5 +16,4 @@ public class WebClientConfig {
                         .port(8080) // Port of the service you want to connect to
                         .keepAlive(true))); // (Optional) Configure other settings as needed
     }
-
 }

@@ -1,12 +1,14 @@
 package com.hoangtien2k3.userservice.service.impl;
 
-import com.hoangtien2k3.userservice.dto.model.TokenManager;
-import com.hoangtien2k3.userservice.dto.request.SignInForm;
-import com.hoangtien2k3.userservice.dto.request.SignUpForm;
-import com.hoangtien2k3.userservice.dto.response.JwtResponse;
-import com.hoangtien2k3.userservice.entity.Role;
-import com.hoangtien2k3.userservice.entity.RoleName;
-import com.hoangtien2k3.userservice.entity.User;
+import com.hoangtien2k3.userservice.avatar.AvatarStore;
+import com.hoangtien2k3.userservice.model.dto.model.TokenManager;
+import com.hoangtien2k3.userservice.model.dto.request.SignInForm;
+import com.hoangtien2k3.userservice.model.dto.request.SignUpForm;
+import com.hoangtien2k3.userservice.model.dto.response.InformationMessage;
+import com.hoangtien2k3.userservice.model.dto.response.JwtResponseMessage;
+import com.hoangtien2k3.userservice.model.entity.Role;
+import com.hoangtien2k3.userservice.model.entity.RoleName;
+import com.hoangtien2k3.userservice.model.entity.User;
 import com.hoangtien2k3.userservice.repository.IRoleRepository;
 import com.hoangtien2k3.userservice.repository.IUserRepository;
 import com.hoangtien2k3.userservice.security.jwt.JwtProvider;
@@ -44,7 +46,7 @@ public class UserServiceImpl implements IUserService {
     @Autowired
     private WebClient.Builder webClientBuilder;
 
-    @Value("${refresh.token.url}") // Đường dẫn endpoint để refresh token
+    @Value("${refresh.token.url}")
     private String refreshTokenUrl;
 
     @Autowired
@@ -70,40 +72,45 @@ public class UserServiceImpl implements IUserService {
 
             Set<Role> roles = new HashSet<>();
             signUpForm.getRoles().forEach(role -> {
-                    RoleName roleName = switch (role) {
-                        case "admin", "ADMIN", "ROLE_ADMIN", "role_admin" -> RoleName.ROLE_ADMIN;
-                        case "PM", "pm", "ROLE_PM", "role_pm" -> RoleName.ROLE_PM;
-                        case "USER", "user", "ROLE_USER", "role_user" -> RoleName.ROLE_USER;
-                        default -> null;
-                    };
+                RoleName roleName = switch (role) {
+                    case "ADMIN" -> RoleName.ADMIN;
+                    case "PM" -> RoleName.PM;
+                    case "USER" -> RoleName.USER;
+                    default -> null;
+                };
 
                 Role userRole = roleRepository.findByName(roleName)
-                            .orElseThrow(() -> new RuntimeException("Role not found database."));
+                        .orElseThrow(() -> new RuntimeException("Role not found database."));
 
-                    roles.add(userRole);
+                roles.add(userRole);
             });
+
+            // check gender user login:
+            boolean checkGender = false;
+            if (Objects.equals(signUpForm.getGender(), "male")
+                    || Objects.equals(signUpForm.getGender(), "Male")
+                    || Objects.equals(signUpForm.getGender(), "MALE")) {
+                checkGender = true;
+            }
 
             User user = User.builder()
                     .name(signUpForm.getName())
                     .username(signUpForm.getUsername())
                     .email(signUpForm.getEmail())
                     .password(passwordEncoder.encode(signUpForm.getPassword()))
-                    .avatar("https://www.facebook.com/photo/?fbid=723931439407032&set=pob.100053705482952")
+                    .avatar(checkGender ? AvatarStore.MALE : AvatarStore.FEMALE)
                     .roles(roles)
                     .build();
 
             userRepository.save(user);
-
             return Mono.just(user);
         });
     }
 
-
-    // login email or username
     @Override
-    public Mono<JwtResponse> login(SignInForm signInForm) {
+    public Mono<JwtResponseMessage> login(SignInForm signInForm) {
         return Mono.defer(() -> {
-            String usernameOrEmail = signInForm.getUsername();
+            String usernameOrEmail = signInForm.getUsernameOrEmail();
             boolean isEmail = usernameOrEmail.contains("@");
 
             UserDetails userDetails;
@@ -113,11 +120,12 @@ public class UserServiceImpl implements IUserService {
                 userDetails = userDetailsService.loadUserByUsername(usernameOrEmail);
             }
 
-            Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, signInForm.getPassword(), userDetails.getAuthorities());
-
-            SecurityContextHolder
-                    .getContext()
-                    .setAuthentication(authentication);
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    userDetails,
+                    signInForm.getPassword(),
+                    userDetails.getAuthorities()
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
             // Generate token and refresh token using JwtProvider
             String accessToken = jwtProvider.createToken(authentication);
@@ -129,15 +137,19 @@ public class UserServiceImpl implements IUserService {
             tokenManager.storeToken(userPrinciple.getUsername(), accessToken);
             tokenManager.storeRefreshToken(userPrinciple.getUsername(), refreshToken);
 
-            JwtResponse jwtResponse = new JwtResponse(
-                    accessToken,
-                    refreshToken,
-                    userPrinciple.getId(),
-                    userPrinciple.getName(),
-                    userPrinciple.getAuthorities()
-            );
+            JwtResponseMessage jwtResponseMessage = JwtResponseMessage.builder()
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .information(InformationMessage.builder()
+                            .id(userPrinciple.id())
+                            .name(userPrinciple.name())
+                            .username(userPrinciple.username())
+                            .email(userPrinciple.email())
+                            .roles(userPrinciple.roles())
+                            .build())
+                    .build();
 
-            return Mono.just(jwtResponse);
+            return Mono.just(jwtResponseMessage);
         });
     }
 
@@ -148,8 +160,8 @@ public class UserServiceImpl implements IUserService {
                 .header("Refresh-Token", refreshToken)
                 .retrieve()
                 .onStatus(HttpStatus::is4xxClientError, clientResponse -> Mono.error(new IllegalArgumentException("Refresh token không hợp lệ")))
-                .bodyToMono(JwtResponse.class)
-                .map(JwtResponse::getAccessToken); // Sử dụng getAccessToken để lấy token từ JwtResponse
+                .bodyToMono(JwtResponseMessage.class)
+                .map(JwtResponseMessage::getAccessToken); // Sử dụng getAccessToken để lấy token từ JwtResponse
     }
 
     public Optional<User> findById(Long id) {
