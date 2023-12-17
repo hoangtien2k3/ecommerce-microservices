@@ -1,8 +1,7 @@
 package com.hoangtien2k3.productservice.entity;
 
 import lombok.*;
-import jakarta.persistence.*;
-//import javax.persistence.*;
+import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 

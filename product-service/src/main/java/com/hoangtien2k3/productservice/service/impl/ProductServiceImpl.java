@@ -5,15 +5,13 @@ import com.hoangtien2k3.productservice.exception.wrapper.ProductNotFoundExceptio
 import com.hoangtien2k3.productservice.helper.ProductMappingHelper;
 import com.hoangtien2k3.productservice.repository.ProductRepository;
 import com.hoangtien2k3.productservice.service.ProductService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-//import javax.transaction.Transactional;
+import javax.transaction.Transactional;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Transactional
 @Slf4j

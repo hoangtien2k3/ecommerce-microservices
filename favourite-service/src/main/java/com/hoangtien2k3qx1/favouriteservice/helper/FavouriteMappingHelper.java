@@ -7,24 +7,22 @@ import com.hoangtien2k3qx1.favouriteservice.entity.Favourite;
 
 public class FavouriteMappingHelper {
 
-    // mapping Favourite -> FavouriteDto
     public static FavouriteDto map(final Favourite favourite) {
         return FavouriteDto.builder()
-                .userId(favourite.userId())
-                .productId(favourite.productId())
-                .likeDate(favourite.likeDate())
+                .userId(favourite.getUserId())
+                .productId(favourite.getProductId())
+                .likeDate(favourite.getLikeDate())
                 .userDto(
                         UserDto.builder()
-                                .userId(favourite.userId())
+                                .userId(favourite.getUserId())
                                 .build())
                 .productDto(
                         ProductDto.builder()
-                                .productId(favourite.productId())
+                                .productId(favourite.getProductId())
                                 .build())
                 .build();
     }
 
-    // mapping FavouriteDto -> Favourites
     public static Favourite map(final FavouriteDto favouriteDto) {
         return Favourite.builder()
                 .userId(favouriteDto.getUserId())
@@ -32,8 +30,6 @@ public class FavouriteMappingHelper {
                 .likeDate(favouriteDto.getLikeDate())
                 .build();
     }
-
-
 
 }
 

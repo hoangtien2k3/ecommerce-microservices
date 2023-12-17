@@ -4,7 +4,6 @@ import com.hoangtien2k3qx1.favouriteservice.constant.ConfigConstant;
 import com.hoangtien2k3qx1.favouriteservice.dto.FavouriteDto;
 import com.hoangtien2k3qx1.favouriteservice.dto.ProductDto;
 import com.hoangtien2k3qx1.favouriteservice.dto.UserDto;
-import com.hoangtien2k3qx1.favouriteservice.entity.Favourite;
 import com.hoangtien2k3qx1.favouriteservice.entity.id.FavouriteId;
 import com.hoangtien2k3qx1.favouriteservice.exception.wrapper.FavouriteNotFoundException;
 import com.hoangtien2k3qx1.favouriteservice.helper.FavouriteMappingHelper;

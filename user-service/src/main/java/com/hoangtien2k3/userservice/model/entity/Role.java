@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@ToString
 @With
 @Accessors(fluent = true)
 @Entity

@@ -1,7 +1,8 @@
-# Ecommerce-Microservice (Backend Java)
+
+# 🛍️ Ecommerce-Microservice
 
 ## Introduction
-Welcome to the backend component of `ecommerce-microservice`. This Java backend is designed to handle the server-side logic and data processing for my application.
+Welcome to the backend component of `ecommerce-microservice`. This Java/Kotlin backend is designed to handle the server-side logic and data processing for my application.
 
 ## Prerequisites
 Before you begin, ensure you have met the following requirements:
@@ -10,11 +11,13 @@ Before you begin, ensure you have met the following requirements:
 - Build tool (e.g., `Maven` or `Gradle`) installed.
 - Database system (e.g., `MySQL`, `PostgreSQL`, `MongoDB`...vv) set up and configured.
 
+## Features
+- ✅ Using `Microservices` as a high level architecture
+
 ## Getting Started
 Follow these steps to set up and run the backend:
 
 1. Clone the repository:
-
 ```bash
    git clone https://github.com/hoangtien2k3qx1/ecommerce-microservices.git
 ```
@@ -34,7 +37,7 @@ Follow these steps to set up and run the backend:
 ```
 
 #### 3. Configure the database:
-  - Update `application.properties` or `application.yml` with your database connection details.
+- Update `application.properties` or `application.yml` with your database connection details.
 
 
 #### 4. Run the application:

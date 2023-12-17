@@ -28,7 +28,7 @@ public class HeaderGenerator {
         try {
             httpHeaders.setLocation(new URI(request.getRequestURI() + "/" + newResourceId));
         } catch (URISyntaxException e) {
-//            e.printStackTrace();
+            e.printStackTrace();
         }
         return httpHeaders;
     }

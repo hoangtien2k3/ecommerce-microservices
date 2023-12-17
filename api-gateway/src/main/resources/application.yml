@@ -1,0 +1,88 @@
+server:
+  port: 8181
+
+spring:
+  application:
+    name: API-GATEWAY
+
+  cloud:
+    gateway:
+      routes:
+        # FAVOURITE-SERVICE
+        - id: favourite-service
+          uri: lb://FAVOURITE-SERVICE
+          predicates:
+            - Path=/api/favourites/**
+
+        # INVENTORY-SERVICE
+        - id: inventory-service
+          uri: lb://INVENTORY-SERVICE
+          predicates:
+            - Path=/api/inventory/**
+
+        # NOTIFY-SERVICE-SEND-EMAIL
+        - id: notify-service-send-email
+          uri: lb://NOTIFY-SERVICE-SEND-EMAIL
+          predicates:
+            - Path=/api/email/**
+
+        # ORDER-SERVICE
+        - id: order-service-carts
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/api/carts/**
+
+        - id: order-service-orders
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/api/orders/**
+
+        # PAYMENT-SERVICE
+        - id: payment-service
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/api/payments/**
+
+        # PRODUCT-SERVICE
+        - id: product-categories
+          uri: lb://PRODUCT-SERVICE
+          predicates:
+            - Path=/api/categories/**
+
+        - id: product-products
+          uri: lb://PRODUCT-SERVICE
+          predicates:
+            - Path=/api/products/**
+
+        # SHIPPING-SERVICE
+        - id: shipping-service
+          uri: lb://SHIPPING-SERVICE
+          predicates:
+            - Path=/api/shippings/**
+
+        # USER-SERVICE
+        - id: user-service-auth
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/auth/**
+
+        - id: user-service-information
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/information/**
+
+        - id: user-service-manager
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/manager/**
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway.route.RouteDefinitionLocator: INFO
+    org.springframework.cloud.gateway: TRACE
