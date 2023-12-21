@@ -11,6 +11,7 @@ import java.util.Set;
 @Builder
 @Entity
 @Table(name = "carts")
+@NoArgsConstructor(force = true)
 public record Cart(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)

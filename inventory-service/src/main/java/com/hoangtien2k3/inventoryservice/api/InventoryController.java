@@ -1,4 +1,4 @@
-package com.hoangtien2k3.inventoryservice.controller;
+package com.hoangtien2k3.inventoryservice.api;
 
 import com.hoangtien2k3.inventoryservice.dto.response.InventoryResponse;
 import com.hoangtien2k3.inventoryservice.security.JwtValidate;

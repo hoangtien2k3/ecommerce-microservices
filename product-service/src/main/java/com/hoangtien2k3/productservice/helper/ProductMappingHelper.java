@@ -6,7 +6,7 @@ import com.hoangtien2k3.productservice.dto.CategoryDto;
 import com.hoangtien2k3.productservice.dto.ProductDto;
 
 public interface ProductMappingHelper {
-    public static ProductDto map(final Product product) {
+    static ProductDto map(final Product product) {
         return ProductDto.builder()
                 .productId(product.getProductId())
                 .productTitle(product.getProductTitle())
@@ -23,7 +23,7 @@ public interface ProductMappingHelper {
                 .build();
     }
 
-    public static Product map(final ProductDto productDto) {
+    static Product map(final ProductDto productDto) {
         return Product.builder()
                 .productId(productDto.getProductId())
                 .productTitle(productDto.getProductTitle())

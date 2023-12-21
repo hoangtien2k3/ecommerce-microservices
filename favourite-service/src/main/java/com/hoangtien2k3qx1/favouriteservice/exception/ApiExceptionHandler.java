@@ -17,9 +17,9 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
-@Slf4j // lombok or Slf4j maven
+@Slf4j
 @RequiredArgsConstructor
-@ControllerAdvice // @ControllerAdvice -> ExceptionHandler
+@ControllerAdvice
 public class ApiExceptionHandler {
 
     @ExceptionHandler(value = {

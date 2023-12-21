@@ -1,4 +1,4 @@
-package com.hoangtien2k3.productservice.controller;
+package com.hoangtien2k3.productservice.api;
 
 import com.hoangtien2k3.productservice.dto.ProductDto;
 import com.hoangtien2k3.productservice.dto.response.collection.DtoCollectionResponse;
@@ -22,12 +22,14 @@ public class ProductController {
     @Autowired
     private final ProductService productService;
 
+    // Get a list of all products
     @GetMapping
     public ResponseEntity<DtoCollectionResponse<ProductDto>> findAll() {
         log.info("ProductDto List, controller; fetch all categories");
         return ResponseEntity.ok(new DtoCollectionResponse<>(productService.findAll()));
     }
 
+    // Get detailed information of a specific product
     @GetMapping("/{productId}")
     public ResponseEntity<ProductDto> findById(@PathVariable("productId")
                                                @NotBlank(message = "Input must not be blank!")
@@ -36,6 +38,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.findById(Integer.parseInt(productId)));
     }
 
+    // Create a new product
     @PostMapping
     public ResponseEntity<ProductDto> save(@RequestBody
                                            @NotNull(message = "Input must not be NULL!")
@@ -44,6 +47,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.save(productDto));
     }
 
+    // Update information of all product
     @PutMapping
     public ResponseEntity<ProductDto> update(@RequestBody
                                              @NotNull(message = "Input must not be NULL!")
@@ -52,6 +56,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.update(productDto));
     }
 
+    // Update information of a product:
     @PutMapping("/{productId}")
     public ResponseEntity<ProductDto> update(@PathVariable("productId")
                                              @NotBlank(message = "Input must not be blank!")
@@ -63,6 +68,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.update(Integer.parseInt(productId), productDto));
     }
 
+    // Delete a product
     @DeleteMapping("/{productId}")
     public ResponseEntity<Boolean> deleteById(@PathVariable("productId") final String productId) {
         log.info("Boolean, resource; delete product by id");

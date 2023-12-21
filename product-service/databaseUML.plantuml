@@ -1,0 +1,45 @@
+@startuml
+
+class AbstractMappedEntity implements Serializable {
+    private Instant createdAt;
+
+    private Instant updatedAt;
+}
+
+class Product extends AbstractMappedEntity implements Serializable {
+    @Id
+    private Integer productId;
+
+    private String productTitle;
+
+    private String imageUrl;
+
+    private String sku;
+
+    private Double priceUnit;
+
+    private Integer quantity;
+
+    private Category category;
+}
+
+class Category extends AbstractMappedEntity implements Serializable {
+    @Id
+    private Integer categoryId;
+
+    private String categoryTitle;
+
+    private String imageUrl;
+
+    @JsonIgnore
+    private Set<Category> subCategories;
+
+    private Category parentCategory;
+
+    @JsonIgnore
+    private Set<Product> products;
+}
+
+Category --o{ Product : 1 ... *
+
+@enduml

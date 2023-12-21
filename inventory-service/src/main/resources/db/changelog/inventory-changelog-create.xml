@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="create-table-inventory" author="inventory" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="table inventory already exists">
+            <not>
+                <tableExists tableName="inventory" />
+            </not>
+        </preConditions>
+        <createTable tableName="inventory">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="table-inventory-add-column-productName" author="inventory" runAlways="true">
+        <preConditions onFail="CONTINUE" onFailMessage="column productName already exists in table inventory">
+            <not>
+                <columnExists  tableName="inventory" columnName="productName" />
+            </not>
+        </preConditions>
+        <addColumn tableName="inventory">
+            <column name="productName" type="VARCHAR(255)">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="table-inventory-add-column-quantity" author="profile">
+        <preConditions onFail="CONTINUE" onFailMessage="column quantity already exists in table inventory">
+            <not>
+                <columnExists  tableName="inventory" columnName="quantity" />
+            </not>
+        </preConditions>
+        <addColumn tableName="inventory">
+            <column name="quantity" type="INT">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,8 +1,7 @@
-
 -- table inventory
 create table inventory (
        id bigint not null auto_increment,
-       quantity integer,
-       sku_code varchar(255),
+       productName varchar(255) not null,
+       quantity int not null,
        primary key (id)
 ) engine=MyISAM

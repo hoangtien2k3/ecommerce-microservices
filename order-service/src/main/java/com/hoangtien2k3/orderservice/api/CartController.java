@@ -1,10 +1,9 @@
-package com.hoangtien2k3.orderservice.controller;
+package com.hoangtien2k3.orderservice.api;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.hoangtien2k3.orderservice.config.jwt.JwtUtil;
 import com.hoangtien2k3.orderservice.dto.CartDto;
 import com.hoangtien2k3.orderservice.dto.response.collection.DtoCollectionResponse;
 import com.hoangtien2k3.orderservice.security.JwtValidate;

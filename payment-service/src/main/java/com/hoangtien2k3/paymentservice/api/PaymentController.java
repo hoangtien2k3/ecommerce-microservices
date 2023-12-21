@@ -1,4 +1,4 @@
-package com.hoangtien2k3.paymentservice.controller;
+package com.hoangtien2k3.paymentservice.api;
 
 import com.hoangtien2k3.paymentservice.dto.PaymentDto;
 import com.hoangtien2k3.paymentservice.dto.response.collection.DtoCollectionResponse;

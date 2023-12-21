@@ -7,6 +7,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Set;
@@ -23,10 +26,10 @@ public class CategoryDto implements Serializable {
     private String categoryTitle;
     private String imageUrl;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL) // nếu subCategoriesDtos khác null thì hiển thị đầu ra của Json, ngược lại nếu null thì sẽ ko được hiển thị ở đầu ra của Json.
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Set<CategoryDto> subCategoriesDtos;
 
-    @JsonProperty("parentCategory") // tên hiển thị khi chuyển sang Json
+    @JsonProperty("parentCategory")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private CategoryDto parentCategoryDto;
 

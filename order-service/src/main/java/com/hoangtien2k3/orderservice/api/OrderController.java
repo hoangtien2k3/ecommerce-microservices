@@ -1,32 +1,25 @@
-package com.hoangtien2k3.orderservice.controller;
+package com.hoangtien2k3.orderservice.api;
 
 import com.hoangtien2k3.orderservice.dto.OrderDto;
 import com.hoangtien2k3.orderservice.dto.response.collection.DtoCollectionResponse;
-import com.hoangtien2k3.orderservice.entity.RoleName;
-import com.hoangtien2k3.orderservice.security.Authorities;
-import com.hoangtien2k3.orderservice.security.AuthorityTokenUtil;
 import com.hoangtien2k3.orderservice.security.JwtValidate;
 import com.hoangtien2k3.orderservice.security.RoleAuthorities;
 import com.hoangtien2k3.orderservice.service.OrderService;
-import io.jsonwebtoken.Jwt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.management.relation.Role;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Slf4j

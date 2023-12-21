@@ -1,0 +1,23 @@
+
+@startuml
+package "Entities" {
+  class Order {
+    +orderId: Integer
+    +orderDate: LocalDateTime
+    +orderDesc: String
+    +orderFee: Double
+    --
+  }
+
+  class Cart {
+    +cartId: Integer
+    +userId: Integer
+    --
+  }
+}
+
+Order --|> Cart : includes
+
+@enduml
+
+

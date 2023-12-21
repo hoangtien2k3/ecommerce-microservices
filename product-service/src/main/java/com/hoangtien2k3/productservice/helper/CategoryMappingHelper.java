@@ -6,8 +6,8 @@ import com.hoangtien2k3.productservice.dto.CategoryDto;
 import java.util.Optional;
 
 public interface CategoryMappingHelper {
-    // map Category -> CategoryDto
-    public static CategoryDto map(final Category category) {
+
+    static CategoryDto map(final Category category) {
         final var parentCategory = Optional.ofNullable(category.getParentCategory())
                 .orElseGet(Category::new);
         return CategoryDto.builder()
@@ -24,9 +24,7 @@ public interface CategoryMappingHelper {
                 .build();
     }
 
-
-    // map CategoryDto -> Category
-    public static Category map(CategoryDto categoryDto) {
+    static Category map(CategoryDto categoryDto) {
         final var parentCategoryDto = Optional.ofNullable(categoryDto.getParentCategoryDto())
                 .orElseGet(CategoryDto::new);
         return Category.builder()

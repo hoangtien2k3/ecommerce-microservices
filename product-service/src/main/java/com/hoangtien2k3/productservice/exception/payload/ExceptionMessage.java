@@ -23,7 +23,6 @@ public class ExceptionMessage implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    //  được sử dụng để chỉ định cách một trường hoặc thuộc tính của một đối tượng Java sẽ được chuyển đổi thành JSON khi sử dụng thư viện Jackson
     @JsonSerialize(using = ZonedDateTimeSerializer.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = AppConstant.ZONED_DATE_TIME_FORMAT)
     private final ZonedDateTime timestamp;

@@ -1,6 +1,7 @@
 package com.hoangtien2k3.productservice.service.impl;
 
 import com.hoangtien2k3.productservice.dto.CategoryDto;
+import com.hoangtien2k3.productservice.exception.payload.ExceptionMessage;
 import com.hoangtien2k3.productservice.exception.wrapper.CategoryNotFoundException;
 import com.hoangtien2k3.productservice.helper.CategoryMappingHelper;
 import com.hoangtien2k3.productservice.repository.CategoryRepository;
@@ -8,8 +9,16 @@ import com.hoangtien2k3.productservice.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 import javax.transaction.Transactional;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @Transactional
@@ -21,14 +30,34 @@ public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private final CategoryRepository categoryRepository;
 
+//    @Override
+//    public List<CategoryDto> findAll() {
+//        log.info("Category List Service, fetch all category");
+//        return categoryRepository.findAll()
+//                .stream()
+//                .map(CategoryMappingHelper::map)
+//                .distinct()
+//                .toList();
+//    }
+
     @Override
-    public List<CategoryDto> findAll() {
+    public Flux<List<CategoryDto>> findAll() {
         log.info("Category List Service, fetch all category");
-        return categoryRepository.findAll()
-                .stream()
-                .map(CategoryMappingHelper::map)
-                .distinct()
-                .toList();
+        return Flux.just(categoryRepository.findAll())
+                .flatMap(categories ->
+                        Flux.fromIterable(categories)
+                                .map(CategoryMappingHelper::map)
+                                .distinct()
+                                .collectList()
+                                .map(categoryDtos -> {
+                                    log.info("Categories fetched successfully");
+                                    return categoryDtos;
+                                })
+                                .onErrorResume(throwable -> {
+                                    log.error("Error while fetching categories: " + throwable.getMessage());
+                                    return Mono.just(Collections.emptyList());
+                                })
+                );
     }
 
     @Override
@@ -39,12 +68,26 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new CategoryNotFoundException(String.format("Category with id[%d] not found", categoryId)));
     }
 
+//    @Override
+//    public CategoryDto save(CategoryDto categoryDto) {
+//        log.info("CategoryDto, service; save category");
+//        return CategoryMappingHelper
+//                .map(categoryRepository.save(CategoryMappingHelper.map(categoryDto)));
+//    }
+
+
     @Override
-    public CategoryDto save(CategoryDto categoryDto) {
+    public Mono<CategoryDto> save(CategoryDto categoryDto) {
         log.info("CategoryDto, service; save category");
-        return CategoryMappingHelper
-                .map(categoryRepository.save(CategoryMappingHelper.map(categoryDto)));
+        return Mono.just(categoryDto)
+                .map(CategoryMappingHelper::map)
+                .flatMap(category ->
+                        Mono.fromCallable(() -> CategoryMappingHelper.map(categoryRepository.save(category)))
+                                .onErrorMap(DataIntegrityViolationException.class, e ->
+                                        new CategoryNotFoundException("Bad Request", e))
+                );
     }
+
 
     @Override
     public CategoryDto update(CategoryDto categoryDto) {

@@ -17,9 +17,9 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-@Service
 @RequiredArgsConstructor
 @Slf4j
+@Service
 public class InventoryService {
 
     @Autowired
@@ -29,7 +29,7 @@ public class InventoryService {
     private final WebClient.Builder webClientBuilder;
 
     @Value("${user-service.base-url}")
-    private String userServiceBaseUrl; // URL của user-service
+    private String userServiceBaseUrl;
 
     // get Token in -> user-service
     public Mono<String> getTokenFromUserService() {

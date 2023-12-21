@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "orders")
+@NoArgsConstructor(force = true)
 public record Order(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)

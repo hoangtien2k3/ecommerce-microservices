@@ -18,6 +18,16 @@
 		<spring-cloud.version>2021.0.8</spring-cloud.version>
 	</properties>
 	<dependencies>
+<!--		<dependency>-->
+<!--			<groupId>org.liquibase</groupId>-->
+<!--			<artifactId>liquibase-core</artifactId>-->
+<!--			<version>4.23.0</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>org.liquibase</groupId>-->
+<!--			<artifactId>liquibase-maven-plugin</artifactId>-->
+<!--			<version>4.20.0</version>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -114,6 +124,28 @@
 						</exclude>
 					</excludes>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.liquibase</groupId>
+				<artifactId>liquibase-maven-plugin</artifactId>
+				<configuration>
+					<propertyFile>src/main/resources/application.properties</propertyFile>
+					<propertyFileWillOverride>true</propertyFileWillOverride>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.8</version>
+				<configuration>
+					<excludes>
+						<exclude>**/model/**</exclude>
+						<exclude>**/configuration/**</exclude>
+						<exclude>**/ProfileserviceApplication.*</exclude>
+						<exclude>**/Constant.*</exclude>
+					</excludes>
+				</configuration>
+				<executions><execution><id>default</id><goals><goal>prepare-agent</goal></goals></execution><execution><id>default-report</id><phase>prepare-package</phase><goals><goal>report</goal></goals></execution></executions>
 			</plugin>
 		</plugins>
 	</build>

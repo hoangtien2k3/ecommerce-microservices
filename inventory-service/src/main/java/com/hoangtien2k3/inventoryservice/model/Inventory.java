@@ -18,6 +18,10 @@ public class Inventory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "productName")
     private String productName;
+
+    @Column(name = "quantity")
     private Integer quantity;
 }
