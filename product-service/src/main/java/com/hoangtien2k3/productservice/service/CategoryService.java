@@ -8,12 +8,10 @@ import java.util.List;
 
 public interface CategoryService {
 
-//    List<CategoryDto> findAll();
     Flux<List<CategoryDto>> findAll();
 
     CategoryDto findById(final Integer categoryId);
 
-//    CategoryDto save(final CategoryDto categoryDto);
     Mono<CategoryDto> save(final CategoryDto categoryDto);
 
     CategoryDto update(final CategoryDto categoryDto);

@@ -49,16 +49,17 @@ public class CategoryServiceImpl implements CategoryService {
                                 .map(CategoryMappingHelper::map)
                                 .distinct()
                                 .collectList()
-                                .map(categoryDtos -> {
-                                    log.info("Categories fetched successfully");
-                                    return categoryDtos;
-                                })
-                                .onErrorResume(throwable -> {
-                                    log.error("Error while fetching categories: " + throwable.getMessage());
-                                    return Mono.just(Collections.emptyList());
-                                })
-                );
+                )
+                .map(categoryDtos -> {
+                    log.info("Categories fetched successfully");
+                    return categoryDtos;
+                })
+                .onErrorResume(throwable -> {
+                    log.error("Error while fetching categories: " + throwable.getMessage());
+                    return Mono.just(Collections.emptyList());
+                });
     }
+
 
     @Override
     public CategoryDto findById(Integer categoryId) {
@@ -68,14 +69,6 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new CategoryNotFoundException(String.format("Category with id[%d] not found", categoryId)));
     }
 
-//    @Override
-//    public CategoryDto save(CategoryDto categoryDto) {
-//        log.info("CategoryDto, service; save category");
-//        return CategoryMappingHelper
-//                .map(categoryRepository.save(CategoryMappingHelper.map(categoryDto)));
-//    }
-
-
     @Override
     public Mono<CategoryDto> save(CategoryDto categoryDto) {
         log.info("CategoryDto, service; save category");
@@ -83,11 +76,9 @@ public class CategoryServiceImpl implements CategoryService {
                 .map(CategoryMappingHelper::map)
                 .flatMap(category ->
                         Mono.fromCallable(() -> CategoryMappingHelper.map(categoryRepository.save(category)))
-                                .onErrorMap(DataIntegrityViolationException.class, e ->
-                                        new CategoryNotFoundException("Bad Request", e))
+                                .onErrorMap(DataIntegrityViolationException.class, e -> new CategoryNotFoundException("Bad Request", e))
                 );
     }
-
 
     @Override
     public CategoryDto update(CategoryDto categoryDto) {

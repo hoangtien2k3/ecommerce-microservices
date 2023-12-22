@@ -26,12 +26,6 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     // Get a list of all categories
-//    @GetMapping
-//    public ResponseEntity<DtoCollectionResponse<CategoryDto>> findAll() {
-//        log.info("CategoryDto List, controller; fetch all categories");
-//        return ResponseEntity.ok(new DtoCollectionResponse<>(categoryService.findAll()));
-//    }
-
     @GetMapping
     public ResponseEntity<Flux<List<CategoryDto>>> findAll() {
         log.info("CategoryDto List, controller; fetch all categories");
@@ -48,14 +42,8 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.findById(Integer.parseInt(categoryId)));
     }
 
-    // Create a new category
-//    @PostMapping
-//    public ResponseEntity<CategoryDto> save(@RequestBody @NotNull(message = "Input must not be NULL")
-//                                            @Valid final CategoryDto categoryDto) {
-//        log.info("CategoryDto, resource; save category");
-//        return ResponseEntity.ok(categoryService.save(categoryDto));
-//    }
 
+//     Create a new category
     @PostMapping
     public ResponseEntity<Mono<CategoryDto>> save(@RequestBody @NotNull(message = "Input must not be NULL")
                                             @Valid final CategoryDto categoryDto) {

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -23,14 +24,22 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
 
     @Override
-    public List<ProductDto> findAll() {
+    public Flux<List<ProductDto>> findAll() {
         log.info("ProductDto List, service, fetch all products");
-        return productRepository.findAll()
-                .stream()
-                .map(ProductMappingHelper::map)
-                .distinct()
-                .toList();
+        return Flux.defer(() -> {
+                    List<ProductDto> productDtos = productRepository.findAll()
+                            .stream()
+                            .map(ProductMappingHelper::map)
+                            .distinct()
+                            .toList();
+                    return Flux.just(productDtos);
+                })
+                .onErrorResume(throwable -> {
+                    log.error("Error while fetching products: " + throwable.getMessage());
+                    return Flux.empty();
+                });
     }
+
 
     @Override
     public ProductDto findById(Integer productId) {

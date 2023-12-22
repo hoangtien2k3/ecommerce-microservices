@@ -8,10 +8,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,10 +27,11 @@ public class ProductController {
 
     // Get a list of all products
     @GetMapping
-    public ResponseEntity<DtoCollectionResponse<ProductDto>> findAll() {
+    public Flux<List<ProductDto>> findAll() {
         log.info("ProductDto List, controller; fetch all categories");
-        return ResponseEntity.ok(new DtoCollectionResponse<>(productService.findAll()));
+        return productService.findAll();
     }
+
 
     // Get detailed information of a specific product
     @GetMapping("/{productId}")
