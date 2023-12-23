@@ -1,4 +1,4 @@
-package com.hoangtien2k3.notifyservicesendemail.entity;
+package com.hoangtien2k3.notificationservice.entity;
 
 import org.springframework.web.multipart.MultipartFile;
 

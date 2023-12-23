@@ -1,6 +1,6 @@
-package com.hoangtien2k3.notifyservicesendemail.service;
+package com.hoangtien2k3.notificationservice.service;
 
-import com.hoangtien2k3.notifyservicesendemail.entity.EmailDetails;
+import com.hoangtien2k3.notificationservice.entity.EmailDetails;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface EmailService {

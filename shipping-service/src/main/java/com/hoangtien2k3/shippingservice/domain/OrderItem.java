@@ -1,20 +1,11 @@
 package com.hoangtien2k3.shippingservice.domain;
 
+import com.hoangtien2k3.shippingservice.domain.id.OrderItemId;
+import lombok.*;
+
+import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.Table;
-
-import com.hoangtien2k3.shippingservice.domain.id.OrderItemId;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "order_items")

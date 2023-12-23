@@ -1,12 +1,17 @@
 package com.hoangtien2k3.productservice.service.impl;
 
 import com.hoangtien2k3.productservice.dto.CategoryDto;
+import com.hoangtien2k3.productservice.entity.Category;
+import com.hoangtien2k3.productservice.entity.Product;
 import com.hoangtien2k3.productservice.exception.wrapper.CategoryNotFoundException;
+import com.hoangtien2k3.productservice.exception.wrapper.ProductNotFoundException;
 import com.hoangtien2k3.productservice.helper.CategoryMappingHelper;
+import com.hoangtien2k3.productservice.helper.ProductMappingHelper;
 import com.hoangtien2k3.productservice.repository.CategoryRepository;
 import com.hoangtien2k3.productservice.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -69,20 +74,73 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto update(CategoryDto categoryDto) {
         log.info("CategoryDto Service, update category");
-        return CategoryMappingHelper
-                .map(categoryRepository.save(CategoryMappingHelper.map(categoryDto)));
+
+        try {
+            Category existingCategory = categoryRepository.findById(categoryDto.getCategoryId())
+                    .orElseThrow(() -> new CategoryNotFoundException("Category not found with id: " + categoryDto.getCategoryId()));
+
+            BeanUtils.copyProperties(categoryDto, existingCategory, "categoryId", "parentCategoryDto");
+
+            if (categoryDto.getParentCategoryDto() != null) {
+                existingCategory.setParentCategory(CategoryMappingHelper.map(categoryDto.getParentCategoryDto()));
+            }
+
+            return CategoryMappingHelper.map(categoryRepository.save(existingCategory));
+        } catch (CategoryNotFoundException e) {
+            log.error("Error updating category. Category with id [{}] not found.", categoryDto.getCategoryId());
+            throw new CategoryNotFoundException(String.format("Category with id [%d] not found.", categoryDto.getCategoryId()), e);
+        } catch (DataIntegrityViolationException e) {
+            log.error("Error updating category: Data integrity violation", e);
+            throw new CategoryNotFoundException("Error updating category: Data integrity violation", e);
+        } catch (Exception e) {
+            log.error("Error updating category", e);
+            throw new CategoryNotFoundException("Error updating category", e);
+        }
     }
+
 
     @Override
     public CategoryDto update(Integer categoryId, CategoryDto categoryDto) {
-        log.info("CategoryDto Service, update category with categoryId");
-        return CategoryMappingHelper
-                .map(categoryRepository.save(CategoryMappingHelper.map(this.findById(categoryId))));
+        log.info("CategoryDto Service: Updating category with categoryId");
+
+        try {
+            // Check if the category exists
+            CategoryDto existingCategoryDto = this.findById(categoryId);
+
+            // Convert CategoryDto to Category and update the fields
+            Category existingCategory = CategoryMappingHelper.map(existingCategoryDto);
+            BeanUtils.copyProperties(categoryDto, existingCategory, "categoryId", "parentCategoryDto");
+
+            if (categoryDto.getParentCategoryDto() != null) {
+                existingCategory.setParentCategory(CategoryMappingHelper.map(categoryDto.getParentCategoryDto()));
+            }
+
+            // Save the updated category to the database
+            Category updatedCategory = categoryRepository.save(existingCategory);
+
+            // Map the updated Category back to CategoryDto and return
+            return CategoryMappingHelper.map(updatedCategory);
+        } catch (CategoryNotFoundException e) {
+            log.error("Error updating category. Category with id [{}] not found.", categoryId);
+            throw new CategoryNotFoundException(String.format("Category with id [%d] not found.", categoryId), e);
+        } catch (DataIntegrityViolationException e) {
+            log.error("Error updating category: Data integrity violation", e);
+            throw new CategoryNotFoundException("Error updating category: Data integrity violation", e);
+        } catch (Exception e) {
+            log.error("Error updating category", e);
+            throw new CategoryNotFoundException("Error updating category", e);
+        }
     }
+
 
     @Override
     public void deleteById(Integer categoryId) {
         log.info("Void Service, delete category by id");
-        categoryRepository.deleteById(categoryId);
+        try {
+            categoryRepository.deleteById(categoryId);
+        } catch (CategoryNotFoundException e) {
+            log.error("Error delete category", e);
+            throw new CategoryNotFoundException("Error updating category", e);
+        }
     }
 }

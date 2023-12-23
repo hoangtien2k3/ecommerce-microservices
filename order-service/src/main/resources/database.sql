@@ -6,12 +6,13 @@ CREATE TABLE carts (
 	updated_at TIMESTAMP
 );
 
-INSERT INTO carts
-(user_id) VALUES
-(1),
-(2),
-(3),
-(4);
+-- Chèn dữ liệu vào bảng carts
+INSERT INTO carts (user_id, created_at, updated_at)
+VALUES
+    (1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    (2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    (3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
 
 CREATE TABLE orders (
 	order_id INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -23,13 +24,12 @@ CREATE TABLE orders (
 	updated_at TIMESTAMP
 );
 
-
-INSERT INTO orders
-(cart_id, order_desc, order_fee) VALUES
-(1, 'init', 5000),
-(2, 'init', 5000),
-(3, 'init', 5000),
-(4, 'init', 5000);
+-- Chèn dữ liệu vào bảng orders
+INSERT INTO orders (cart_id, order_date, order_desc, order_fee, created_at, updated_at)
+VALUES
+    (1, CURRENT_TIMESTAMP, 'Đơn hàng 1', 50.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    (2, CURRENT_TIMESTAMP, 'Đơn hàng 2', 75.50, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    (3, CURRENT_TIMESTAMP, 'Đơn hàng 3', 120.25, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 
 ALTER TABLE orders

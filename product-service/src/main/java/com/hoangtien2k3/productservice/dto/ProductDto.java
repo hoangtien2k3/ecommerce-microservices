@@ -2,16 +2,15 @@ package com.hoangtien2k3.productservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
 
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Data
 @Builder
 public class ProductDto implements Serializable {

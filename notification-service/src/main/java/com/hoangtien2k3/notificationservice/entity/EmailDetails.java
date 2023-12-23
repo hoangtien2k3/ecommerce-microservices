@@ -1,6 +1,8 @@
-package com.hoangtien2k3.notifyservicesendemail.entity;
+package com.hoangtien2k3.notificationservice.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor

@@ -1,22 +1,19 @@
 package com.hoangtien2k3.shippingservice.domain;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.Instant;
-
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
-
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.Instant;
 
 @MappedSuperclass
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

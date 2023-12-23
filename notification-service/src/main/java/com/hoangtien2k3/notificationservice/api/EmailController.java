@@ -1,7 +1,7 @@
-package com.hoangtien2k3.notifyservicesendemail.api;
+package com.hoangtien2k3.notificationservice.api;
 
-import com.hoangtien2k3.notifyservicesendemail.entity.EmailDetails;
-import com.hoangtien2k3.notifyservicesendemail.service.EmailService;
+import com.hoangtien2k3.notificationservice.entity.EmailDetails;
+import com.hoangtien2k3.notificationservice.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;

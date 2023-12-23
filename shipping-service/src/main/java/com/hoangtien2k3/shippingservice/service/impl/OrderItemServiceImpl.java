@@ -1,10 +1,5 @@
 package com.hoangtien2k3.shippingservice.service.impl;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.transaction.Transactional;
-
 import com.hoangtien2k3.shippingservice.constant.AppConstant;
 import com.hoangtien2k3.shippingservice.domain.id.OrderItemId;
 import com.hoangtien2k3.shippingservice.dto.OrderDto;
@@ -14,12 +9,13 @@ import com.hoangtien2k3.shippingservice.exception.wrapper.OrderItemNotFoundExcep
 import com.hoangtien2k3.shippingservice.helper.OrderItemMappingHelper;
 import com.hoangtien2k3.shippingservice.repository.OrderItemRepository;
 import com.hoangtien2k3.shippingservice.service.OrderItemService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 @Transactional
