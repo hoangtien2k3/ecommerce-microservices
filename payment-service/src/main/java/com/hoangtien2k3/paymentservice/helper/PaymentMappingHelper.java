@@ -1,8 +1,8 @@
 package com.hoangtien2k3.paymentservice.helper;
 
-import com.hoangtien2k3.paymentservice.entity.Payment;
 import com.hoangtien2k3.paymentservice.dto.OrderDto;
 import com.hoangtien2k3.paymentservice.dto.PaymentDto;
+import com.hoangtien2k3.paymentservice.entity.Payment;
 
 public interface PaymentMappingHelper {
     public static PaymentDto map(final Payment payment) {

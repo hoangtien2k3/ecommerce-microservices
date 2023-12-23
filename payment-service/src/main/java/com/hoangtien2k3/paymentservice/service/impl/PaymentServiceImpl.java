@@ -3,21 +3,13 @@ package com.hoangtien2k3.paymentservice.service.impl;
 import com.hoangtien2k3.paymentservice.constant.AppConstant;
 import com.hoangtien2k3.paymentservice.dto.OrderDto;
 import com.hoangtien2k3.paymentservice.dto.PaymentDto;
-import com.hoangtien2k3.paymentservice.entity.Payment;
 import com.hoangtien2k3.paymentservice.exception.wrapper.PaymentNotFoundException;
 import com.hoangtien2k3.paymentservice.helper.PaymentMappingHelper;
 import com.hoangtien2k3.paymentservice.repository.PaymentRepository;
 import com.hoangtien2k3.paymentservice.service.PaymentService;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -25,6 +17,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.transaction.Transactional;
+import java.util.Collections;
+import java.util.List;
 
 @Transactional
 @Slf4j
@@ -54,7 +48,11 @@ public class PaymentServiceImpl implements PaymentService {
         return this.paymentRepository.findAll()
                 .stream()
                 .map(PaymentMappingHelper::map) // Map Payment -> PaymentDto
-                .peek(p -> p.setOrderDto(restTemplate.getForObject(AppConstant.DiscoveredDomainsApi.ORDER_SERVICE_API_URL + "/" + p.getOrderDto().getOrderId(), OrderDto.class)))
+                .peek(p -> p.setOrderDto(
+                        restTemplate.getForObject(
+                                AppConstant.DiscoveredDomainsApi.ORDER_SERVICE_API_URL + "/" + p.getOrderDto().getOrderId(), OrderDto.class)
+                        )
+                )
                 .distinct()
                 .toList();
     }
@@ -73,36 +71,6 @@ public class PaymentServiceImpl implements PaymentService {
                 .map(responseList -> responseList != null ? responseList : Collections.emptyList());
     }
 
-    // set list payment
-/*    @Override
-    public List<PaymentDto> findAll() {
-        List<Payment> payments = paymentRepository.findAll();
-
-        // Sử dụng Flux để tạo một luồng các Mono<OrderDto> từ WebClient
-        Flux<Mono<OrderDto>> orderDtos = Flux.fromIterable(payments)
-                .map(payment -> webClientBuilder.baseUrl("/api/payment")
-                        .uri("/{orderId}", payment.getOrderId())
-                        .retrieve()
-                        .bodyToMono(OrderDto.class));
-
-        Flux<OrderDto> orderDtoFlux = Flux.mergeSequential(orderDtos);
-
-        List<OrderDto> orderDtoList = orderDtoFlux.collectList().block();
-
-        return payments.stream()
-                .map(payment -> {
-                    PaymentDto paymentDto = PaymentMappingHelper.map(payment);
-                    assert orderDtoList != null;
-                    OrderDto orderDto = orderDtoList.stream()
-                            .filter(o -> o.getOrderId().equals(payment.getOrderId()))
-                            .findFirst()
-                            .orElse(null);
-                    paymentDto.setOrderDto(orderDto);
-                    return paymentDto;
-                })
-                .collect(Collectors.toList());
-    }*/
-
     @Override
     public PaymentDto findById(Integer paymentId) {
         log.info("PaymentDto, service; fetch payment by id");
@@ -115,7 +83,6 @@ public class PaymentServiceImpl implements PaymentService {
                 })
                 .orElseThrow(() -> new PaymentNotFoundException(String.format("Payment with id[%d] not found", paymentId)));
     }
-
 
     @Override
     public PaymentDto save(PaymentDto paymentDto) {

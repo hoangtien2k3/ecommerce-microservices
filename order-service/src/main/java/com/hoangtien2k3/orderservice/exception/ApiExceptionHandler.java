@@ -27,12 +27,17 @@ public class ApiExceptionHandler {
             HttpMessageNotReadableException.class,
     })
     public <T extends BindException> ResponseEntity<ExceptionMessage> handleValidationException(final T e) {
+
+        log.info("**ApiExceptionHandler controller, handle validation exception*\n");
+        final var badRequest = HttpStatus.BAD_REQUEST;
+
         return new ResponseEntity<>(
                 ExceptionMessage.builder()
-                        .message(Objects.requireNonNull(e.getBindingResult().getFieldError()).getDefaultMessage())
-                        .httpStatus(HttpStatus.BAD_REQUEST)
-                        .timestamp(ZonedDateTime.now(ZoneId.systemDefault()))
-                        .build(), HttpStatus.BAD_REQUEST);
+                        .msg("*" + Objects.requireNonNull(e.getBindingResult().getFieldError()).getDefaultMessage() + "!**")
+                        .httpStatus(badRequest)
+                        .timestamp(ZonedDateTime
+                                .now(ZoneId.systemDefault()))
+                        .build(), badRequest);
     }
 
     @ExceptionHandler(value = {
@@ -41,13 +46,17 @@ public class ApiExceptionHandler {
             IllegalStateException.class,
     })
     public <T extends RuntimeException> ResponseEntity<ExceptionMessage> handleApiRequestException(final T e) {
+
+        log.info("**ApiExceptionHandler controller, handle API request*\n");
         final var badRequest = HttpStatus.BAD_REQUEST;
+
         return new ResponseEntity<>(
                 ExceptionMessage.builder()
-                        .message(e.getMessage())
-                        .httpStatus(HttpStatus.BAD_REQUEST)
-                        .timestamp(ZonedDateTime.now(ZoneId.systemDefault()))
-                        .build(), HttpStatus.BAD_REQUEST);
+                        .msg("#### " + e.getMessage() + "! ####")
+                        .httpStatus(badRequest)
+                        .timestamp(ZonedDateTime
+                                .now(ZoneId.systemDefault()))
+                        .build(), badRequest);
     }
 
 }

@@ -4,25 +4,29 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.Set;
 
-@Builder
 @Entity
 @Table(name = "carts")
-@NoArgsConstructor(force = true)
-public record Cart(
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        @Column(name = "cart_id", unique = true, nullable = false, updatable = false)
-        Integer cartId,
-        @Column(name = "user_id")
-        Integer userId,
-        @JsonIgnore
-        @OneToMany(mappedBy = "cart", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-        Set<Order> orders
-) implements Serializable {
-    @Serial
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true, exclude = {"orders"})
+@Data
+@Builder
+public final class Cart extends AbstractMappedEntity {
+
     private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "cart_id", unique = true, nullable = false, updatable = false)
+    private Integer cartId;
+
+    @Column(name = "user_id")
+    private Integer userId;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "cart", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<Order> orders;
+
 }

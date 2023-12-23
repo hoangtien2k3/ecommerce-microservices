@@ -3,7 +3,7 @@ package com.hoangtien2k3.productservice.constant;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE) // constructor không đối số và khai báo PRIVATE
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public abstract class AppConstant {
 
     public static final String LOCAL_DATE_FORMAT = "dd-MM-yyyy";

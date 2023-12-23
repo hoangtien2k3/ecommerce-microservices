@@ -1,17 +1,17 @@
 package com.hoangtien2k3.orderservice.helper;
 
-import com.hoangtien2k3.orderservice.entity.Cart;
 import com.hoangtien2k3.orderservice.dto.CartDto;
 import com.hoangtien2k3.orderservice.dto.UserDto;
+import com.hoangtien2k3.orderservice.entity.Cart;
 
 public interface CartMappingHelper {
     static CartDto map( Cart cart) {
         return CartDto.builder()
-                .cartId(cart.cartId())
-                .userId(cart.userId())
+                .cartId(cart.getCartId())
+                .userId(cart.getUserId())
                 .userDto(
                         UserDto.builder()
-                                .userId(cart.userId())
+                                .userId(cart.getUserId())
                                 .build())
                 .build();
     }

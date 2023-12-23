@@ -40,7 +40,6 @@ public class ProductServiceImpl implements ProductService {
                 });
     }
 
-
     @Override
     public ProductDto findById(Integer productId) {
         log.info("ProductDto, service; fetch product by id");

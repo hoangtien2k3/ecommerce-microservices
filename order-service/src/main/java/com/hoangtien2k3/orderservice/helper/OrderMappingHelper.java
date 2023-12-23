@@ -1,19 +1,19 @@
 package com.hoangtien2k3.orderservice.helper;
 
-import com.hoangtien2k3.orderservice.entity.Cart;
-import com.hoangtien2k3.orderservice.entity.Order;
 import com.hoangtien2k3.orderservice.dto.CartDto;
 import com.hoangtien2k3.orderservice.dto.OrderDto;
+import com.hoangtien2k3.orderservice.entity.Cart;
+import com.hoangtien2k3.orderservice.entity.Order;
 
 public interface OrderMappingHelper {
     static OrderDto map(Order order) {
         return OrderDto.builder()
-                .orderId(order.orderId())
-                .orderDate(order.orderDate())
-                .orderDesc(order.orderDesc())
-                .orderFee(order.orderFee())
+                .orderId(order.getOrderId())
+                .orderDate(order.getOrderDate())
+                .orderDesc(order.getOrderDesc())
+                .orderFee(order.getOrderFee())
                 .cartDto(CartDto.builder()
-                                .cartId(order.cart().cartId())
+                                .cartId(order.getCart().getCartId())
                                 .build())
                 .build();
     }

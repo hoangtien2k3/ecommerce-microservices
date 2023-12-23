@@ -1,7 +1,6 @@
 package com.hoangtien2k3.productservice.service.impl;
 
 import com.hoangtien2k3.productservice.dto.CategoryDto;
-import com.hoangtien2k3.productservice.exception.payload.ExceptionMessage;
 import com.hoangtien2k3.productservice.exception.wrapper.CategoryNotFoundException;
 import com.hoangtien2k3.productservice.helper.CategoryMappingHelper;
 import com.hoangtien2k3.productservice.repository.CategoryRepository;
@@ -10,14 +9,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.transaction.Transactional;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,16 +25,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private final CategoryRepository categoryRepository;
-
-//    @Override
-//    public List<CategoryDto> findAll() {
-//        log.info("Category List Service, fetch all category");
-//        return categoryRepository.findAll()
-//                .stream()
-//                .map(CategoryMappingHelper::map)
-//                .distinct()
-//                .toList();
-//    }
 
     @Override
     public Flux<List<CategoryDto>> findAll() {

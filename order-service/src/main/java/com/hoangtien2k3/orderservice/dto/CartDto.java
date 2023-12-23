@@ -1,17 +1,16 @@
 package com.hoangtien2k3.orderservice.dto;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.Set;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
