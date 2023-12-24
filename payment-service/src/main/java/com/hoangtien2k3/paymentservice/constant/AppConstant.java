@@ -20,7 +20,7 @@ public class AppConstant {
         public static final String PRODUCT_SERVICE_API_URL = "http://PRODUCT-SERVICE/product-service/api/products";
 
         public static final String ORDER_SERVICE_HOST = "http://ORDER-SERVICE/order-service";
-        public static final String ORDER_SERVICE_API_URL = "http://ORDER-SERVICE/order-service/api/orders";
+        public static final String ORDER_SERVICE_API_URL = "http://localhost:8080/api/orders";
 
         public static final String FAVOURITE_SERVICE_HOST = "http://FAVOURITE-SERVICE/favourite-service";
         public static final String FAVOURITE_SERVICE_API_URL = "http://FAVOURITE-SERVICE/favourite-service/api/favourites";
