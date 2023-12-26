@@ -33,6 +33,6 @@ public final class ExceptionMessage implements Serializable {
     @JsonInclude(value = Include.NON_NULL)
     private Throwable throwable;
     private final HttpStatus httpStatus;
-    private final String msg;
+    private final String message;
 
 }

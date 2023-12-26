@@ -1,5 +1,6 @@
 package com.hoangtien2k3.userservice.service.impl;
 
+import com.hoangtien2k3.userservice.exception.wrapper.RoleNotFoundException;
 import com.hoangtien2k3.userservice.model.entity.Role;
 import com.hoangtien2k3.userservice.model.entity.RoleName;
 import com.hoangtien2k3.userservice.repository.IRoleRepository;
@@ -19,7 +20,8 @@ public class RoleServiceImpl implements IRoleService {
 
     @Override
     public Optional<Role> findByName(RoleName name) {
-        return roleRepository.findByName(name);
+        return Optional.ofNullable(roleRepository.findByName(name)
+                .orElseThrow(() -> new RoleNotFoundException("Role Not Found with name: " + name)));
     }
 
 }

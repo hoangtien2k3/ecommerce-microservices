@@ -25,28 +25,42 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "userId", unique = true, nullable = false, updatable = false)
     private Long id;
 
     @NotBlank
     @Size(min = 3, max = 50)
-    private String name;
+    @Column(name = "fullName")
+    private String fullname;
 
     @NotBlank
     @Size(min = 3, max = 50)
+    @Column(name = "userName")
     private String username;
 
     @NaturalId
     @NotBlank
     @Size(max = 50)
-    @Email
+    @Email(message = "Input must be in Email format")
+    @Column(name = "email")
     private String email;
 
     @JsonIgnore
     @NotBlank
     @Size(min = 6, max = 100)
+    @Column(name = "password")
     private String password;
 
+    @NotBlank
+    @Column(name = "gender", nullable = false)
+    private String gender;
+
+    @Size(min = 10, max = 11)
+    @Column(name = "phoneNumber", unique = true)
+    private String phone;
+
     @Lob
+    @Column(name = "imageUrl")
     private String avatar;
 
     @ManyToMany(fetch = FetchType.EAGER)

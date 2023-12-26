@@ -16,7 +16,6 @@ public class TokenManager {
     private Map<String, String> tokenStore = new HashMap<>();
     private Map<String, String> refreshTokenStore = new HashMap<>();
 
-    // Lưu trữ token cho một tên người dùng
     public void storeToken(String username, String token) {
         tokenStore.put(username, token);
         TOKEN = token;
@@ -27,12 +26,10 @@ public class TokenManager {
         REFRESHTOKEN = refreshToken;
     }
 
-    // Lấy token dựa trên tên người dùng
     public String getTokenByUsername(String username) {
         return tokenStore.get(username);
     }
 
-    // Xóa token dựa trên tên người dùng (ví dụ: khi đăng xuất)
     public void removeToken(String username) {
         tokenStore.remove(username);
     }

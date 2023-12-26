@@ -44,7 +44,7 @@ public class InformationUserController {
     private String jwtSecret;
 
     @GetMapping(value = "/user/{username}")
-    @PreAuthorize(value = "hasRole('ADMIN')")
+    @PreAuthorize(value = "hasAuthority('ADMIN')")
     public ResponseEntity<?> getUserByUsername(@PathVariable("username") String username) {
         User user = userRepository.getUserByUsername(username);
         return (user != null)
@@ -52,7 +52,7 @@ public class InformationUserController {
                 : new ResponseEntity<>(null, headerGenerator.getHeadersForError(), HttpStatus.NOT_FOUND);
     }
 
-    @PreAuthorize(value = "hasRole('USER')")
+    @PreAuthorize(value = "hasAuthority('USER')")
     @GetMapping(value = "/user/{id}")
     public ResponseEntity<?> getUserById(@PathVariable("id") Long id) {
         if (userService.findById(id).isPresent()) {
@@ -83,7 +83,7 @@ public class InformationUserController {
     @GetMapping("/generate/token")
     public ResponseEntity<String> getToken(@RequestBody SignInForm signInForm) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(signInForm.getUsernameOrEmail(), signInForm.getPassword())
+                new UsernamePasswordAuthenticationToken(signInForm.getUsername(), signInForm.getPassword())
         );
 
         String token = jwtProvider.createToken(authentication); // Đoạn mã ở đây để lấy token từ hệ thống xác thực (nếu cần)

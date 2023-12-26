@@ -11,10 +11,14 @@ import java.util.Collection;
 @NoArgsConstructor
 @AllArgsConstructor
 public class InformationMessage {
+
     private Long id;
-    private String name;
+    private String fullname;
     private String username;
     private String email;
+    private String gender;
+    private String phone;
+    private String avatar;
     private Collection<? extends GrantedAuthority> roles;
 
 }

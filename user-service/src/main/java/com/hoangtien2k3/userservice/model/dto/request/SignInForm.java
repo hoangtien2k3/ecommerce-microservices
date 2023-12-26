@@ -6,6 +6,6 @@ import lombok.*;
 @Setter
 @RequiredArgsConstructor
 public class SignInForm {
-    private String usernameOrEmail;
+    private String username;
     private String password;
 }

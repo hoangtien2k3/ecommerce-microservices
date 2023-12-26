@@ -16,7 +16,6 @@ public class JwtEntryPoint implements AuthenticationEntryPoint {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtEntryPoint.class);
 
-    // bắt lỗi Exception
     @Override
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,

@@ -26,16 +26,13 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     @Autowired
     private UserDetailService userDetailService;
 
-
-    // tìm token trong request
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         try {
-            // lấy ra token trong request
             String token = getJwt(request);
-            // Or secretkey
+
             if (token != null && jwtProvider.validateToken(token)) {
                 String username = jwtProvider.getUserNameFromToken(token);
                 UserDetails userDetails = userDetailService.loadUserByUsername(username);
@@ -46,10 +43,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-                // Tạo mới refresh token
                 String refreshToken = jwtProvider.createRefreshToken(authenticationToken);
 
-                // Gửi cả token và refresh token về cho người dùng
                 response.setHeader("Authorization", "Bearer " + token);
                 response.setHeader("Refresh-Token", refreshToken);
             }

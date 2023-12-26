@@ -19,11 +19,12 @@ public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", unique = true, nullable = false, updatable = false)
     private Long id;
 
     @Enumerated(EnumType.STRING)
     @NaturalId
-    @Column(length = 60)
+    @Column(name = "roleName", length = 60)
     private RoleName name;
 
 }

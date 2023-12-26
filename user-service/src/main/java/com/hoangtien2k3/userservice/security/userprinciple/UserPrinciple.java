@@ -21,10 +21,13 @@ import java.util.stream.Collectors;
 public class UserPrinciple implements UserDetails {
 
     private Long id;
-    private String name;
+    private String fullname;
     private String username;
     private String email;
-    @JsonIgnore private String password;
+    @JsonIgnore
+    private String password;
+    private String gender;
+    private String phone;
     private String avatar;
     private Collection<? extends GrantedAuthority> roles;
 
@@ -34,22 +37,14 @@ public class UserPrinciple implements UserDetails {
                 .map(role -> new SimpleGrantedAuthority(role.name().name()))
                 .collect(Collectors.toList());
 
-//        return new UserPrinciple(
-//                user.getId(),
-//                user.getName(),
-//                user.getUsername(),
-//                user.getEmail(),
-//                user.getPassword(),
-//                user.getAvatar(),
-//                authorityList
-//        );
-
         return UserPrinciple.builder()
                 .id(user.getId())
-                .name(user.getName())
+                .fullname(user.getFullname())
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .password(user.getPassword())
+                .gender(user.getGender())
+                .phone(user.getPhone())
                 .avatar(user.getAvatar())
                 .roles(authorityList)
                 .build();

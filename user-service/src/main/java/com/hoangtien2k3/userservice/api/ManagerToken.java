@@ -16,20 +16,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Service
 @RequestMapping("/api/manager")
-public class SenToken {
+public class ManagerToken {
 
     private final IUserService userService;
     private final IUserRepository userRepository;
     private final TokenManager tokenManager;
 
     @Autowired
-    public SenToken(IUserService userService, IUserRepository userRepository, TokenManager tokenManager) {
+    public ManagerToken(IUserService userService, IUserRepository userRepository, TokenManager tokenManager) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.tokenManager = tokenManager;
     }
 
-    @PreAuthorize(value = "hasRole('USER')")
+    @PreAuthorize(value = "hasAuthority('USER')")
     @GetMapping("/token/{username}")
     public ResponseEntity<String> getTokenByUsername(@PathVariable("username") String username) {
         User user = userRepository.findByUsername(username)

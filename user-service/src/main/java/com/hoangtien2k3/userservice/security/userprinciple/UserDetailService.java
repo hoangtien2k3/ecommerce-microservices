@@ -16,7 +16,6 @@ public class UserDetailService implements UserDetailsService {
     @Autowired
     IUserRepository userRepository;
 
-    // check user exists in DB
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

@@ -1,0 +1,14 @@
+@startuml
+
+class Inventory {
+
+    @Id
+    private Long id;
+
+    private String productName;
+
+    private Integer quantity;
+
+}
+
+@enduml

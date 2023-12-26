@@ -1,0 +1,25 @@
+
+@startuml
+
+class Payment extends AbstractMappedEntity implements Serializable {
+
+    @Id
+    private Integer paymentId;
+
+    private Integer orderId;
+
+    private Boolean isPayed;
+
+    private PaymentStatus paymentStatus;
+
+}
+
+class AbstractMappedEntity implements Serializable {
+
+    private Instant createdAt;
+
+    private Instant updatedAt;
+
+}
+
+@enduml

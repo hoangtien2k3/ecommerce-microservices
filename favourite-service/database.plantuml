@@ -1,0 +1,35 @@
+@startuml
+
+class Favourite implements Serializable {
+
+    @Id
+    private Integer userId;
+
+    @Id
+    private Integer productId;
+
+    @Id
+    private LocalDateTime likeDate;
+
+}
+
+abstract class AbstractMappedEntity implements Serializable {
+
+    private Instant createdAt;
+
+    private Instant updatedAt;
+}
+
+class FavouriteId implements Serializable {
+
+    @NotNull
+    private Integer userId;
+
+    @NotNull
+    private Integer productId;
+
+    private LocalDateTime likeDate;
+
+}
+
+@enduml

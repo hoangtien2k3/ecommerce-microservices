@@ -15,28 +15,24 @@ public class Authorities {
 
     public static List<String> extractAuthoritiesFromToken(String token) {
         try {
-            // Giả định rằng bạn sử dụng thư viện JWT (JSON Web Token) để giải mã token
             Jws<Claims> claims = Jwts
                     .parser()
-                    .setSigningKey(jwtSecret) // Thêm khóa bí mật khi giải mã token
+                    .setSigningKey(jwtSecret)
                     .parseClaimsJws(token);
 
-            // Trích xuất phần "authorities" từ claims
             Claims body = claims.getBody();
             List<String> authorities = new ArrayList<>();
             List<Object> roles = body.get("authorities", List.class);
 
-            // Trích xuất danh sách quyền từ mảng "authority"
             for (Object role : roles) {
                 if (role instanceof String) {
                     authorities.add((String) role);
                 }
             }
 
-            // Trả về danh sách quyền
             return authorities;
         } catch (Exception e) {
-            return new ArrayList<>(); // Trả về danh sách trống nếu xảy ra lỗi
+            return new ArrayList<>();
         }
     }
 }

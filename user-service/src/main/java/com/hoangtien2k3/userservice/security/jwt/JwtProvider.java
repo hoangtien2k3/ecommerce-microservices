@@ -28,7 +28,6 @@ public class JwtProvider {
     public String createToken(Authentication authentication) {
         UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
 
-        // danh sách các quyền (authorities) của người dùng
         List<String> authorities = userPrinciple.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());

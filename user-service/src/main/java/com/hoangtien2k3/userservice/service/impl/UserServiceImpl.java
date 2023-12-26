@@ -1,6 +1,6 @@
 package com.hoangtien2k3.userservice.service.impl;
 
-import com.hoangtien2k3.userservice.avatar.AvatarStore;
+import com.hoangtien2k3.userservice.exception.wrapper.UserNotFoundException;
 import com.hoangtien2k3.userservice.model.dto.model.TokenManager;
 import com.hoangtien2k3.userservice.model.dto.request.SignInForm;
 import com.hoangtien2k3.userservice.model.dto.request.SignUpForm;
@@ -26,7 +26,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -59,7 +58,6 @@ public class UserServiceImpl implements IUserService {
         this.userDetailsService = userDetailsService;
     }
 
-    // register user
     @Override
     public Mono<User> registerUser(SignUpForm signUpForm) {
         return Mono.defer(() -> {
@@ -85,20 +83,14 @@ public class UserServiceImpl implements IUserService {
                 roles.add(userRole);
             });
 
-            // check gender user login:
-            boolean checkGender = false;
-            if (Objects.equals(signUpForm.getGender(), "male")
-                    || Objects.equals(signUpForm.getGender(), "Male")
-                    || Objects.equals(signUpForm.getGender(), "MALE")) {
-                checkGender = true;
-            }
-
             User user = User.builder()
-                    .name(signUpForm.getName())
+                    .fullname(signUpForm.getFullname())
                     .username(signUpForm.getUsername())
                     .email(signUpForm.getEmail())
                     .password(passwordEncoder.encode(signUpForm.getPassword()))
-                    .avatar(checkGender ? AvatarStore.MALE : AvatarStore.FEMALE)
+                    .phone(signUpForm.getPhone())
+                    .gender(signUpForm.getGender())
+                    .avatar(signUpForm.getAvatar())
                     .roles(roles)
                     .build();
 
@@ -110,7 +102,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public Mono<JwtResponseMessage> login(SignInForm signInForm) {
         return Mono.defer(() -> {
-            String usernameOrEmail = signInForm.getUsernameOrEmail();
+            String usernameOrEmail = signInForm.getUsername();
             boolean isEmail = usernameOrEmail.contains("@");
 
             UserDetails userDetails;
@@ -142,9 +134,12 @@ public class UserServiceImpl implements IUserService {
                     .refreshToken(refreshToken)
                     .information(InformationMessage.builder()
                             .id(userPrinciple.id())
-                            .name(userPrinciple.name())
+                            .fullname(userPrinciple.fullname())
                             .username(userPrinciple.username())
                             .email(userPrinciple.email())
+                            .phone(userPrinciple.phone())
+                            .gender(userPrinciple.gender())
+                            .avatar(userPrinciple.avatar())
                             .roles(userPrinciple.roles())
                             .build())
                     .build();
@@ -166,22 +161,19 @@ public class UserServiceImpl implements IUserService {
 
     public Optional<User> findById(Long id) {
         return Optional.ofNullable(userRepository.findById(id))
-                .orElseThrow(() -> new UsernameNotFoundException("User not found."));
+                .orElseThrow(() -> new UserNotFoundException("User not found."));
     }
 
-
-    // get all user in list user
     public Optional<List<User>> getAllUsers() {
-        return Optional.ofNullable(userRepository.findAll());
+        List<User> users = userRepository.findAll();
+        return Optional.ofNullable(Optional.ofNullable(users)
+                .orElseThrow(() -> new UserNotFoundException("Not found any user.")));
     }
 
-
-    // load user by page and size
     public Page<User> getAllUsers(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return userRepository.findAll(pageable);
     }
-
 
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
