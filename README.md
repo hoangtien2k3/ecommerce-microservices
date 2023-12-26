@@ -10,6 +10,13 @@ Before you begin, ensure you have met the following requirements:
 - Java Development Kit `(JDK) 17` or higher installed.
 - Build tool (e.g., `Maven` or `Gradle`) installed.
 - Database system (e.g., `MySQL`, `PostgreSQL`, `MongoDB`...vv) set up and configured.
+- Liquibase Migration Database `MySql`
+- Reactive Programming with WebFlux Reactor Spring Boot.
+- Hibernate, JPA, WebFlux
+- Docker build
+- Restfull API
+- PostMan Testing API and Client.
+- Send message and receiver using Kafka server, Zookeeper, Broker.
 
 ## Features
 - ✅ Using `Microservices` as a high level architecture
