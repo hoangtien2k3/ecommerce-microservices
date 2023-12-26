@@ -42,13 +42,11 @@ public class InventoryController {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/validateToken")
     public String getOrderDetails(@RequestHeader(name = "Authorization") String authorizationHeader) {
-        // Kiểm tra tính hợp lệ của token trước khi gọi API
         if (jwtValidate.validateTokenUserService(authorizationHeader)) {
             return inventoryService.getTokenUserService(authorizationHeader);
         } else {
             return "Unauthorized accessToken";
         }
     }
-
 
 }

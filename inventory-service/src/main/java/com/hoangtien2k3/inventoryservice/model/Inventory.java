@@ -24,4 +24,5 @@ public class Inventory {
 
     @Column(name = "quantity")
     private Integer quantity;
+
 }

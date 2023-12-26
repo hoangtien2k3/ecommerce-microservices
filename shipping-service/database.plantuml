@@ -1,0 +1,33 @@
+
+@startuml
+
+class OrderItem extends AbstractMappedEntity implements Serializable {
+
+    @Id
+    private Integer productId;
+
+    @Id
+    private Integer orderId;
+
+    private Integer orderedQuantity;
+
+}
+
+class AbstractMappedEntity implements Serializable {
+
+    private Instant createdAt;
+
+    private Instant updatedAt;
+
+}
+
+class OrderItemId implements Serializable {
+
+    private Integer productId;
+
+    private Integer orderId;
+
+}
+
+
+@enduml

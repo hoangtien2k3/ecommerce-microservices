@@ -1,7 +1,8 @@
 
 @startuml
 package "Entities" {
-  class Order {
+
+  class Order extends AbstractMappedEntity {
     +orderId: Integer
     +orderDate: LocalDateTime
     +orderDesc: String
@@ -9,11 +10,23 @@ package "Entities" {
     --
   }
 
-  class Cart {
+  class Cart extends AbstractMappedEntity {
     +cartId: Integer
     +userId: Integer
     --
   }
+
+  abstract class AbstractMappedEntity implements Serializable {
+
+      @Serial
+      private static final long serialVersionUID = 1L;
+
+      private Instant createdAt;
+
+      private Instant updatedAt;
+
+  }
+
 }
 
 Order --|> Cart : includes
