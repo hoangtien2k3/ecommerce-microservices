@@ -3921,3 +3921,7 @@ Caused by: java.net.ConnectException: Connection refused
 2023-12-27 04:13:09.158 DEBUG 78213 --- [DiscoveryClient-HeartbeatExecutor-0] o.s.web.client.RestTemplate              : HTTP PUT http://localhost:8761/eureka/apps/SHIPPING-SERVICE/10.97.13.12:SHIPPING-SERVICE:8087?status=UP&lastDirtyTimestamp=1703622968227
 2023-12-27 04:13:09.158 DEBUG 78213 --- [DiscoveryClient-HeartbeatExecutor-0] o.s.web.client.RestTemplate              : Accept=[application/json, application/*+json]
 2023-12-27 04:13:09.161 DEBUG 78213 --- [DiscoveryClient-HeartbeatExecutor-0] o.s.web.client.RestTemplate              : Response 200 OK
+2023-12-27 04:13:22.143 DEBUG 78213 --- [DiscoveryClient-CacheRefreshExecutor-0] o.s.web.client.RestTemplate              : HTTP GET http://localhost:8761/eureka/apps/delta
+2023-12-27 04:13:22.144 DEBUG 78213 --- [DiscoveryClient-CacheRefreshExecutor-0] o.s.web.client.RestTemplate              : Accept=[application/json, application/*+json]
+2023-12-27 04:13:22.149 DEBUG 78213 --- [DiscoveryClient-CacheRefreshExecutor-0] o.s.web.client.RestTemplate              : Response 200 OK
+2023-12-27 04:13:22.150 DEBUG 78213 --- [DiscoveryClient-CacheRefreshExecutor-0] o.s.web.client.RestTemplate              : Reading to [org.springframework.cloud.netflix.eureka.http.EurekaApplications]

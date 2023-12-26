@@ -5,24 +5,33 @@ class User {
     @Id
     private Long id;
 
-    private String name;
+    private String fullname;
 
     private String username;
 
     private String email;
 
+    @JsonIgnore
     private String password;
+
+    private String gender;
+
+    private String phone;
 
     private String avatar;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_role",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles = new HashSet<>();
+    private Set<Role> roles;
 
 }
+
+class user_role {
+
+    private String user_id;
+
+    private String role_id;
+
+}
+
 
 class Role {
 
@@ -34,5 +43,8 @@ class Role {
 }
 
 
+user_role --|> Role
+
+user_role --|> User
 
 @enduml

@@ -1,7 +1,6 @@
 ## zookeeper
 ## broker
 ## kafka
-
 version: '2'
 services:
   zookeeper:
