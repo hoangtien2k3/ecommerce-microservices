@@ -19,17 +19,21 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/auth")
-public class UserController {
+@RequestMapping("/api/auth/user")
+public class UserRegisterAndLogin {
+
+    private final UserServiceImpl userService;
+    private final JwtProvider jwtProvider;
 
     @Autowired
-    private UserServiceImpl userService;
-    @Autowired
-    private JwtProvider jwtProvider;
+    public UserRegisterAndLogin(UserServiceImpl userService, JwtProvider jwtProvider) {
+        this.userService = userService;
+        this.jwtProvider = jwtProvider;
+    }
 
     @PostMapping({"/signup", "/register"})
     public Mono<ResponseEntity<ResponseMessage>> register(@Valid @RequestBody SignUpForm signUpForm) {
-        return userService.registerUser(signUpForm)
+        return userService.register(signUpForm)
                 .flatMap(user -> Mono.just(new ResponseEntity<>(
                         new ResponseMessage("Create user: " + signUpForm.getUsername() + " successfully."),
                         HttpStatus.OK))
@@ -63,6 +67,7 @@ public class UserController {
                 .onErrorResume(error -> Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()));
     }
 
+
     @GetMapping({"/validateToken", "/validate-token"})
     public Boolean validateToken(@RequestHeader(name = "Authorization") String authorizationToken) {
         TokenValidate validate = new TokenValidate();
@@ -73,7 +78,6 @@ public class UserController {
         }
     }
 
-    // check role token authorities
     @GetMapping({"/hasAuthority", "/authorization"})
     public Boolean getAuthority(@RequestHeader(name = "Authorization") String authorizationToken,
                                 String requiredRole) {
