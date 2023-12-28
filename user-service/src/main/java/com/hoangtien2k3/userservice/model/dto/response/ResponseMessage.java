@@ -3,13 +3,12 @@ package com.hoangtien2k3.userservice.model.dto.response;
 import lombok.*;
 
 import javax.validation.constraints.Size;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
-public class ResponseMessage {
+public class ResponseMessage extends RuntimeException {
     @Size(min = 10, max = 500)
     private String message;
 }

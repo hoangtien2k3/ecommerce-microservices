@@ -8,10 +8,13 @@ import com.hoangtien2k3.userservice.model.dto.response.JwtResponseMessage;
 import com.hoangtien2k3.userservice.model.dto.response.ResponseMessage;
 import com.hoangtien2k3.userservice.security.jwt.JwtProvider;
 import com.hoangtien2k3.userservice.security.validate.AuthorityTokenUtil;
+import com.hoangtien2k3.userservice.service.IUserService;
 import com.hoangtien2k3.userservice.service.impl.UserServiceImpl;
 import com.hoangtien2k3.userservice.security.validate.TokenValidate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -19,20 +22,20 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/auth/user")
-public class UserRegisterAndLogin {
+@RequestMapping("/api/auth")
+public class UserAuth {
 
-    private final UserServiceImpl userService;
+    private final IUserService userService;
     private final JwtProvider jwtProvider;
 
     @Autowired
-    public UserRegisterAndLogin(UserServiceImpl userService, JwtProvider jwtProvider) {
+    public UserAuth(IUserService userService, JwtProvider jwtProvider) {
         this.userService = userService;
         this.jwtProvider = jwtProvider;
     }
 
     @PostMapping({"/signup", "/register"})
-    public Mono<ResponseEntity<ResponseMessage>> register(@Valid @RequestBody SignUpForm signUpForm) {
+    public Mono<ResponseEntity<ResponseMessage>> register(@Validated @RequestBody SignUpForm signUpForm) {
         return userService.register(signUpForm)
                 .flatMap(user -> Mono.just(new ResponseEntity<>(
                         new ResponseMessage("Create user: " + signUpForm.getUsername() + " successfully."),
@@ -44,7 +47,7 @@ public class UserRegisterAndLogin {
     }
 
     @PostMapping({"/signin", "/login"})
-    public Mono<ResponseEntity<JwtResponseMessage>> login(@Valid @RequestBody SignInForm signInForm) {
+    public Mono<ResponseEntity<JwtResponseMessage>> login(@Validated @RequestBody SignInForm signInForm) {
         return userService.login(signInForm)
                 .map(ResponseEntity::ok)
                 .onErrorResume(error -> {
@@ -57,16 +60,15 @@ public class UserRegisterAndLogin {
                 });
     }
 
-    @PostMapping({"/refresh", "/refresh-token"})
-    public Mono<ResponseEntity<JwtResponseMessage>> refresh(@RequestHeader("Refresh-Token") String refreshToken) {
-        return userService.refreshToken(refreshToken)
-                .map(newAccessToken -> {
-                    JwtResponseMessage jwtResponseMessage = new JwtResponseMessage(newAccessToken, null, null);
-                    return ResponseEntity.ok(jwtResponseMessage);
-                })
-                .onErrorResume(error -> Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()));
-    }
-
+//    @PostMapping({"/refresh", "/refresh-token"})
+//    public Mono<ResponseEntity<JwtResponseMessage>> refresh(@RequestHeader("Refresh-Token") String refreshToken) {
+//        return userService.refreshToken(refreshToken)
+//                .map(newAccessToken -> {
+//                    JwtResponseMessage jwtResponseMessage = new JwtResponseMessage(newAccessToken, null, null);
+//                    return ResponseEntity.ok(jwtResponseMessage);
+//                })
+//                .onErrorResume(error -> Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()));
+//    }
 
     @GetMapping({"/validateToken", "/validate-token"})
     public Boolean validateToken(@RequestHeader(name = "Authorization") String authorizationToken) {

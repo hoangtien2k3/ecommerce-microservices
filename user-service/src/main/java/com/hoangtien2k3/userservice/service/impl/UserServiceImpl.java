@@ -17,11 +17,12 @@ import com.hoangtien2k3.userservice.security.userprinciple.UserPrinciple;
 import com.hoangtien2k3.userservice.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import javax.transaction.Transactional;
 import java.util.*;
 
 @Service
@@ -49,7 +51,7 @@ public class UserServiceImpl implements IUserService {
     private String refreshTokenUrl;
 
     @Autowired
-    public UserServiceImpl(IUserRepository userRepository, IRoleRepository roleRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtProvider jwtProvider, TokenManager tokenManager, UserDetailService userDetailsService) {
+    public UserServiceImpl(IUserRepository userRepository, IRoleRepository roleRepository, PasswordEncoder passwordEncoder, JwtProvider jwtProvider, TokenManager tokenManager, UserDetailService userDetailsService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -59,7 +61,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public Mono<User> registerUser(SignUpForm signUpForm) {
+    public Mono<User> register(SignUpForm signUpForm) {
         return Mono.defer(() -> {
             if (existsByUsername(signUpForm.getUsername())) {
                 return Mono.error(new RuntimeException("The username " + signUpForm.getUsername() + " is existed, please try again."));
@@ -76,10 +78,7 @@ public class UserServiceImpl implements IUserService {
                     case "USER" -> RoleName.USER;
                     default -> null;
                 };
-
-                Role userRole = roleRepository.findByName(roleName)
-                        .orElseThrow(() -> new RuntimeException("Role not found database."));
-
+                Role userRole = roleRepository.findByName(roleName).orElseThrow(() -> new RuntimeException("Role not found database."));
                 roles.add(userRole);
             });
 
@@ -101,51 +100,103 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public Mono<JwtResponseMessage> login(SignInForm signInForm) {
-        return Mono.defer(() -> {
-            String usernameOrEmail = signInForm.getUsername();
-            boolean isEmail = usernameOrEmail.contains("@");
+        return Mono.fromCallable(() -> {
+                    String usernameOrEmail = signInForm.getUsername();
+                    boolean isEmail = usernameOrEmail.contains("@");
 
-            UserDetails userDetails;
-            if (isEmail) {
-                userDetails = userDetailsService.loadUserByEmail(usernameOrEmail);
-            } else {
-                userDetails = userDetailsService.loadUserByUsername(usernameOrEmail);
-            }
+                    UserDetails userDetails;
+                    if (isEmail) {
+                        userDetails = userDetailsService.loadUserByEmail(usernameOrEmail);
+                    } else {
+                        userDetails = userDetailsService.loadUserByUsername(usernameOrEmail);
+                    }
 
-            Authentication authentication = new UsernamePasswordAuthenticationToken(
-                    userDetails,
-                    signInForm.getPassword(),
-                    userDetails.getAuthorities()
-            );
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                    // check username
+                    if (userDetails == null) {
+                        throw new UserNotFoundException("User not found");
+                    }
 
-            // Generate token and refresh token using JwtProvider
-            String accessToken = jwtProvider.createToken(authentication);
-            String refreshToken = jwtProvider.createRefreshToken(authentication);
+                    // Check password
+                    if (!passwordEncoder.matches(signInForm.getPassword(), userDetails.getPassword())) {
+                        throw new BadCredentialsException("Incorrect password");
+                    }
 
-            UserPrinciple userPrinciple = (UserPrinciple) userDetails;
+                    Authentication authentication = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            signInForm.getPassword(),
+                            userDetails.getAuthorities()
+                    );
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // Store the token and refresh token using TokenManager
-            tokenManager.storeToken(userPrinciple.getUsername(), accessToken);
-            tokenManager.storeRefreshToken(userPrinciple.getUsername(), refreshToken);
+                    // Generate token and refresh token using JwtProvider
+                    String accessToken = jwtProvider.createToken(authentication);
+                    String refreshToken = jwtProvider.createRefreshToken(authentication);
 
-            JwtResponseMessage jwtResponseMessage = JwtResponseMessage.builder()
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .information(InformationMessage.builder()
-                            .id(userPrinciple.id())
-                            .fullname(userPrinciple.fullname())
-                            .username(userPrinciple.username())
-                            .email(userPrinciple.email())
-                            .phone(userPrinciple.phone())
-                            .gender(userPrinciple.gender())
-                            .avatar(userPrinciple.avatar())
-                            .roles(userPrinciple.roles())
-                            .build())
-                    .build();
+                    UserPrinciple userPrinciple = (UserPrinciple) userDetails;
 
-            return Mono.just(jwtResponseMessage);
-        });
+                    // Store the token and refresh token using TokenManager
+                    tokenManager.storeToken(userPrinciple.getUsername(), accessToken);
+                    tokenManager.storeRefreshToken(userPrinciple.getUsername(), refreshToken);
+
+                    JwtResponseMessage jwtResponseMessage = JwtResponseMessage.builder()
+                            .accessToken(accessToken)
+                            .refreshToken(refreshToken)
+                            .information(InformationMessage.builder()
+                                    .id(userPrinciple.id())
+                                    .fullname(userPrinciple.fullname())
+                                    .username(userPrinciple.username())
+                                    .email(userPrinciple.email())
+                                    .phone(userPrinciple.phone())
+                                    .gender(userPrinciple.gender())
+                                    .avatar(userPrinciple.avatar())
+                                    .roles(userPrinciple.roles())
+                                    .build())
+                            .build();
+
+                    return Mono.just(jwtResponseMessage);
+                })
+                .flatMap(Mono::just)
+                .onErrorResume(Mono::error).block();
+    }
+
+    @Transactional
+    @Override
+    public Mono<User> update(Long userId, SignUpForm signUpForm) {
+        try {
+            User existingUser = userRepository.findById(userId)
+                    .orElseThrow(() -> new UserNotFoundException("User not found userId: " + userId + "for update"));
+
+            existingUser.setFullname(signUpForm.getFullname());
+            existingUser.setUsername(signUpForm.getUsername());
+            existingUser.setEmail(signUpForm.getEmail());
+            existingUser.setPassword(passwordEncoder.encode(signUpForm.getPassword()));
+            existingUser.setPhone(signUpForm.getPhone());
+            existingUser.setGender(signUpForm.getGender());
+            existingUser.setAvatar(signUpForm.getAvatar());
+
+            return Mono.just(userRepository.save(existingUser));
+        } catch (Exception e) {
+            return Mono.error(e);
+        }
+    }
+
+    @Transactional
+    @Override
+    public String delete(Long userId) {
+        userRepository.findById(userId)
+                .ifPresentOrElse(
+                        user -> {
+                            try {
+                                userRepository.delete(user);
+                            } catch (DataAccessException e) {
+                                throw new RuntimeException("Error deleting user with userId: " + userId, e);
+                            }
+                        },
+                        () -> {
+                            throw new UserNotFoundException("User not found for userId: " + userId);
+                        }
+                );
+        return "User with id " + userId + " deleted successfully.";
     }
 
     public Mono<String> refreshToken(String refreshToken) {
@@ -159,12 +210,20 @@ public class UserServiceImpl implements IUserService {
                 .map(JwtResponseMessage::getAccessToken); // Sử dụng getAccessToken để lấy token từ JwtResponse
     }
 
-    public Optional<User> findById(Long id) {
-        return Optional.ofNullable(userRepository.findById(id))
-                .orElseThrow(() -> new UserNotFoundException("User not found."));
+    @Override
+    public Optional<User> findById(Long userId) {
+        return Optional.of(userRepository.findById(userId))
+                .orElseThrow(() -> new UserNotFoundException("User not found with userId: " + userId));
     }
 
-    public Optional<List<User>> getAllUsers() {
+    @Override
+    public Optional<User> findByUsername(String userName) {
+        return Optional.ofNullable(userRepository.findByUsername(userName)
+                .orElseThrow(() -> new UserNotFoundException("User not found with userName: " + userName)));
+    }
+
+    @Override
+    public Optional<List<User>> findAllUser() {
         List<User> users = userRepository.findAll();
         return Optional.ofNullable(Optional.ofNullable(users)
                 .orElseThrow(() -> new UserNotFoundException("Not found any user.")));

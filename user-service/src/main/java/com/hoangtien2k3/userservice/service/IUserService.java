@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Optional;
 
-public interface UserService {
+public interface IUserService {
     Mono<User> register(SignUpForm signUpFrom);
     Mono<JwtResponseMessage> login(SignInForm signInForm);
     Mono<User> update(Long userId, SignUpForm signUpForm);

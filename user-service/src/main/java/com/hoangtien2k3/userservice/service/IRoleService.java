@@ -5,7 +5,7 @@ import com.hoangtien2k3.userservice.model.entity.RoleName;
 
 import java.util.Optional;
 
-public interface RoleService {
+public interface IRoleService {
 
     Optional<Role> findByName(RoleName name);
 }

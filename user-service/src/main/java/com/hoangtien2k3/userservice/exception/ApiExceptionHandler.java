@@ -27,7 +27,6 @@ public class ApiExceptionHandler {
             HttpMessageNotReadableException.class
     })
     public <T extends BindException> ResponseEntity<ExceptionMessage> handleValidationException(final T e) {
-
         log.info("ApiExceptionHandler controller, handle validation exception\n");
         final var badRequest = HttpStatus.BAD_REQUEST;
 
@@ -45,7 +44,6 @@ public class ApiExceptionHandler {
             RoleNotFoundException.class
     })
     public <T extends RuntimeException> ResponseEntity<ExceptionMessage> handleApiRequestException(final T e) {
-
         log.info("ApiExceptionHandler controller, handle API request\n");
         final var badRequest = HttpStatus.BAD_REQUEST;
 
