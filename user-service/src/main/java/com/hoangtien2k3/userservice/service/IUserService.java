@@ -6,8 +6,15 @@ import com.hoangtien2k3.userservice.model.dto.response.JwtResponseMessage;
 import com.hoangtien2k3.userservice.model.entity.User;
 import reactor.core.publisher.Mono;
 
-public interface IUserService {
-    Mono<User> registerUser(SignUpForm signUpFrom);
+import java.util.List;
+import java.util.Optional;
 
+public interface UserService {
+    Mono<User> register(SignUpForm signUpFrom);
     Mono<JwtResponseMessage> login(SignInForm signInForm);
+    Mono<User> update(Long userId, SignUpForm signUpForm);
+    String delete(Long id);
+    Optional<User> findById(Long userId);
+    Optional<User> findByUsername(String userName);
+    Optional<List<User>> findAllUser();
 }
