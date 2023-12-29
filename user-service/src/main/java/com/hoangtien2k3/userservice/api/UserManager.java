@@ -1,17 +1,21 @@
 package com.hoangtien2k3.userservice.api;
 
+import com.hoangtien2k3.userservice.exception.wrapper.TokenErrorOrAccessTimeOut;
 import com.hoangtien2k3.userservice.exception.wrapper.UserNotFoundException;
 import com.hoangtien2k3.userservice.http.HeaderGenerator;
 import com.hoangtien2k3.userservice.model.dto.model.TokenManager;
 import com.hoangtien2k3.userservice.model.dto.request.SignUpForm;
 import com.hoangtien2k3.userservice.model.dto.response.ResponseMessage;
 import com.hoangtien2k3.userservice.model.entity.User;
-import com.hoangtien2k3.userservice.repository.IUserRepository;
-import com.hoangtien2k3.userservice.service.IUserService;
+import com.hoangtien2k3.userservice.repository.UserRepository;
+import com.hoangtien2k3.userservice.security.jwt.JwtProvider;
+import com.hoangtien2k3.userservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -23,23 +27,26 @@ import java.util.Optional;
 @RequestMapping("/api/manager")
 public class UserManager {
 
-    private final IUserService userService;
-    private final IUserRepository userRepository;
+    private final UserService userService;
+    private final UserRepository userRepository;
     private final TokenManager tokenManager;
     private final HeaderGenerator headerGenerator;
+    private final JwtProvider jwtProvider;
 
     @Autowired
-    public UserManager(IUserService userService, IUserRepository userRepository, TokenManager tokenManager, HeaderGenerator headerGenerator) {
+    public UserManager(UserService userService, UserRepository userRepository, TokenManager tokenManager, HeaderGenerator headerGenerator, JwtProvider jwtProvider) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.tokenManager = tokenManager;
         this.headerGenerator = headerGenerator;
+        this.jwtProvider = jwtProvider;
     }
 
-    @PutMapping("update/{userId}")
-    @PreAuthorize("hasAuthority('USER')")
-    public Mono<ResponseEntity<ResponseMessage>> update(@PathVariable("userId") Long userId, @RequestBody SignUpForm signUpForm) {
-        return userService.update(userId, signUpForm)
+    // update infomation by username
+    @PutMapping("update/{id}")
+    @PreAuthorize("isAuthenticated() and (hasAuthority('USER') and principal.username == #username)")
+    public Mono<ResponseEntity<ResponseMessage>> update(@PathVariable("id") Long id, @RequestBody SignUpForm signUpForm) {
+        return userService.update(id, signUpForm)
                 .flatMap(user -> Mono.just(new ResponseEntity<>(
                         new ResponseMessage("Update user: " + signUpForm.getUsername() + " successfully."),
                         HttpStatus.OK))
@@ -52,10 +59,10 @@ public class UserManager {
                 );
     }
 
-    @DeleteMapping("delete/{userId}")
-    @PreAuthorize("hasAuthority('USER')")
-    public String delete(@PathVariable("userId") Long userId) {
-        return userService.delete(userId);
+    @DeleteMapping("delete/{id}")
+    @PreAuthorize("isAuthenticated() and ((hasAuthority('USER') and principal.username == #username) or hasAuthority('ADMIN'))")
+    public String delete(@PathVariable("id") Long id) {
+        return userService.delete(id);
     }
 
     @GetMapping("/user")
@@ -68,17 +75,15 @@ public class UserManager {
     }
 
     @GetMapping("/user/{id}")
-    @PreAuthorize("hasAuthority('USER')")
-    //    @PreAuthorize("hasAuthority('ADMIN') or principal.id == #userId")
+    @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('USER') and principal.id == #id)")
     public ResponseEntity<?> getUserById(@PathVariable("id") Long id) {
         Optional<User> user = userService.findById(id);
         return (user.isPresent())
                 ? new ResponseEntity<>(user.get(), headerGenerator.getHeadersForSuccessGetMethod(), HttpStatus.OK)
                 : new ResponseEntity<>(null, headerGenerator.getHeadersForError(), HttpStatus.NOT_FOUND);
-
     }
 
-    @GetMapping("")
+    @GetMapping("/all")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> getAllUsers() {
         List<User> listUsers = userService.findAllUser()
@@ -88,20 +93,15 @@ public class UserManager {
                 HttpStatus.OK);
     }
 
-    @PreAuthorize(value = "hasAuthority('USER')")
-    @GetMapping("/token/{username}")
-    public ResponseEntity<String> getTokenByUsername(@PathVariable("username") String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Username not found."));
+    @GetMapping("/info")
+    public ResponseEntity<User> getUserInfo(@RequestHeader("Authorization") String token) {
+        String username = jwtProvider.getUserNameFromToken(token);
+        User user = userService.findByUsername(username)
+                .orElseThrow(() -> new TokenErrorOrAccessTimeOut("Token error or access timeout"));
 
-        String token = null;
-        if (user != null) {
-            token = tokenManager.getTokenByUsername(user.getUsername());
-        }
-
-        return (token != null)
-                ? ResponseEntity.ok(token)
-                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Token not found for the username.");
+        return new ResponseEntity<>(user,
+                headerGenerator.getHeadersForSuccessGetMethod(),
+                HttpStatus.OK);
     }
 
     @GetMapping("/token")

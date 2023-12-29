@@ -3,20 +3,20 @@ package com.hoangtien2k3.userservice.service.impl;
 import com.hoangtien2k3.userservice.exception.wrapper.RoleNotFoundException;
 import com.hoangtien2k3.userservice.model.entity.Role;
 import com.hoangtien2k3.userservice.model.entity.RoleName;
-import com.hoangtien2k3.userservice.repository.IRoleRepository;
-import com.hoangtien2k3.userservice.service.IRoleService;
+import com.hoangtien2k3.userservice.repository.RoleRepository;
+import com.hoangtien2k3.userservice.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
-public class RoleServiceImpl implements IRoleService {
+public class RoleServiceImpl implements RoleService {
 
-    private final IRoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
     @Autowired
-    public RoleServiceImpl(IRoleRepository roleRepository) {
+    public RoleServiceImpl(RoleRepository roleRepository) {
         this.roleRepository = roleRepository;
     }
 

@@ -68,18 +68,15 @@ public class JwtProvider {
         } catch (IllegalArgumentException e) {
             logger.error("JWT claims string is empty -> Message: ", e);
         }
-
         return false;
     }
 
     public String getUserNameFromToken(String token) {
-        String userName = Jwts.parser()
+        return Jwts.parser()
                 .setSigningKey(jwtSecret)
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
-
-        return userName;
     }
 
 }

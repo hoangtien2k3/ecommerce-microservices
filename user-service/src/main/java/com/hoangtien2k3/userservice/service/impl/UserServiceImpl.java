@@ -1,5 +1,6 @@
 package com.hoangtien2k3.userservice.service.impl;
 
+import com.hoangtien2k3.userservice.exception.wrapper.PasswordNotFoundException;
 import com.hoangtien2k3.userservice.exception.wrapper.UserNotFoundException;
 import com.hoangtien2k3.userservice.model.dto.model.TokenManager;
 import com.hoangtien2k3.userservice.model.dto.request.SignInForm;
@@ -9,12 +10,14 @@ import com.hoangtien2k3.userservice.model.dto.response.JwtResponseMessage;
 import com.hoangtien2k3.userservice.model.entity.Role;
 import com.hoangtien2k3.userservice.model.entity.RoleName;
 import com.hoangtien2k3.userservice.model.entity.User;
-import com.hoangtien2k3.userservice.repository.IRoleRepository;
-import com.hoangtien2k3.userservice.repository.IUserRepository;
+import com.hoangtien2k3.userservice.repository.RoleRepository;
+import com.hoangtien2k3.userservice.repository.UserRepository;
 import com.hoangtien2k3.userservice.security.jwt.JwtProvider;
 import com.hoangtien2k3.userservice.security.userprinciple.UserDetailService;
 import com.hoangtien2k3.userservice.security.userprinciple.UserPrinciple;
-import com.hoangtien2k3.userservice.service.IUserService;
+import com.hoangtien2k3.userservice.service.RoleService;
+import com.hoangtien2k3.userservice.service.UserService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
@@ -34,15 +37,17 @@ import reactor.core.publisher.Mono;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
-public class UserServiceImpl implements IUserService {
-    private final IUserRepository userRepository;
-    private final IRoleRepository roleRepository;
+public class UserServiceImpl implements UserService {
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final TokenManager tokenManager;
     private final UserDetailService userDetailsService;
+    private final ModelMapper modelMapper;
+    private final RoleService roleService;
 
     @Autowired
     private WebClient.Builder webClientBuilder;
@@ -51,13 +56,14 @@ public class UserServiceImpl implements IUserService {
     private String refreshTokenUrl;
 
     @Autowired
-    public UserServiceImpl(IUserRepository userRepository, IRoleRepository roleRepository, PasswordEncoder passwordEncoder, JwtProvider jwtProvider, TokenManager tokenManager, UserDetailService userDetailsService) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtProvider jwtProvider, TokenManager tokenManager, UserDetailService userDetailsService, ModelMapper modelMapper, RoleService roleService) {
         this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtProvider = jwtProvider;
         this.tokenManager = tokenManager;
         this.userDetailsService = userDetailsService;
+        this.modelMapper = modelMapper;
+        this.roleService = roleService;
     }
 
     @Override
@@ -70,39 +76,33 @@ public class UserServiceImpl implements IUserService {
                 return Mono.error(new RuntimeException("The email " + signUpForm.getEmail() + " is existed, please try again."));
             }
 
-            Set<Role> roles = new HashSet<>();
-            signUpForm.getRoles().forEach(role -> {
-                RoleName roleName = switch (role) {
-                    case "ADMIN" -> RoleName.ADMIN;
-                    case "PM" -> RoleName.PM;
-                    case "USER" -> RoleName.USER;
-                    default -> null;
-                };
-                Role userRole = roleRepository.findByName(roleName).orElseThrow(() -> new RuntimeException("Role not found database."));
-                roles.add(userRole);
-            });
-
-            User user = User.builder()
-                    .fullname(signUpForm.getFullname())
-                    .username(signUpForm.getUsername())
-                    .email(signUpForm.getEmail())
-                    .password(passwordEncoder.encode(signUpForm.getPassword()))
-                    .phone(signUpForm.getPhone())
-                    .gender(signUpForm.getGender())
-                    .avatar(signUpForm.getAvatar())
-                    .roles(roles)
-                    .build();
+            User user = modelMapper.map(signUpForm, User.class);
+            user.setPassword(passwordEncoder.encode(signUpForm.getPassword()));
+            user.setRoles(signUpForm.getRoles()
+                    .stream()
+                    .map(role -> roleService.findByName(mapToRoleName(role))
+                            .orElseThrow(() -> new RuntimeException("Role not found in the database.")))
+                    .collect(Collectors.toSet()));
 
             userRepository.save(user);
             return Mono.just(user);
         });
     }
 
+    private RoleName mapToRoleName(String roleName) {
+        return switch (roleName) {
+            case "ADMIN" -> RoleName.ADMIN;
+            case "PM" -> RoleName.PM;
+            case "USER" -> RoleName.USER;
+            default -> null;
+        };
+    }
+
     @Override
     public Mono<JwtResponseMessage> login(SignInForm signInForm) {
         return Mono.fromCallable(() -> {
                     String usernameOrEmail = signInForm.getUsername();
-                    boolean isEmail = usernameOrEmail.contains("@");
+                    boolean isEmail = usernameOrEmail.contains("@gmail.com");
 
                     UserDetails userDetails;
                     if (isEmail) {
@@ -118,7 +118,7 @@ public class UserServiceImpl implements IUserService {
 
                     // Check password
                     if (!passwordEncoder.matches(signInForm.getPassword(), userDetails.getPassword())) {
-                        throw new BadCredentialsException("Incorrect password");
+                        throw new PasswordNotFoundException("Incorrect password");
                     }
 
                     Authentication authentication = new UsernamePasswordAuthenticationToken(
@@ -161,18 +161,13 @@ public class UserServiceImpl implements IUserService {
 
     @Transactional
     @Override
-    public Mono<User> update(Long userId, SignUpForm signUpForm) {
+    public Mono<User> update(Long id, SignUpForm signUpForm) {
         try {
-            User existingUser = userRepository.findById(userId)
-                    .orElseThrow(() -> new UserNotFoundException("User not found userId: " + userId + "for update"));
+            User existingUser = userRepository.findById(id)
+                    .orElseThrow(() -> new UserNotFoundException("User not found userId: " + id + " for update"));
 
-            existingUser.setFullname(signUpForm.getFullname());
-            existingUser.setUsername(signUpForm.getUsername());
-            existingUser.setEmail(signUpForm.getEmail());
+            modelMapper.map(signUpForm, existingUser);
             existingUser.setPassword(passwordEncoder.encode(signUpForm.getPassword()));
-            existingUser.setPhone(signUpForm.getPhone());
-            existingUser.setGender(signUpForm.getGender());
-            existingUser.setAvatar(signUpForm.getAvatar());
 
             return Mono.just(userRepository.save(existingUser));
         } catch (Exception e) {
@@ -182,21 +177,21 @@ public class UserServiceImpl implements IUserService {
 
     @Transactional
     @Override
-    public String delete(Long userId) {
-        userRepository.findById(userId)
+    public String delete(Long id) {
+        userRepository.findById(id)
                 .ifPresentOrElse(
                         user -> {
                             try {
                                 userRepository.delete(user);
                             } catch (DataAccessException e) {
-                                throw new RuntimeException("Error deleting user with userId: " + userId, e);
+                                throw new RuntimeException("Error deleting user with userId: " + id, e);
                             }
                         },
                         () -> {
-                            throw new UserNotFoundException("User not found for userId: " + userId);
+                            throw new UserNotFoundException("User not found for userId: " + id);
                         }
                 );
-        return "User with id " + userId + " deleted successfully.";
+        return "User with id " + id + " deleted successfully.";
     }
 
     public Mono<String> refreshToken(String refreshToken) {

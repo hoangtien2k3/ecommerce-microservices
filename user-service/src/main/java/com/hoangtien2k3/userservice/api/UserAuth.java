@@ -8,12 +8,10 @@ import com.hoangtien2k3.userservice.model.dto.response.JwtResponseMessage;
 import com.hoangtien2k3.userservice.model.dto.response.ResponseMessage;
 import com.hoangtien2k3.userservice.security.jwt.JwtProvider;
 import com.hoangtien2k3.userservice.security.validate.AuthorityTokenUtil;
-import com.hoangtien2k3.userservice.service.IUserService;
-import com.hoangtien2k3.userservice.service.impl.UserServiceImpl;
+import com.hoangtien2k3.userservice.service.UserService;
 import com.hoangtien2k3.userservice.security.validate.TokenValidate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -25,29 +23,28 @@ import java.util.List;
 @RequestMapping("/api/auth")
 public class UserAuth {
 
-    private final IUserService userService;
+    private final UserService userService;
     private final JwtProvider jwtProvider;
 
     @Autowired
-    public UserAuth(IUserService userService, JwtProvider jwtProvider) {
+    public UserAuth(UserService userService, JwtProvider jwtProvider) {
         this.userService = userService;
         this.jwtProvider = jwtProvider;
     }
 
     @PostMapping({"/signup", "/register"})
-    public Mono<ResponseEntity<ResponseMessage>> register(@Validated @RequestBody SignUpForm signUpForm) {
+    public Mono<ResponseMessage> register(@Valid @RequestBody SignUpForm signUpForm) {
         return userService.register(signUpForm)
-                .flatMap(user -> Mono.just(new ResponseEntity<>(
-                        new ResponseMessage("Create user: " + signUpForm.getUsername() + " successfully."),
-                        HttpStatus.OK))
+                .map(user ->
+                        new ResponseMessage("Create user: " + signUpForm.getUsername() + " successfully.")
                 )
-                .onErrorResume(
-                        error -> Mono.just(new ResponseEntity<>(new ResponseMessage(error.getMessage()), HttpStatus.BAD_REQUEST))
+                .onErrorResume(error ->
+                        Mono.just(new ResponseMessage(error.getMessage()))
                 );
     }
 
     @PostMapping({"/signin", "/login"})
-    public Mono<ResponseEntity<JwtResponseMessage>> login(@Validated @RequestBody SignInForm signInForm) {
+    public Mono<ResponseEntity<JwtResponseMessage>> login(@Valid @RequestBody SignInForm signInForm) {
         return userService.login(signInForm)
                 .map(ResponseEntity::ok)
                 .onErrorResume(error -> {

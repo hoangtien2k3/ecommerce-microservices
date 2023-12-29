@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 @Setter
 @Builder
 @AllArgsConstructor
-public class ResponseMessage extends RuntimeException {
+public class ResponseMessage {
     @Size(min = 10, max = 500)
     private String message;
 }
