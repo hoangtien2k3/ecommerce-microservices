@@ -12,16 +12,16 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class SignUpForm {
 
-    @NotBlank
-    @Size(min = 6, max = 50, message = "FullName must not be left blank")
+    @NotBlank(message = "The fullName must not be left blank")
+    @Size(min = 6, max = 50, message = "The fullName must be 6 characters or more")
     private String fullname;
 
-    @NotBlank
-    @Size(min = 6, max = 50, message = "FullName must not be left blank")
+    @NotBlank(message = "The username must not be left blank")
+    @Size(min = 6, max = 50, message = "The username must be 6 characters or more")
     private String username;
 
-    @Size(min = 6, max = 100, message = "Password must be between 6 and 100 characters")
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\\\d)[a-zA-Z\\\\d]{8,}$",
+    @Size(min = 8, max = 50, message = "Password must be between 8 and 50 characters")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$",
             message = "Password must contain all uppercase and lowercase letters and numbers")
     private String password;
 
@@ -32,6 +32,7 @@ public class SignUpForm {
     @NotBlank(message = "Gender must not be left blank")
     private String gender;
 
+    @Size(min = 10, max = 11, message = "Phone number must be between 10 and 11 digits")
     @Pattern(regexp = "^\\+84[0-9]{9,10}$|^0[0-9]{9,10}$", message = "The phone number is not in the correct format")
     private String phone;
 

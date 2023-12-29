@@ -1,10 +1,7 @@
 package com.hoangtien2k3.userservice.exception;
 
 import com.hoangtien2k3.userservice.exception.payload.ExceptionMessage;
-import com.hoangtien2k3.userservice.exception.wrapper.RoleNotFoundException;
-import com.hoangtien2k3.userservice.exception.wrapper.UserNotFoundException;
-import com.hoangtien2k3.userservice.exception.wrapper.EmailOrUsernameNotFoundException;
-import com.hoangtien2k3.userservice.exception.wrapper.PasswordNotFoundException;
+import com.hoangtien2k3.userservice.exception.wrapper.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -45,7 +42,8 @@ public class ApiExceptionHandler {
             UserNotFoundException.class,
             RoleNotFoundException.class,
             PasswordNotFoundException.class,
-            EmailOrUsernameNotFoundException.class
+            EmailOrUsernameNotFoundException.class,
+            PhoneNumberNotFoundException.class
     })
     public <T extends RuntimeException> ResponseEntity<ExceptionMessage> handleApiRequestException(final T e) {
         log.info("ApiExceptionHandler controller, handle API request\n");

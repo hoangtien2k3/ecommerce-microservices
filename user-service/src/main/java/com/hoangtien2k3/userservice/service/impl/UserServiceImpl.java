@@ -1,6 +1,8 @@
 package com.hoangtien2k3.userservice.service.impl;
 
+import com.hoangtien2k3.userservice.exception.wrapper.EmailOrUsernameNotFoundException;
 import com.hoangtien2k3.userservice.exception.wrapper.PasswordNotFoundException;
+import com.hoangtien2k3.userservice.exception.wrapper.PhoneNumberNotFoundException;
 import com.hoangtien2k3.userservice.exception.wrapper.UserNotFoundException;
 import com.hoangtien2k3.userservice.model.dto.model.TokenManager;
 import com.hoangtien2k3.userservice.model.dto.request.SignInForm;
@@ -70,10 +72,13 @@ public class UserServiceImpl implements UserService {
     public Mono<User> register(SignUpForm signUpForm) {
         return Mono.defer(() -> {
             if (existsByUsername(signUpForm.getUsername())) {
-                return Mono.error(new RuntimeException("The username " + signUpForm.getUsername() + " is existed, please try again."));
+                return Mono.error(new EmailOrUsernameNotFoundException("The username " + signUpForm.getUsername() + " is existed, please try again."));
             }
             if (existsByEmail(signUpForm.getEmail())) {
-                return Mono.error(new RuntimeException("The email " + signUpForm.getEmail() + " is existed, please try again."));
+                return Mono.error(new EmailOrUsernameNotFoundException("The email " + signUpForm.getEmail() + " is existed, please try again."));
+            }
+            if (existsByPhoneNumber(signUpForm.getPhone())) {
+                return Mono.error(new PhoneNumberNotFoundException("The phone number " + signUpForm.getPhone() + " is existed, please try again."));
             }
 
             User user = modelMapper.map(signUpForm, User.class);
@@ -235,6 +240,10 @@ public class UserServiceImpl implements UserService {
 
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
+    }
+
+    public boolean existsByPhoneNumber(String phone) {
+        return userRepository.existsByPhoneNumber(phone);
     }
 
 }
