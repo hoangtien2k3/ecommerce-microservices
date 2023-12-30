@@ -1,22 +1,20 @@
 package com.hoangtien2k3.userservice.service.impl;
 
-import com.hoangtien2k3.userservice.exception.wrapper.EmailOrUsernameNotFoundException;
-import com.hoangtien2k3.userservice.exception.wrapper.PasswordNotFoundException;
-import com.hoangtien2k3.userservice.exception.wrapper.PhoneNumberNotFoundException;
-import com.hoangtien2k3.userservice.exception.wrapper.UserNotFoundException;
+import com.hoangtien2k3.userservice.exception.wrapper.*;
 import com.hoangtien2k3.userservice.model.dto.model.TokenManager;
+import com.hoangtien2k3.userservice.model.dto.request.ChangePasswordRequest;
+import com.hoangtien2k3.userservice.model.dto.request.EmailDetails;
 import com.hoangtien2k3.userservice.model.dto.request.SignInForm;
 import com.hoangtien2k3.userservice.model.dto.request.SignUpForm;
 import com.hoangtien2k3.userservice.model.dto.response.InformationMessage;
 import com.hoangtien2k3.userservice.model.dto.response.JwtResponseMessage;
-import com.hoangtien2k3.userservice.model.entity.Role;
 import com.hoangtien2k3.userservice.model.entity.RoleName;
 import com.hoangtien2k3.userservice.model.entity.User;
-import com.hoangtien2k3.userservice.repository.RoleRepository;
 import com.hoangtien2k3.userservice.repository.UserRepository;
 import com.hoangtien2k3.userservice.security.jwt.JwtProvider;
 import com.hoangtien2k3.userservice.security.userprinciple.UserDetailService;
 import com.hoangtien2k3.userservice.security.userprinciple.UserPrinciple;
+import com.hoangtien2k3.userservice.service.EmailService;
 import com.hoangtien2k3.userservice.service.RoleService;
 import com.hoangtien2k3.userservice.service.UserService;
 import org.modelmapper.ModelMapper;
@@ -27,7 +25,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,10 +43,10 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
-    private final TokenManager tokenManager;
     private final UserDetailService userDetailsService;
     private final ModelMapper modelMapper;
     private final RoleService roleService;
+    private final EmailService emailService;
 
     @Autowired
     private WebClient.Builder webClientBuilder;
@@ -58,14 +55,14 @@ public class UserServiceImpl implements UserService {
     private String refreshTokenUrl;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtProvider jwtProvider, TokenManager tokenManager, UserDetailService userDetailsService, ModelMapper modelMapper, RoleService roleService) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtProvider jwtProvider, UserDetailService userDetailsService, ModelMapper modelMapper, RoleService roleService, EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtProvider = jwtProvider;
-        this.tokenManager = tokenManager;
         this.userDetailsService = userDetailsService;
         this.modelMapper = modelMapper;
         this.roleService = roleService;
+        this.emailService = emailService;
     }
 
     @Override
@@ -133,15 +130,10 @@ public class UserServiceImpl implements UserService {
                     );
                     SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                    // Generate token and refresh token using JwtProvider
                     String accessToken = jwtProvider.createToken(authentication);
                     String refreshToken = jwtProvider.createRefreshToken(authentication);
 
                     UserPrinciple userPrinciple = (UserPrinciple) userDetails;
-
-                    // Store the token and refresh token using TokenManager
-                    tokenManager.storeToken(userPrinciple.getUsername(), accessToken);
-                    tokenManager.storeRefreshToken(userPrinciple.getUsername(), refreshToken);
 
                     JwtResponseMessage jwtResponseMessage = JwtResponseMessage.builder()
                             .accessToken(accessToken)
@@ -164,6 +156,40 @@ public class UserServiceImpl implements UserService {
                 .onErrorResume(Mono::error).block();
     }
 
+    @Override
+    public Mono<Void> logout() {
+        return Mono.defer(() -> {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            SecurityContextHolder.getContext().setAuthentication(null);
+
+            String currentToken = getCurrentToken();
+
+            if (authentication != null && authentication.isAuthenticated()) {
+                // Invalidate the current token by reducing its expiration time
+                String updatedToken = jwtProvider.reduceTokenExpiration(currentToken);
+            }
+
+            SecurityContextHolder.clearContext();
+
+            return Mono.empty();
+        });
+    }
+
+    private String getCurrentToken() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            Object credentials = authentication.getCredentials();
+
+            if (credentials instanceof String) {
+                return (String) credentials;
+            }
+        }
+
+        return null;
+    }
+
     @Transactional
     @Override
     public Mono<User> update(Long id, SignUpForm signUpForm) {
@@ -177,6 +203,53 @@ public class UserServiceImpl implements UserService {
             return Mono.just(userRepository.save(existingUser));
         } catch (Exception e) {
             return Mono.error(e);
+        }
+    }
+
+    @Transactional
+    @Override
+    public Mono<String> changePassword(ChangePasswordRequest request) {
+        try {
+            UserDetails userDetails = getCurrentUserDetails();
+            String username = userDetails.getUsername();
+
+            User existingUser = findByUsername(username)
+                    .orElseThrow(() -> new UserNotFoundException("User not found with username " + username));
+
+            if (passwordEncoder.matches(request.getOldPassword(), userDetails.getPassword())) {
+                validateNewPassword(request.getNewPassword(), request.getConfirmPassword());
+                existingUser.setPassword(passwordEncoder.encode(request.getNewPassword()));
+
+                // send email change password successfully
+                EmailDetails emailDetails = EmailDetails.builder()
+                        .recipient("hoangtien2k3dev@gmail.com")
+                        .msgBody("Happy New Year")
+                        .subject("Change Password Successfully.")
+                        .attachment("Please be careful, don't let this information leak")
+                        .build();
+                String message = emailService.sendMail(emailDetails);
+
+                return Mono.just("Password changed successfully " + message);
+            } else {
+                return Mono.error(new PasswordNotFoundException("Incorrect password"));
+            }
+        } catch (Exception e) {
+            return Mono.error(e);
+        }
+    }
+
+    private UserDetails getCurrentUserDetails() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.isAuthenticated() && authentication.getPrincipal() instanceof UserDetails) {
+            return (UserDetails) authentication.getPrincipal();
+        } else {
+            throw new UserNotAuthenticatedException("User not authenticated.");
+        }
+    }
+
+    private void validateNewPassword(String newPassword, String confirmPassword) {
+        if (!Objects.equals(newPassword, confirmPassword)) {
+            throw new PasswordNotFoundException("Confirm password is incorrect");
         }
     }
 

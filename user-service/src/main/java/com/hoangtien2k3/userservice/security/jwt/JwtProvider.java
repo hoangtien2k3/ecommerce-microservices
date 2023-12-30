@@ -1,5 +1,6 @@
 package com.hoangtien2k3.userservice.security.jwt;
 
+import com.hoangtien2k3.userservice.security.userprinciple.UserDetailService;
 import com.hoangtien2k3.userservice.security.userprinciple.UserPrinciple;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.*;
@@ -13,6 +14,7 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 @Component
 public class JwtProvider {
@@ -50,6 +52,24 @@ public class JwtProvider {
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
+
+    public String reduceTokenExpiration(String token) {
+        // Decode the token to extract its claims
+        Claims claims = Jwts.parser()
+                .setSigningKey(jwtSecret)
+                .parseClaimsJws(token)
+                .getBody();
+
+        // Reduce the expiration time by setting it to a past date
+        claims.setExpiration(new Date(0));
+
+        // Build a new token with the updated expiration time
+        return Jwts.builder()
+                .setClaims(claims)
+                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .compact();
+    }
+
 
     public Boolean validateToken(String token) {
         try {

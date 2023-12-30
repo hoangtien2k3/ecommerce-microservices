@@ -16,21 +16,28 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
+
+import javax.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private UserDetailService userDetailService;
+    private final UserDetailService userDetailService;
+    private final JwtEntryPoint jwtEntryPoint;
 
     @Autowired
-    private JwtEntryPoint jwtEntryPoint;
+    public WebSecurityConfig(UserDetailService userDetailService, JwtEntryPoint jwtEntryPoint) {
+        this.userDetailService = userDetailService;
+        this.jwtEntryPoint = jwtEntryPoint;
+    }
 
     @Bean
     public JwtTokenFilter jwtTokenFilter() {
@@ -75,16 +82,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/api/auth/**").permitAll()
                 .antMatchers("/api/manager/token").permitAll()
-                .antMatchers("/api/info/user/**").authenticated()
+                .antMatchers("/api/manager/change-password").authenticated()
+                .antMatchers("/api/auth/logout").authenticated()
                 .antMatchers("/api/manager/user/**").authenticated()
                 .anyRequest().authenticated()
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .exceptionHandling().authenticationEntryPoint(jwtEntryPoint)
                 .and()
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class)
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         httpSecurity.addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
