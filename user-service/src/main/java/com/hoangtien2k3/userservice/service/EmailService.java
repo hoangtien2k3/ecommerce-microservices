@@ -5,16 +5,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-
 @Service
 public class EmailService {
-
     private final WebClient.Builder webClientBuilder;
 
-    @Value("${apigateway.url}")
+    @Value("${api.gateway.url}")
     private String baseUrl; // http://localhost:8080
 
     public EmailService(WebClient.Builder webClientBuilder) {
@@ -22,8 +17,8 @@ public class EmailService {
     }
 
     public String sendMail(EmailDetails emailDetails) {
-        // Sử dụng block() để đợi đến khi hoàn tất và lấy giá trị kết quả
-        return webClientBuilder.baseUrl("http://localhost:8080").build()
+        // Use block() to wait until completion and get the result value
+        return webClientBuilder.baseUrl(baseUrl).build()
                 .post()
                 .uri("/api/email/sendMail")
                 .bodyValue(emailDetails)
@@ -31,6 +26,5 @@ public class EmailService {
                 .bodyToMono(String.class)
                 .block();
     }
-
 }
 

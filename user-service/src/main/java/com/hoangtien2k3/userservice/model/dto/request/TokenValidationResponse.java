@@ -1,7 +1,9 @@
 package com.hoangtien2k3.userservice.model.dto.request;
 
 import lombok.Getter;
+import lombok.Setter;
 
+@Setter
 @Getter
 public class TokenValidationResponse {
     private String message;
@@ -13,7 +15,4 @@ public class TokenValidationResponse {
         this.message = message;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
 }

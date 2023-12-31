@@ -1,7 +1,9 @@
 package com.hoangtien2k3.userservice.model.dto.request;
 
 import lombok.Getter;
+import lombok.Setter;
 
+@Setter
 @Getter
 public class TokenValidationRequest {
     private String accessToken;
@@ -13,7 +15,4 @@ public class TokenValidationRequest {
         this.accessToken = accessToken;
     }
 
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
 }
