@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class TokenValidate {
 
-//    @Value("${jwt.secret}")
-    private String SECRET_KEY = "vip2023";
+    @Value("${jwt.secret}")
+    private String SECRET_KEY;
 
     public boolean validateToken(String token) {
         if (SECRET_KEY == null || SECRET_KEY.isEmpty())
@@ -24,12 +24,8 @@ public class TokenValidate {
                     .parseClaimsJws(token)
                     .getBody();
 
-            // Kiểm tra thời gian hết hạn của token
             long currentTimeMillis = System.currentTimeMillis();
-
-            // Token đã hết hạn
             return claims.getExpiration().getTime() >= currentTimeMillis;
-
         } catch (ExpiredJwtException ex) {
             throw new IllegalArgumentException("Token has expired.");
         } catch (MalformedJwtException ex) {

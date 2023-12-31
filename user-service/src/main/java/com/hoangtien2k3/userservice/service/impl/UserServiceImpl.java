@@ -1,7 +1,6 @@
 package com.hoangtien2k3.userservice.service.impl;
 
 import com.hoangtien2k3.userservice.exception.wrapper.*;
-import com.hoangtien2k3.userservice.model.dto.model.TokenManager;
 import com.hoangtien2k3.userservice.model.dto.request.ChangePasswordRequest;
 import com.hoangtien2k3.userservice.model.dto.request.EmailDetails;
 import com.hoangtien2k3.userservice.model.dto.request.SignInForm;
@@ -35,6 +34,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -93,9 +94,9 @@ public class UserServiceImpl implements UserService {
 
     private RoleName mapToRoleName(String roleName) {
         return switch (roleName) {
-            case "ADMIN" -> RoleName.ADMIN;
-            case "PM" -> RoleName.PM;
-            case "USER" -> RoleName.USER;
+            case "ADMIN", "admin", "Admin" -> RoleName.ADMIN;
+            case "PM", "pm", "Pm" -> RoleName.PM;
+            case "USER", "user", "User" -> RoleName.USER;
             default -> null;
         };
     }
@@ -220,15 +221,13 @@ public class UserServiceImpl implements UserService {
                 validateNewPassword(request.getNewPassword(), request.getConfirmPassword());
                 existingUser.setPassword(passwordEncoder.encode(request.getNewPassword()));
 
-                // send email change password successfully
                 EmailDetails emailDetails = EmailDetails.builder()
                         .recipient("hoangtien2k3dev@gmail.com")
-                        .msgBody("Happy New Year")
-                        .subject("Change Password Successfully.")
+                        .msgBody(textSendEmailChangePasswordSuccessfully(username))
+                        .subject("Password Change Successful: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                         .attachment("Please be careful, don't let this information leak")
                         .build();
                 String message = emailService.sendMail(emailDetails);
-
                 return Mono.just("Password changed successfully " + message);
             } else {
                 return Mono.error(new PasswordNotFoundException("Incorrect password"));
@@ -236,6 +235,16 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e) {
             return Mono.error(e);
         }
+    }
+
+    public String textSendEmailChangePasswordSuccessfully(String username) {
+        return "Hey " + username + "!\n\n" +
+                "This is a confirmation that your password has been successfully changed.\n\n" +
+                " If you did not initiate this change, please contact our support team immediately.\n\n" +
+                "If you have any questions or concerns, feel free to reach out to us.\n\n" +
+                "Best regards:\n\n" +
+                "Contact: hoangtien2k3qx1@gmail.com\n" +
+                "Fanpage: https://hoangtien2k3qx1.github.io/";
     }
 
     private UserDetails getCurrentUserDetails() {

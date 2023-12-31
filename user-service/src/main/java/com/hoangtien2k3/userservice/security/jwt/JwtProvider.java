@@ -36,7 +36,7 @@ public class JwtProvider {
 
         return Jwts.builder()
                 .setSubject(userPrinciple.getUsername())
-                .claim("authorities", authorities) // Thêm quyền vào mã thông báo truy cập
+                .claim("authorities", authorities) // add auth
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + jwtExpiration * 1000L))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
@@ -92,11 +92,16 @@ public class JwtProvider {
     }
 
     public String getUserNameFromToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(jwtSecret)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(jwtSecret)
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            return claims.getSubject();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 }

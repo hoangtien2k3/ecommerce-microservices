@@ -8,13 +8,11 @@ import com.hoangtien2k3.userservice.model.entity.User;
 import com.hoangtien2k3.userservice.repository.RoleRepository;
 import com.hoangtien2k3.userservice.repository.UserRepository;
 import com.hoangtien2k3.userservice.service.RoleService;
-import org.bouncycastle.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class RoleServiceImpl implements RoleService {
@@ -40,17 +38,14 @@ public class RoleServiceImpl implements RoleService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
 
-        RoleName checkRoleName = RoleName.valueOf(roleName.toUpperCase());
-        Role role = roleRepository.findByName(checkRoleName)
-                .orElseThrow(() -> new RoleNotFoundException("Role not found: " + roleName));
+        Role role = roleRepository.findByName(mapToRoleName(roleName))
+                .orElseThrow(() -> new RoleNotFoundException("Role not found in system: " + roleName));
 
-        if (user.getRoles().contains(role)) {
+        if (user.getRoles().contains(role))
             return false;
-        }
 
         user.getRoles().add(role);
         userRepository.save(user);
-
         return true;
     }
 
@@ -60,12 +55,10 @@ public class RoleServiceImpl implements RoleService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found."));
 
-        RoleName checkRoleName = RoleName.valueOf(Strings.toUpperCase(roleName));
-        if (user.getRoles().removeIf(role -> role.name().equals(checkRoleName))) {
+        if (user.getRoles().removeIf(role -> role.name().equals(mapToRoleName(roleName)))) {
             userRepository.save(user);
             return true;
         }
-
         return false;
     }
 
@@ -77,6 +70,15 @@ public class RoleServiceImpl implements RoleService {
         List<String> roleNames = new ArrayList<>();
         user.getRoles().forEach(userRole -> roleNames.add(userRole.name().toString()));
         return roleNames;
+    }
+
+    private RoleName mapToRoleName(String roleName) {
+        return switch (roleName) {
+            case "ADMIN", "admin", "Admin" -> RoleName.ADMIN;
+            case "PM", "pm", "Pm" -> RoleName.PM;
+            case "USER", "user", "User" -> RoleName.USER;
+            default -> null;
+        };
     }
 
 }

@@ -11,7 +11,9 @@ public class AppConstant {
     public static final String INSTANT_FORMAT = "dd-MM-yyyy__HH:mm:ss:SSSSSS";
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public abstract class DiscoveredDomainsApi {
+    public abstract static class DiscoveredDomainsApi {
+
+        public static final String API_GATEWAY_HOST = "http://localhost:8080";
 
         public static final String USER_SERVICE_HOST = "http://USER-SERVICE/user-service";
         public static final String USER_SERVICE_API_URL = "http://USER-SERVICE/user-service/api/users";

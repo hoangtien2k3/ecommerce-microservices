@@ -77,9 +77,7 @@ public class UserManager {
     @PreAuthorize("((hasAuthority('USER') and principal.username == #username) or hasAuthority('ADMIN'))")
     public ResponseEntity<?> getUserByUsername(@RequestParam(value = "username") String username) {
         Optional<User> user = Optional.ofNullable(userService.findByUsername(username)
-                .orElseThrow(()
-                        -> new UserNotFoundException("User not found with: " + username)
-                ));
+                .orElseThrow(() -> new UserNotFoundException("User not found with: " + username)));
         return user.map(u -> new ResponseEntity<>(u,
                         headerGenerator.getHeadersForSuccessGetMethod(),
                         HttpStatus.OK)
@@ -93,7 +91,8 @@ public class UserManager {
     @GetMapping("/user/{id}")
     @PreAuthorize("hasAuthority('ADMIN') or (hasAuthority('USER') and principal.id == #id)")
     public ResponseEntity<?> getUserById(@PathVariable("id") Long id) {
-        Optional<User> user = userService.findById(id);
+        Optional<User> user = Optional.ofNullable(userService.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found with: " + id)));
         return (user.isPresent())
                 ? new ResponseEntity<>(user.get(), headerGenerator.getHeadersForSuccessGetMethod(), HttpStatus.OK)
                 : new ResponseEntity<>(null, headerGenerator.getHeadersForError(), HttpStatus.NOT_FOUND);
@@ -102,33 +101,23 @@ public class UserManager {
     @GetMapping("/all")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> getAllUsers() {
-        List<User> listUsers = userService.findAllUser()
-                .orElseThrow(() ->
+        List<User> listUsers = userService.findAllUser().orElseThrow(() ->
                         new UsernameNotFoundException("Not Found List User")
-                );
-        return new ResponseEntity<>(listUsers,
-                headerGenerator.getHeadersForSuccessGetMethod(),
-                HttpStatus.OK);
+        );
+        return (listUsers != null)
+                ? new ResponseEntity<>(listUsers, headerGenerator.getHeadersForSuccessGetMethod(), HttpStatus.OK)
+                : new ResponseEntity<>(null, headerGenerator.getHeadersForError(), HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/info")
     public ResponseEntity<User> getUserInfo(@RequestHeader("Authorization") String token) {
         String username = jwtProvider.getUserNameFromToken(token);
         User user = userService.findByUsername(username)
-                .orElseThrow(()
-                        -> new TokenErrorOrAccessTimeOut("Token error or access timeout")
-                );
-        return new ResponseEntity<>(user,
-                headerGenerator.getHeadersForSuccessGetMethod(),
-                HttpStatus.OK);
-    }
+                .orElseThrow(() -> new TokenErrorOrAccessTimeOut("Token error or access timeout"));
 
-    @GetMapping("/token")
-    public ResponseEntity<String> getToken() {
-        String token = tokenManager.TOKEN;
-        return (token != null)
-                ? ResponseEntity.ok(token)
-                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Token not found for the username.");
+        return (user != null)
+                ? new ResponseEntity<>(user, headerGenerator.getHeadersForSuccessGetMethod(), HttpStatus.OK)
+                : new ResponseEntity<>(null, headerGenerator.getHeadersForError(), HttpStatus.NOT_FOUND);
     }
 
 }
