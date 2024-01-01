@@ -20,9 +20,9 @@ spring:
           predicates:
             - Path=/api/inventory/**
 
-        # NOTIFY-SERVICE-SEND-EMAIL
-        - id: notify-service-send-email
-          uri: lb://NOTIFY-SERVICE-SEND-EMAIL
+        # NOTIFY-SERVICE
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
           predicates:
             - Path=/api/email/**
 
@@ -69,7 +69,7 @@ spring:
         - id: user-service-information
           uri: lb://USER-SERVICE
           predicates:
-            - Path=/api/information/**
+            - Path=/api/role/**
 
         - id: user-service-manager
           uri: lb://USER-SERVICE

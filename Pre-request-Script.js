@@ -10,7 +10,7 @@ const postRequest = {
     mode: 'raw',
     raw: JSON.stringify({
         "username" : "admin",
-        "password" : "1234567"
+        "password" : "abc123"
     })
   }
 };

@@ -1,4 +1,4 @@
-package com.hoangtien2k3.notificationservice.entity;
+package com.hoangtien2k3.notificationservice.dto;
 
 import org.springframework.web.multipart.MultipartFile;
 

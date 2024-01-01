@@ -24,7 +24,7 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(value = {
             MethodArgumentNotValidException.class,
-            HttpMessageNotReadableException.class,
+            HttpMessageNotReadableException.class
     })
     public <T extends BindException> ResponseEntity<ExceptionMessage> handleValidationException(final T e) {
 
@@ -42,8 +42,7 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(value = {
             CartNotFoundException.class,
-            OrderNotFoundException.class,
-            IllegalStateException.class,
+            OrderNotFoundException.class
     })
     public <T extends RuntimeException> ResponseEntity<ExceptionMessage> handleApiRequestException(final T e) {
 

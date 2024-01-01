@@ -1,4 +1,4 @@
-package com.hoangtien2k3.notificationservice.entity;
+package com.hoangtien2k3.notificationservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
