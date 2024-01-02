@@ -1,8 +1,7 @@
 package com.hoangtien2k3.userservice.api;
 
-import com.hoangtien2k3.userservice.model.dto.request.EmailDetails;
-import com.hoangtien2k3.userservice.model.dto.request.SignInForm;
-import com.hoangtien2k3.userservice.model.dto.request.SignUpForm;
+import com.hoangtien2k3.userservice.model.dto.request.LoginDTO;
+import com.hoangtien2k3.userservice.model.dto.request.UserDTO;
 import com.hoangtien2k3.userservice.model.dto.request.TokenValidationResponse;
 import com.hoangtien2k3.userservice.model.dto.response.InformationMessage;
 import com.hoangtien2k3.userservice.model.dto.response.JwtResponseMessage;
@@ -40,7 +39,7 @@ public class UserAuth {
     }
 
     @PostMapping({"/signup", "/register"})
-    public Mono<ResponseMessage> register(@Valid @RequestBody SignUpForm signUpForm) {
+    public Mono<ResponseMessage> register(@Valid @RequestBody UserDTO signUpForm) {
         return userService.register(signUpForm)
                 .map(user ->
                         new ResponseMessage("Create user: " + signUpForm.getUsername() + " successfully.")
@@ -51,7 +50,7 @@ public class UserAuth {
     }
 
     @PostMapping({"/signin", "/login"})
-    public Mono<ResponseEntity<JwtResponseMessage>> login(@Valid @RequestBody SignInForm signInForm) {
+    public Mono<ResponseEntity<JwtResponseMessage>> login(@Valid @RequestBody LoginDTO signInForm) {
         return userService.login(signInForm)
                 .map(ResponseEntity::ok)
                 .onErrorResume(error -> {

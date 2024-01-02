@@ -40,6 +40,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "END FROM User u WHERE u.phone = :phone")
     Boolean existsByPhoneNumber(@Param("phone") String phone);
 
-    @Query("SELECT u FROM User u")
-    List<User> findAll();
 }

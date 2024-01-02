@@ -5,7 +5,7 @@ import lombok.*;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class SignInForm {
+public class LoginDTO {
 
     private String username;
 

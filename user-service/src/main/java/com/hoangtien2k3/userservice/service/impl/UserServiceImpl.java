@@ -6,26 +6,24 @@ import com.hoangtien2k3.userservice.event.EventProducer;
 import com.hoangtien2k3.userservice.exception.wrapper.*;
 import com.hoangtien2k3.userservice.model.dto.request.ChangePasswordRequest;
 import com.hoangtien2k3.userservice.model.dto.request.EmailDetails;
-import com.hoangtien2k3.userservice.model.dto.request.SignInForm;
-import com.hoangtien2k3.userservice.model.dto.request.SignUpForm;
+import com.hoangtien2k3.userservice.model.dto.request.LoginDTO;
+import com.hoangtien2k3.userservice.model.dto.request.UserDTO;
 import com.hoangtien2k3.userservice.model.dto.response.InformationMessage;
 import com.hoangtien2k3.userservice.model.dto.response.JwtResponseMessage;
 import com.hoangtien2k3.userservice.model.entity.RoleName;
 import com.hoangtien2k3.userservice.model.entity.User;
 import com.hoangtien2k3.userservice.repository.UserRepository;
+import com.hoangtien2k3.userservice.repository.UserRepositoryPaging;
 import com.hoangtien2k3.userservice.security.jwt.JwtProvider;
 import com.hoangtien2k3.userservice.security.userprinciple.UserDetailService;
 import com.hoangtien2k3.userservice.security.userprinciple.UserPrinciple;
-import com.hoangtien2k3.userservice.service.EmailService;
 import com.hoangtien2k3.userservice.service.RoleService;
 import com.hoangtien2k3.userservice.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -50,7 +48,6 @@ public class UserServiceImpl implements UserService {
     private final UserDetailService userDetailsService;
     private final ModelMapper modelMapper;
     private final RoleService roleService;
-    private final EmailService emailService;
 
     Gson gson = new Gson(); // google.code.gson
     @Autowired
@@ -63,18 +60,23 @@ public class UserServiceImpl implements UserService {
     private String refreshTokenUrl;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtProvider jwtProvider, UserDetailService userDetailsService, ModelMapper modelMapper, RoleService roleService, EmailService emailService) {
+    public UserServiceImpl(UserRepository userRepository,
+                           PasswordEncoder passwordEncoder,
+                           JwtProvider jwtProvider,
+                           UserDetailService userDetailsService,
+                           ModelMapper modelMapper,
+                           RoleService roleService
+    ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtProvider = jwtProvider;
         this.userDetailsService = userDetailsService;
         this.modelMapper = modelMapper;
         this.roleService = roleService;
-        this.emailService = emailService;
     }
 
     @Override
-    public Mono<User> register(SignUpForm signUpForm) {
+    public Mono<User> register(UserDTO signUpForm) {
         return Mono.defer(() -> {
             if (existsByUsername(signUpForm.getUsername())) {
                 return Mono.error(new EmailOrUsernameNotFoundException("The username " + signUpForm.getUsername() + " is existed, please try again."));
@@ -109,7 +111,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Mono<JwtResponseMessage> login(SignInForm signInForm) {
+    public Mono<JwtResponseMessage> login(LoginDTO signInForm) {
         return Mono.fromCallable(() -> {
                     String usernameOrEmail = signInForm.getUsername();
                     boolean isEmail = usernameOrEmail.contains("@gmail.com");
@@ -200,7 +202,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public Mono<User> update(Long id, SignUpForm signUpForm) {
+    public Mono<User> update(Long id, UserDTO signUpForm) {
         try {
             User existingUser = userRepository.findById(id)
                     .orElseThrow(() -> new UserNotFoundException("User not found userId: " + id + " for update"));
@@ -222,6 +224,7 @@ public class UserServiceImpl implements UserService {
             String username = userDetails.getUsername();
 
             User existingUser = findByUsername(username)
+                    .map((element) -> modelMapper.map(element, User.class))
                     .orElseThrow(() -> new UserNotFoundException("User not found with username " + username));
 
             if (passwordEncoder.matches(request.getOldPassword(), userDetails.getPassword())) {
@@ -229,7 +232,7 @@ public class UserServiceImpl implements UserService {
                 existingUser.setPassword(passwordEncoder.encode(request.getNewPassword()));
 
                 // send email through kafka client
-                eventProducer.send(KafkaConstant.PROFILE_ONBOARDING_TOPIC,gson.toJson(emailDetailsConfig(username))).subscribe();
+                eventProducer.send(KafkaConstant.PROFILE_ONBOARDING_TOPIC, gson.toJson(emailDetailsConfig(username))).subscribe();
 
                 return Mono.just("Password changed successfully");
             } else {
@@ -305,22 +308,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> findById(Long userId) {
-        return Optional.of(userRepository.findById(userId))
+    public Optional<UserDTO> findById(Long userId) {
+        return Optional.of(userRepository.findById(userId)
+                        .map((element) -> modelMapper.map(element, UserDTO.class))
+                )
                 .orElseThrow(() -> new UserNotFoundException("User not found with userId: " + userId));
     }
 
     @Override
-    public Optional<User> findByUsername(String userName) {
+    public Optional<UserDTO> findByUsername(String userName) {
         return Optional.ofNullable(userRepository.findByUsername(userName)
+                .map((element) -> modelMapper.map(element, UserDTO.class))
                 .orElseThrow(() -> new UserNotFoundException("User not found with userName: " + userName)));
     }
 
     @Override
-    public Optional<List<User>> findAllUser() {
-        List<User> users = userRepository.findAll();
-        return Optional.ofNullable(Optional.ofNullable(users)
-                .orElseThrow(() -> new UserNotFoundException("Not found any user.")));
+    public Page<UserDTO> findAllUsers(int page, int size, String sortBy, String sortOrder) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortOrder), sortBy);
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+        Page<User> usersPage = userRepository.findAll(pageRequest);
+
+        return usersPage.map(user -> modelMapper.map(user, UserDTO.class));
     }
 
     public Page<User> getAllUsers(int page, int size) {

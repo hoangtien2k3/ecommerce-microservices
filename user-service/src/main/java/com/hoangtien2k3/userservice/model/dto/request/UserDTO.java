@@ -1,5 +1,6 @@
 package com.hoangtien2k3.userservice.model.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -10,7 +11,7 @@ import java.util.Set;
 @Setter
 @Getter
 @RequiredArgsConstructor
-public class SignUpForm {
+public class UserDTO {
 
     @NotBlank(message = "The fullName must not be left blank")
     @Size(min = 6, max = 50, message = "The fullName must be 6 characters or more")
@@ -39,6 +40,7 @@ public class SignUpForm {
     @Pattern(regexp = "^(http|https)://.*$", message = "Avatar URL must be a valid HTTP or HTTPS URL")
     private String avatar;
 
+    @JsonIgnore
     private Set<String> roles;
 
 }
