@@ -43,7 +43,6 @@ public class EmailServiceImpl implements EmailService {
                     return "Mail Sent Successfully";
                 })
                 .onErrorResume(ex -> {
-                    // Log the exception or handle it accordingly
                     log.error("Error while sending mail", ex);
                     return Mono.just("Error while Sending Mail");
                 });
@@ -64,11 +63,9 @@ public class EmailServiceImpl implements EmailService {
                     mimeMessageHelper.addAttachment(Objects.requireNonNull(file.getFilename()), file);
 
                     javaMailSender.send(mimeMessage);
-
                     return "Mail Sent Successfully";
                 })
                 .onErrorResume(MessagingException.class, ex -> {
-                    // Log the exception or handle it accordingly
                     log.error("Error while sending mail with attachment", ex);
                     return Mono.just("Error while Sending Mail with Attachment");
                 });
@@ -98,7 +95,6 @@ public class EmailServiceImpl implements EmailService {
                     return "Email sent successfully to " + Arrays.toString(cc);
                 })
                 .onErrorResume(Exception.class, ex -> {
-                    // Log the exception or handle it accordingly
                     log.error("Error while sending email", ex);
                     return Mono.just("Error while Sending Email");
                 });

@@ -1,6 +1,5 @@
 package com.hoangtien2k3.userservice.security.jwt;
 
-import com.hoangtien2k3.userservice.security.userprinciple.UserDetailService;
 import com.hoangtien2k3.userservice.security.userprinciple.UserPrinciple;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.*;
@@ -10,11 +9,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.security.core.GrantedAuthority;
-
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-
 
 @Component
 public class JwtProvider {
@@ -36,7 +33,7 @@ public class JwtProvider {
 
         return Jwts.builder()
                 .setSubject(userPrinciple.getUsername())
-                .claim("authorities", authorities) // add auth
+                .claim("authorities", authorities)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + jwtExpiration * 1000L))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
@@ -69,7 +66,6 @@ public class JwtProvider {
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
-
 
     public Boolean validateToken(String token) {
         try {

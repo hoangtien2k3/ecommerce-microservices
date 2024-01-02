@@ -6,6 +6,7 @@ import com.hoangtien2k3.orderservice.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -21,12 +22,14 @@ public class OrderController {
     private final OrderService orderService;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<DtoCollectionResponse<OrderDto>> findAll() {
         log.info("*** OrderDto List, controller; fetch all orders *");
         return ResponseEntity.ok(new DtoCollectionResponse<>(this.orderService.findAll()));
     }
 
     @GetMapping("/{orderId}")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     public ResponseEntity<OrderDto> findById(@PathVariable("orderId")
                                              @NotBlank(message = "Input must not be blank")
                                              @Valid final String orderId) {
@@ -35,6 +38,7 @@ public class OrderController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<OrderDto> save(@RequestBody
                                          @NotNull(message = "Input must not be NULL")
                                          @Valid final OrderDto orderDto) {
@@ -43,6 +47,7 @@ public class OrderController {
     }
 
     @PutMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<OrderDto> update(@RequestBody
                                            @NotNull(message = "Input must not be NULL")
                                            @Valid final OrderDto orderDto) {
@@ -51,6 +56,7 @@ public class OrderController {
     }
 
     @PutMapping("/{orderId}")
+    @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<OrderDto> update(@PathVariable("orderId")
                                            @NotBlank(message = "Input must not be blank")
                                            @Valid final String orderId,
@@ -62,6 +68,7 @@ public class OrderController {
     }
 
     @DeleteMapping("/{orderId}")
+    @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
     public ResponseEntity<Boolean> deleteById(@PathVariable("orderId") final String orderId) {
         log.info("*** Boolean, resource; delete order by id *");
         this.orderService.deleteById(Integer.parseInt(orderId));

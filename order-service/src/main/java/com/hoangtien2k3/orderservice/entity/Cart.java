@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serial;
 import java.util.Set;
 
 @Entity
@@ -15,6 +16,7 @@ import java.util.Set;
 @Builder
 public final class Cart extends AbstractMappedEntity {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id

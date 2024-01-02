@@ -32,7 +32,6 @@ public class ProductController {
         return productService.findAll();
     }
 
-
     // Get detailed information of a specific product
     @GetMapping("/{productId}")
     public ResponseEntity<ProductDto> findById(@PathVariable("productId")

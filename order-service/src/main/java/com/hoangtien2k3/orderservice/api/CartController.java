@@ -6,6 +6,7 @@ import com.hoangtien2k3.orderservice.service.CartService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -21,12 +22,14 @@ public class CartController {
     private final CartService cartService;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<DtoCollectionResponse<CartDto>> findAll() {
         log.info("*** CartDto List, controller; fetch all categories *");
         return ResponseEntity.ok(new DtoCollectionResponse<>(this.cartService.findAll()));
     }
 
     @GetMapping("/{cartId}")
+    @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
     public ResponseEntity<CartDto> findById(@PathVariable("cartId")
                                             @NotBlank(message = "Input must not be blank")
                                             @Valid final String cartId) {
@@ -35,6 +38,7 @@ public class CartController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<CartDto> save(@RequestBody
                                         @NotNull(message = "Input must not be NULL!")
                                         @Valid final CartDto cartDto) {
@@ -43,6 +47,7 @@ public class CartController {
     }
 
     @PutMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<CartDto> update(@RequestBody
                                           @NotNull(message = "Input must not be NULL")
                                           @Valid final CartDto cartDto) {
@@ -51,6 +56,7 @@ public class CartController {
     }
 
     @PutMapping("/{cartId}")
+    @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<CartDto> update(@PathVariable("cartId")
                                           @NotBlank(message = "Input must not be blank")
                                           @Valid final String cartId,
@@ -62,6 +68,7 @@ public class CartController {
     }
 
     @DeleteMapping("/{cartId}")
+    @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<Boolean> deleteById(@PathVariable("cartId") final String cartId) {
         log.info("*** Boolean, resource; delete cart by id *");
         this.cartService.deleteById(Integer.parseInt(cartId));

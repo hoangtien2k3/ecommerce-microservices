@@ -2,6 +2,7 @@ package com.hoangtien2k3.orderservice.exception;
 
 import com.hoangtien2k3.orderservice.exception.payload.ExceptionMessage;
 import com.hoangtien2k3.orderservice.exception.wrapper.CartNotFoundException;
+import com.hoangtien2k3.orderservice.exception.wrapper.JwtAuthenticationException;
 import com.hoangtien2k3.orderservice.exception.wrapper.OrderNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,8 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(value = {
             MethodArgumentNotValidException.class,
-            HttpMessageNotReadableException.class
+            HttpMessageNotReadableException.class,
+            JwtAuthenticationException.class
     })
     public <T extends BindException> ResponseEntity<ExceptionMessage> handleValidationException(final T e) {
 

@@ -8,7 +8,6 @@ CREATE TABLE categories (
 	updated_at TIMESTAMP
 );
 
-
 -- Insert dữ liệu vào bảng categories
 INSERT INTO categories (parent_category_id, category_title, image_url, created_at, updated_at)
 VALUES
