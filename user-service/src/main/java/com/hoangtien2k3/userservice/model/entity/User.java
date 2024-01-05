@@ -54,6 +54,7 @@ public class User {
     @Column(name = "gender", nullable = false)
     private String gender;
 
+    @Pattern(regexp = "^\\+84[0-9]{9,10}$|^0[0-9]{9,10}$", message = "The phone number is not in the correct format")
     @Size(min = 10, max = 11, message = "Phone number must be between 10 and 11 characters")
     @Column(name = "phoneNumber", unique = true)
     private String phone;

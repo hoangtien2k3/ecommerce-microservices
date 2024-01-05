@@ -25,7 +25,7 @@ public final class Cart extends AbstractMappedEntity {
     private Integer cartId;
 
     @Column(name = "user_id")
-    private Integer userId;
+    private Long userId; // userId
 
     @JsonIgnore
     @OneToMany(mappedBy = "cart", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

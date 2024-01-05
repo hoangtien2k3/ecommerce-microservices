@@ -1,17 +1,22 @@
 package com.hoangtien2k3.orderservice.api;
 
+import com.hoangtien2k3.orderservice.dto.CartDto;
 import com.hoangtien2k3.orderservice.dto.OrderDto;
-import com.hoangtien2k3.orderservice.dto.response.collection.DtoCollectionResponse;
 import com.hoangtien2k3.orderservice.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -23,56 +28,78 @@ public class OrderController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<DtoCollectionResponse<OrderDto>> findAll() {
+    public Mono<ResponseEntity<List<OrderDto>>> findAll() {
         log.info("*** OrderDto List, controller; fetch all orders *");
-        return ResponseEntity.ok(new DtoCollectionResponse<>(this.orderService.findAll()));
+        return orderService.findAll()
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.ok(Collections.emptyList()));
+    }
+
+    // paging
+    @GetMapping("/all")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
+    public Mono<ResponseEntity<Page<OrderDto>>> findAll(@RequestParam(defaultValue = "0") int page,
+                                                        @RequestParam(defaultValue = "10") int size,
+                                                        @RequestParam(defaultValue = "orderId") String sortBy,
+                                                        @RequestParam(defaultValue = "asc") String sortOrder) {
+        return orderService.findAll(page, size, sortBy, sortOrder)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.noContent().build());
     }
 
     @GetMapping("/{orderId}")
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
-    public ResponseEntity<OrderDto> findById(@PathVariable("orderId")
-                                             @NotBlank(message = "Input must not be blank")
-                                             @Valid final String orderId) {
+    public ResponseEntity<Mono<OrderDto>> findById(@PathVariable("orderId")
+                                                   @NotBlank(message = "Input must not be blank")
+                                                   @Valid final String orderId) {
         log.info("*** OrderDto, resource; fetch order by id *");
-        return ResponseEntity.ok(this.orderService.findById(Integer.parseInt(orderId)));
+        return ResponseEntity.ok(orderService.findById(Integer.parseInt(orderId)));
     }
 
     @PostMapping
     @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<OrderDto> save(@RequestBody
-                                         @NotNull(message = "Input must not be NULL")
-                                         @Valid final OrderDto orderDto) {
+    public Mono<ResponseEntity<OrderDto>> save(@RequestBody
+                                               @NotNull(message = "Input must not be NULL")
+                                               @Valid final OrderDto orderDto) {
         log.info("*** OrderDto, resource; save order *");
-        return ResponseEntity.ok(this.orderService.save(orderDto));
+        return orderService.save(orderDto)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
     }
 
     @PutMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<OrderDto> update(@RequestBody
-                                           @NotNull(message = "Input must not be NULL")
-                                           @Valid final OrderDto orderDto) {
+    public Mono<ResponseEntity<OrderDto>> update(@RequestBody
+                                                 @NotNull(message = "Input must not be NULL")
+                                                 @Valid final OrderDto orderDto) {
         log.info("*** OrderDto, resource; update order *");
-        return ResponseEntity.ok(this.orderService.update(orderDto));
+        return orderService.update(orderDto)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{orderId}")
     @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<OrderDto> update(@PathVariable("orderId")
-                                           @NotBlank(message = "Input must not be blank")
-                                           @Valid final String orderId,
-                                           @RequestBody
-                                           @NotNull(message = "Input must not be NULL")
-                                           @Valid final OrderDto orderDto) {
+    public Mono<ResponseEntity<OrderDto>> update(@PathVariable("orderId")
+                                                 @NotBlank(message = "Input must not be blank")
+                                                 @Valid final String orderId,
+                                                 @RequestBody
+                                                 @NotNull(message = "Input must not be NULL")
+                                                 @Valid final OrderDto orderDto) {
         log.info("*** OrderDto, resource; update order with orderId *");
-        return ResponseEntity.ok(this.orderService.update(Integer.parseInt(orderId), orderDto));
+        return orderService.update(Integer.parseInt(orderId), orderDto)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{orderId}")
     @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
-    public ResponseEntity<Boolean> deleteById(@PathVariable("orderId") final String orderId) {
+    public Mono<ResponseEntity<Boolean>> deleteById(@PathVariable("orderId") final String orderId) {
         log.info("*** Boolean, resource; delete order by id *");
         this.orderService.deleteById(Integer.parseInt(orderId));
-        return ResponseEntity.ok(true);
+        return orderService.deleteById(Integer.parseInt(orderId))
+                .thenReturn(ResponseEntity.ok(true))
+                .defaultIfEmpty(ResponseEntity.status(HttpStatus.NOT_FOUND).body(false));
     }
 
 }

@@ -22,7 +22,7 @@ public class EventConsumer {
     private EmailService emailService;
 
     @Autowired
-    EventProducer eventProducer;
+    private EventProducer eventProducer;
 
     public EventConsumer(ReceiverOptions<String, String> receiverOptions) {
         KafkaReceiver.create(receiverOptions.subscription(Collections.singleton(KafkaConstant.PROFILE_ONBOARDING_TOPIC)))
@@ -36,7 +36,7 @@ public class EventConsumer {
 
         emailService.sendSimpleMail(emailDetails).subscribe(email -> {
             log.info("send email successfully -> user-service change password.");
-            eventProducer.send(KafkaConstant.PROFILE_ONBOARDED_TOPIC, gson.toJson(emailDetails)).subscribe();
+            eventProducer.send(KafkaConstant.PROFILE_ONBOARDED_TOPIC, gson.toJson(email)).subscribe();
         });
     }
 }

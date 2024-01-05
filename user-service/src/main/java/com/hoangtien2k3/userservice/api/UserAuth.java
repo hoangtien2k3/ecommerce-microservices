@@ -1,8 +1,8 @@
 package com.hoangtien2k3.userservice.api;
 
-import com.hoangtien2k3.userservice.model.dto.request.LoginDTO;
-import com.hoangtien2k3.userservice.model.dto.request.UserDTO;
-import com.hoangtien2k3.userservice.model.dto.request.TokenValidationResponse;
+import com.hoangtien2k3.userservice.model.dto.request.Login;
+import com.hoangtien2k3.userservice.model.dto.request.SignUp;
+import com.hoangtien2k3.userservice.model.dto.response.TokenValidationResponse;
 import com.hoangtien2k3.userservice.model.dto.response.InformationMessage;
 import com.hoangtien2k3.userservice.model.dto.response.JwtResponseMessage;
 import com.hoangtien2k3.userservice.model.dto.response.ResponseMessage;
@@ -39,18 +39,14 @@ public class UserAuth {
     }
 
     @PostMapping({"/signup", "/register"})
-    public Mono<ResponseMessage> register(@Valid @RequestBody UserDTO signUpForm) {
-        return userService.register(signUpForm)
-                .map(user ->
-                        new ResponseMessage("Create user: " + signUpForm.getUsername() + " successfully.")
-                )
-                .onErrorResume(error ->
-                        Mono.just(new ResponseMessage(error.getMessage()))
-                );
+    public Mono<ResponseMessage> register(@Valid @RequestBody SignUp signUp) {
+        return userService.register(signUp)
+                .map(user -> new ResponseMessage("Create user: " + signUp.getUsername() + " successfully."))
+                .onErrorResume(error -> Mono.just(new ResponseMessage("Error occurred while creating the account.")));
     }
 
     @PostMapping({"/signin", "/login"})
-    public Mono<ResponseEntity<JwtResponseMessage>> login(@Valid @RequestBody LoginDTO signInForm) {
+    public Mono<ResponseEntity<JwtResponseMessage>> login(@Valid @RequestBody Login signInForm) {
         return userService.login(signInForm)
                 .map(ResponseEntity::ok)
                 .onErrorResume(error -> {

@@ -1,14 +1,27 @@
 package com.hoangtien2k3.orderservice.service.impl;
 
+import com.hoangtien2k3.orderservice.dto.CartDto;
 import com.hoangtien2k3.orderservice.dto.OrderDto;
+import com.hoangtien2k3.orderservice.entity.Cart;
+import com.hoangtien2k3.orderservice.entity.Order;
+import com.hoangtien2k3.orderservice.exception.wrapper.CartNotFoundException;
 import com.hoangtien2k3.orderservice.exception.wrapper.OrderNotFoundException;
+import com.hoangtien2k3.orderservice.helper.CartMappingHelper;
 import com.hoangtien2k3.orderservice.helper.OrderMappingHelper;
 import com.hoangtien2k3.orderservice.repository.OrderRepository;
 import com.hoangtien2k3.orderservice.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.ast.Or;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -22,47 +35,70 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private final OrderRepository orderRepository;
 
+    @Autowired
+    private final ModelMapper modelMapper;
+
     @Override
-    public List<OrderDto> findAll() {
+    public Mono<List<OrderDto>> findAll() {
         log.info("OrderDto List, service; fetch all orders");
-        return orderRepository.findAll()
-                .stream()
-                .map(OrderMappingHelper::map)
-                .distinct()
-                .toList();
+        return Mono.fromSupplier(() -> orderRepository.findAll()
+                        .stream()
+                        .map(OrderMappingHelper::map)
+                        .toList()
+                );
     }
 
     @Override
-    public OrderDto findById(Integer orderId) {
+    public Mono<Page<OrderDto>> findAll(int page, int size, String sortBy, String sortOrder) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortOrder), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return Mono.fromSupplier(() -> orderRepository.findAll(pageable)
+                .map(OrderMappingHelper::map)
+        );
+    }
+
+    @Override
+    public Mono<OrderDto> findById(Integer orderId) {
         log.info("OrderDto, service; fetch order by id");
-        return this.orderRepository.findById(orderId)
+        return Mono.fromSupplier(() -> orderRepository.findById(orderId)
                 .map(OrderMappingHelper::map)
-                .orElseThrow(() ->
-                        new OrderNotFoundException(String.format("Order with id[%d] not found", orderId)));
+                .orElseThrow(() -> new CartNotFoundException(String.format("Cart with id: %d not found", orderId)))
+        );
     }
 
     @Override
-    public OrderDto save(final OrderDto orderDto) {
+    public Mono<OrderDto> save(final OrderDto orderDto) {
         log.info("OrderDto, service; save order");
-        return OrderMappingHelper.map(orderRepository.save(OrderMappingHelper.map(orderDto)));
+        return Mono.fromSupplier(() -> OrderMappingHelper.map(orderRepository.save(OrderMappingHelper.map(orderDto))))
+                .onErrorResume(throwable -> {
+                    log.error("Error saving order: {}", throwable.getMessage());
+                    return Mono.error(throwable);
+                });
     }
 
     @Override
-    public OrderDto update(final OrderDto orderDto) {
+    public Mono<OrderDto> update(final OrderDto orderDto) {
         log.info("OrderDto, service; update order");
-        return OrderMappingHelper.map(orderRepository.save(OrderMappingHelper.map(orderDto)));
+        return Mono.fromSupplier(() -> orderRepository.save(OrderMappingHelper.map(orderDto)))
+                .map(OrderMappingHelper::map);
     }
 
     @Override
-    public OrderDto update(final Integer orderId, final OrderDto orderDto) {
+    public Mono<OrderDto> update(final Integer orderId, final OrderDto orderDto) {
         log.info("OrderDto, service; update order with orderId");
-        return OrderMappingHelper.map(orderRepository.save(OrderMappingHelper.map(this.findById(orderId))));
+        return findById(orderId).flatMap(existingOrderDto -> {
+                    modelMapper.map(orderDto, existingOrderDto);
+                    return Mono.fromSupplier(() -> orderRepository.save(OrderMappingHelper.map(existingOrderDto)))
+                            .map(OrderMappingHelper::map);
+                })
+                .switchIfEmpty(Mono.error(new CartNotFoundException("Cart with id " + orderId + " not found")));
     }
 
     @Override
-    public void deleteById(final Integer orderId) {
+    public Mono<Void> deleteById(final Integer orderId) {
         log.info("Void, service; delete order by id");
-        this.orderRepository.delete(OrderMappingHelper.map(this.findById(orderId)));
+        return Mono.fromRunnable(() -> orderRepository.deleteById(orderId));
     }
 
 }

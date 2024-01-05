@@ -1,21 +1,26 @@
 package com.hoangtien2k3.orderservice.service.impl;
 
-import com.hoangtien2k3.orderservice.constrant.AppConstant;
 import com.hoangtien2k3.orderservice.dto.CartDto;
-import com.hoangtien2k3.orderservice.dto.UserDto;
+import com.hoangtien2k3.orderservice.entity.Cart;
 import com.hoangtien2k3.orderservice.exception.wrapper.CartNotFoundException;
 import com.hoangtien2k3.orderservice.helper.CartMappingHelper;
 import com.hoangtien2k3.orderservice.repository.CartRepository;
+import com.hoangtien2k3.orderservice.repository.OrderRepository;
 import com.hoangtien2k3.orderservice.service.CartService;
+import com.hoangtien2k3.orderservice.service.CallAPI;
+import com.netflix.discovery.converters.Auto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import javax.transaction.Transactional;
 import java.util.List;
-
+import java.util.Optional;
 
 @Transactional
 @Slf4j
@@ -27,64 +32,122 @@ public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
 
     @Autowired
-    private final RestTemplate restTemplate;
+    private final OrderServiceImpl orderService;
+
+    @Autowired
+    private final OrderRepository orderRepository;
+
+    @Autowired
+    private final ModelMapper modelMapper;
+
+    @Autowired
+    private final CallAPI callAPI;
 
     @Override
-    public List<CartDto> findAll() {
+    public Mono<List<CartDto>> findAll() {
         log.info("CartDto List, service; fetch all carts");
-        return this.cartRepository.findAll()
-                .stream()
-                .map(CartMappingHelper::map)
-                .peek(c -> c.setUserDto(
-                        restTemplate.getForObject(AppConstant.DiscoveredDomainsApi
-                        .USER_SERVICE_API_URL + "/" + c.getUserDto().getUserId(), UserDto.class)))
-                .distinct()
-                .toList();
+        return Mono.fromSupplier(() -> cartRepository.findAll()
+                        .stream()
+                        .map(CartMappingHelper::map)
+                        .toList()
+                )
+                .flatMap(cartDtos -> Flux.fromIterable(cartDtos)
+                        .flatMap(cartDto ->
+                                callAPI.receiverUserDto(cartDto.getUserDto().getId())
+                                        .map(userDto -> {
+                                            cartDto.setUserDto(userDto);
+                                            return cartDto;
+                                        })
+                                        .onErrorResume(throwable -> {
+                                            log.error("Error fetching user info: {}", throwable.getMessage());
+                                            return Mono.just(cartDto);
+                                        })
+                        ).collectList()
+                );
     }
 
     @Override
-    public CartDto findById(final Integer cartId) {
+    public Mono<Page<CartDto>> findAll(int page, int size, String sortBy, String sortOrder) {
+        log.info("CartDto List, service; fetch all carts with paging and sorting");
+        Sort sort = Sort.by(Sort.Direction.fromString(sortOrder), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return Mono.fromSupplier(() -> cartRepository
+                        .findAll(pageable).map(CartMappingHelper::map)
+                )
+                .flatMap(cartDtos -> Flux.fromIterable(cartDtos)
+                        .flatMap(cartDto ->
+                                callAPI.receiverUserDto(cartDto.getUserDto().getId())
+                                        .map(userDto -> {
+                                            cartDto.setUserDto(userDto);
+                                            return cartDto;
+                                        })
+                                        .onErrorResume(throwable -> {
+                                            log.error("Error fetching user info: {}", throwable.getMessage());
+                                            return Mono.just(cartDto);
+                                        })
+                        )
+                        .collectList()
+                        .map(resultList -> new PageImpl<>(resultList, pageable, resultList.size()))
+                );
+    }
+
+    @Override
+    public Mono<CartDto> findById(Integer cartId) {
         log.info("CartDto, service; fetch cart by id");
-        return this.cartRepository.findById(cartId)
-                .map(CartMappingHelper::map)
-                .map(c -> {
-                    c.setUserDto(
-                            restTemplate.getForObject(AppConstant.DiscoveredDomainsApi
-                            .USER_SERVICE_API_URL + "/" + c.getUserDto().getUserId(), UserDto.class));
-                    return c;
-                })
-                .orElseThrow(() -> new CartNotFoundException(String
-                        .format("Cart with id: %d not found", cartId)));
+        return Mono.fromSupplier(() -> cartRepository.findById(cartId)
+                        .map(CartMappingHelper::map)
+                        .orElseThrow(() -> new CartNotFoundException(String.format("Cart with id: %d not found", cartId)))
+                )
+                .flatMap(cartDto ->
+                        callAPI.receiverUserDto(cartDto.getUserDto().getId())
+                                .map(userDto -> {
+                                    cartDto.setUserDto(userDto);
+                                    return cartDto;
+                                })
+                                .onErrorResume(throwable -> {
+                                    log.error("Error fetching user info: {}", throwable.getMessage());
+                                    return Mono.just(cartDto);
+                                })
+                );
     }
 
     @Override
-    public CartDto save(final CartDto cartDto) {
+    public Mono<CartDto> save(final CartDto cartDto) {
         log.info("CartDto, service; save cart");
-        return CartMappingHelper.map(
-                cartRepository
-                .save(CartMappingHelper.map(cartDto)));
+        return Mono.fromSupplier(() -> cartRepository.save(modelMapper.map(cartDto, Cart.class)))
+                .map(savedCart -> modelMapper.map(savedCart, CartDto.class));
     }
 
     @Override
-    public CartDto update(final CartDto cartDto) {
+    public Mono<CartDto> update(final CartDto cartDto) {
         log.info("CartDto, service; update cart");
-        return CartMappingHelper.map(
-                cartRepository
-                .save(CartMappingHelper.map(cartDto)));
+        return Mono.fromSupplier(() -> cartRepository.save(CartMappingHelper.map(cartDto)))
+                .map(CartMappingHelper::map);
     }
 
     @Override
-    public CartDto update(final Integer cartId, final CartDto cartDto) {
+    public Mono<CartDto> update(final Integer cartId, final CartDto cartDto) {
         log.info("CartDto, service; update cart with cartId");
-        return CartMappingHelper.map(
-                cartRepository
-                .save(CartMappingHelper.map(this.findById(cartId))));
+        return findById(cartId).flatMap(existingCartDto -> {
+                    modelMapper.map(cartDto, existingCartDto);
+                    return Mono.fromSupplier(() -> cartRepository.save(CartMappingHelper.map(existingCartDto)))
+                            .map(CartMappingHelper::map);
+                })
+                .switchIfEmpty(Mono.error(new CartNotFoundException("Cart with id " + cartId + " not found")));
     }
 
     @Override
-    public void deleteById(final Integer cartId) {
+    public Mono<Void> deleteById(final Integer cartId) {
         log.info("Void, service; delete cart by id");
-        this.cartRepository.deleteById(cartId);
+
+        cartRepository.findById(cartId)
+                .ifPresent(cart -> {
+                    orderRepository.deleteAllByCart(cart);
+                    cartRepository.deleteById(cartId);
+                });
+        return Mono.empty();
     }
+
 
 }

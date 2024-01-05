@@ -1,14 +1,23 @@
 package com.hoangtien2k3.orderservice.service;
 
 import com.hoangtien2k3.orderservice.dto.CartDto;
+import org.springframework.data.domain.Page;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 public interface CartService {
-    List<CartDto> findAll();
-    CartDto findById(final Integer cartId);
-    CartDto save(final CartDto cartDto);
-    CartDto update(final CartDto cartDto);
-    CartDto update(final Integer cartId, final CartDto cartDto);
-    void deleteById(final Integer cartId);
+    Mono<List<CartDto>> findAll();
+
+    Mono<Page<CartDto>> findAll(int page, int size, String sortBy, String sortOrder);
+
+    Mono<CartDto> findById(Integer cartId);
+
+    Mono<CartDto> save(final CartDto cartDto);
+
+    Mono<CartDto> update(final CartDto cartDto);
+
+    Mono<CartDto> update(final Integer cartId, final CartDto cartDto);
+
+    Mono<Void> deleteById(final Integer cartId);
 }

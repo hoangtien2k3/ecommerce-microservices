@@ -25,7 +25,7 @@ import java.util.Objects;
 public class EmailServiceImpl implements EmailService {
 
     @Autowired
-    private JavaMailSender javaMailSender; // spring-boot-starter-mail
+    private JavaMailSender javaMailSender;
 
     @Value("${spring.mail.username}")
     private String fromEmail;

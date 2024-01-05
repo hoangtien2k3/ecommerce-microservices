@@ -4,16 +4,12 @@ import com.google.gson.Gson;
 import com.hoangtien2k3.userservice.constant.KafkaConstant;
 import com.hoangtien2k3.userservice.event.EventProducer;
 import com.hoangtien2k3.userservice.exception.wrapper.*;
-import com.hoangtien2k3.userservice.model.dto.request.ChangePasswordRequest;
-import com.hoangtien2k3.userservice.model.dto.request.EmailDetails;
-import com.hoangtien2k3.userservice.model.dto.request.LoginDTO;
-import com.hoangtien2k3.userservice.model.dto.request.UserDTO;
+import com.hoangtien2k3.userservice.model.dto.request.*;
 import com.hoangtien2k3.userservice.model.dto.response.InformationMessage;
 import com.hoangtien2k3.userservice.model.dto.response.JwtResponseMessage;
 import com.hoangtien2k3.userservice.model.entity.RoleName;
 import com.hoangtien2k3.userservice.model.entity.User;
 import com.hoangtien2k3.userservice.repository.UserRepository;
-import com.hoangtien2k3.userservice.repository.UserRepositoryPaging;
 import com.hoangtien2k3.userservice.security.jwt.JwtProvider;
 import com.hoangtien2k3.userservice.security.userprinciple.UserDetailService;
 import com.hoangtien2k3.userservice.security.userprinciple.UserPrinciple;
@@ -76,21 +72,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Mono<User> register(UserDTO signUpForm) {
+    public Mono<User> register(SignUp signUp) {
         return Mono.defer(() -> {
-            if (existsByUsername(signUpForm.getUsername())) {
-                return Mono.error(new EmailOrUsernameNotFoundException("The username " + signUpForm.getUsername() + " is existed, please try again."));
+            if (existsByUsername(signUp.getUsername())) {
+                return Mono.error(new EmailOrUsernameNotFoundException("The username " + signUp.getUsername() + " is existed, please try again."));
             }
-            if (existsByEmail(signUpForm.getEmail())) {
-                return Mono.error(new EmailOrUsernameNotFoundException("The email " + signUpForm.getEmail() + " is existed, please try again."));
+            if (existsByEmail(signUp.getEmail())) {
+                return Mono.error(new EmailOrUsernameNotFoundException("The email " + signUp.getEmail() + " is existed, please try again."));
             }
-            if (existsByPhoneNumber(signUpForm.getPhone())) {
-                return Mono.error(new PhoneNumberNotFoundException("The phone number " + signUpForm.getPhone() + " is existed, please try again."));
+            if (existsByPhoneNumber(signUp.getPhone())) {
+                return Mono.error(new PhoneNumberNotFoundException("The phone number " + signUp.getPhone() + " is existed, please try again."));
             }
 
-            User user = modelMapper.map(signUpForm, User.class);
-            user.setPassword(passwordEncoder.encode(signUpForm.getPassword()));
-            user.setRoles(signUpForm.getRoles()
+            User user = modelMapper.map(signUp, User.class);
+            user.setPassword(passwordEncoder.encode(signUp.getPassword()));
+            user.setRoles(signUp.getRoles()
                     .stream()
                     .map(role -> roleService.findByName(mapToRoleName(role))
                             .orElseThrow(() -> new RuntimeException("Role not found in the database.")))
@@ -111,7 +107,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Mono<JwtResponseMessage> login(LoginDTO signInForm) {
+    public Mono<JwtResponseMessage> login(Login signInForm) {
         return Mono.fromCallable(() -> {
                     String usernameOrEmail = signInForm.getUsername();
                     boolean isEmail = usernameOrEmail.contains("@gmail.com");
@@ -202,13 +198,13 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public Mono<User> update(Long id, UserDTO signUpForm) {
+    public Mono<User> update(Long id, SignUp updateDTO) {
         try {
             User existingUser = userRepository.findById(id)
                     .orElseThrow(() -> new UserNotFoundException("User not found userId: " + id + " for update"));
 
-            modelMapper.map(signUpForm, existingUser);
-            existingUser.setPassword(passwordEncoder.encode(signUpForm.getPassword()));
+            modelMapper.map(updateDTO, existingUser);
+            existingUser.setPassword(passwordEncoder.encode(updateDTO.getPassword()));
 
             return Mono.just(userRepository.save(existingUser));
         } catch (Exception e) {
@@ -224,22 +220,25 @@ public class UserServiceImpl implements UserService {
             String username = userDetails.getUsername();
 
             User existingUser = findByUsername(username)
-                    .map((element) -> modelMapper.map(element, User.class))
                     .orElseThrow(() -> new UserNotFoundException("User not found with username " + username));
 
             if (passwordEncoder.matches(request.getOldPassword(), userDetails.getPassword())) {
-                validateNewPassword(request.getNewPassword(), request.getConfirmPassword());
-                existingUser.setPassword(passwordEncoder.encode(request.getNewPassword()));
+                if (validateNewPassword(request.getNewPassword(), request.getConfirmPassword())) {
+                    existingUser.setPassword(passwordEncoder.encode(request.getNewPassword()));
+                    userRepository.save(existingUser);
 
-                // send email through kafka client
-                eventProducer.send(KafkaConstant.PROFILE_ONBOARDING_TOPIC, gson.toJson(emailDetailsConfig(username))).subscribe();
+                    // send email through kafka client
+                    eventProducer.send(KafkaConstant.PROFILE_ONBOARDING_TOPIC, gson.toJson(emailDetailsConfig(username))).subscribe();
 
-                return Mono.just("Password changed successfully");
+                    return Mono.just("Password changed successfully");
+                }
+
+                return Mono.just("Password changed failed.");
             } else {
                 return Mono.error(new PasswordNotFoundException("Incorrect password"));
             }
         } catch (Exception e) {
-            return Mono.error(e);
+            return Mono.error(new UserNotAuthenticatedException("Transaction silently rolled back"));
         }
     }
 
@@ -271,10 +270,8 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private void validateNewPassword(String newPassword, String confirmPassword) {
-        if (!Objects.equals(newPassword, confirmPassword)) {
-            throw new PasswordNotFoundException("Confirm password is incorrect");
-        }
+    private boolean validateNewPassword(String newPassword, String confirmPassword) {
+        return Objects.equals(newPassword, confirmPassword);
     }
 
     @Transactional
@@ -308,32 +305,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<UserDTO> findById(Long userId) {
-        return Optional.of(userRepository.findById(userId)
-                        .map((element) -> modelMapper.map(element, UserDTO.class))
-                )
+    public Optional<User> findById(Long userId) {
+        return Optional.of(userRepository.findById(userId))
                 .orElseThrow(() -> new UserNotFoundException("User not found with userId: " + userId));
     }
 
     @Override
-    public Optional<UserDTO> findByUsername(String userName) {
+    public Optional<User> findByUsername(String userName) {
         return Optional.ofNullable(userRepository.findByUsername(userName)
-                .map((element) -> modelMapper.map(element, UserDTO.class))
                 .orElseThrow(() -> new UserNotFoundException("User not found with userName: " + userName)));
     }
 
     @Override
-    public Page<UserDTO> findAllUsers(int page, int size, String sortBy, String sortOrder) {
+    public Page<UserDto> findAllUsers(int page, int size, String sortBy, String sortOrder) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortOrder), sortBy);
         PageRequest pageRequest = PageRequest.of(page, size, sort);
         Page<User> usersPage = userRepository.findAll(pageRequest);
 
-        return usersPage.map(user -> modelMapper.map(user, UserDTO.class));
-    }
-
-    public Page<User> getAllUsers(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return userRepository.findAll(pageable);
+        return usersPage.map(user -> modelMapper.map(user, UserDto.class));
     }
 
     public boolean existsByUsername(String username) {
