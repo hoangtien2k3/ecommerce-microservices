@@ -1,6 +1,5 @@
 package com.hoangtien2k3.orderservice.api;
 
-import com.hoangtien2k3.orderservice.dto.CartDto;
 import com.hoangtien2k3.orderservice.dto.OrderDto;
 import com.hoangtien2k3.orderservice.service.OrderService;
 import lombok.RequiredArgsConstructor;

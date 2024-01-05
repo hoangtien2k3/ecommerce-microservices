@@ -3,6 +3,8 @@ package com.hoangtien2k3.orderservice.api;
 import com.hoangtien2k3.orderservice.dto.CartDto;
 import com.hoangtien2k3.orderservice.service.CartService;
 import com.hoangtien2k3.orderservice.service.CallAPI;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/carts")
+@Tag(name = "CartController", description = "To perform operations on students")
 public class CartController {
 
     private final CartService cartService;
@@ -60,6 +63,10 @@ public class CartController {
         return ResponseEntity.ok(this.cartService.findById(Integer.parseInt(cartId)));
     }
 
+    @Operation(
+            summary = "POST operation on cart",
+            description = "It is used to save cart object in database"
+    )
     @PostMapping
     @PreAuthorize("hasAuthority('USER')")
     public Mono<ResponseEntity<CartDto>> save(@RequestBody

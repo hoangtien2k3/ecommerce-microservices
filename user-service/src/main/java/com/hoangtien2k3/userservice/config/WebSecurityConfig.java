@@ -82,6 +82,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/manager/delete/**").authenticated()
                 .antMatchers("/api/auth/logout").authenticated()
                 .antMatchers("/api/manager/user/**").permitAll()
+                .antMatchers("/v2/api-docs", "/swagger-ui/**", "/swagger-resources/**", "/webjars/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()

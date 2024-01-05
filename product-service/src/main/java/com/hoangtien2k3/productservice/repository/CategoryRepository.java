@@ -17,5 +17,4 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     // Thêm các phương thức tìm kiếm hoặc lọc tại đây
     Page<Category> findByCategoryTitleContaining(String categoryTitle, Pageable pageable);
 
-
 }
