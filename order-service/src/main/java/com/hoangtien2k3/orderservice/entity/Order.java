@@ -2,11 +2,14 @@ package com.hoangtien2k3.orderservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.hoangtien2k3.orderservice.constrant.AppConstant;
+import com.hoangtien2k3.orderservice.dto.product.ProductDto;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -43,6 +46,9 @@ public final class Order extends AbstractMappedEntity {
 
     @Column(name = "order_fee", columnDefinition = "decimal")
     private Double orderFee;
+
+    @Column(name = "product_id")
+    private Integer productId;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cart_id")

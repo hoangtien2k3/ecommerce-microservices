@@ -1,14 +1,14 @@
 package com.hoangtien2k3.orderservice.service.impl;
 
-import com.hoangtien2k3.orderservice.dto.CartDto;
+import com.hoangtien2k3.orderservice.dto.order.CartDto;
 import com.hoangtien2k3.orderservice.entity.Cart;
 import com.hoangtien2k3.orderservice.exception.wrapper.CartNotFoundException;
 import com.hoangtien2k3.orderservice.helper.CartMappingHelper;
 import com.hoangtien2k3.orderservice.repository.CartRepository;
 import com.hoangtien2k3.orderservice.repository.OrderRepository;
+import com.hoangtien2k3.orderservice.security.JwtTokenFilter;
 import com.hoangtien2k3.orderservice.service.CartService;
 import com.hoangtien2k3.orderservice.service.CallAPI;
-import com.netflix.discovery.converters.Auto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -20,7 +20,6 @@ import reactor.core.publisher.Mono;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 
 @Transactional
 @Slf4j
@@ -43,9 +42,11 @@ public class CartServiceImpl implements CartService {
     @Autowired
     private final CallAPI callAPI;
 
+
     @Override
     public Mono<List<CartDto>> findAll() {
         log.info("CartDto List, service; fetch all carts");
+
         return Mono.fromSupplier(() -> cartRepository.findAll()
                         .stream()
                         .map(CartMappingHelper::map)
@@ -53,7 +54,7 @@ public class CartServiceImpl implements CartService {
                 )
                 .flatMap(cartDtos -> Flux.fromIterable(cartDtos)
                         .flatMap(cartDto ->
-                                callAPI.receiverUserDto(cartDto.getUserDto().getId())
+                                callAPI.receiverUserDto(cartDto.getUserDto().getId(), JwtTokenFilter.getTokenFromRequest())
                                         .map(userDto -> {
                                             cartDto.setUserDto(userDto);
                                             return cartDto;
@@ -73,11 +74,12 @@ public class CartServiceImpl implements CartService {
         Pageable pageable = PageRequest.of(page, size, sort);
 
         return Mono.fromSupplier(() -> cartRepository
-                        .findAll(pageable).map(CartMappingHelper::map)
+                        .findAll(pageable)
+                        .map(CartMappingHelper::map)
                 )
                 .flatMap(cartDtos -> Flux.fromIterable(cartDtos)
                         .flatMap(cartDto ->
-                                callAPI.receiverUserDto(cartDto.getUserDto().getId())
+                                callAPI.receiverUserDto(cartDto.getUserDto().getId(), JwtTokenFilter.getTokenFromRequest())
                                         .map(userDto -> {
                                             cartDto.setUserDto(userDto);
                                             return cartDto;
@@ -95,12 +97,13 @@ public class CartServiceImpl implements CartService {
     @Override
     public Mono<CartDto> findById(Integer cartId) {
         log.info("CartDto, service; fetch cart by id");
+
         return Mono.fromSupplier(() -> cartRepository.findById(cartId)
                         .map(CartMappingHelper::map)
                         .orElseThrow(() -> new CartNotFoundException(String.format("Cart with id: %d not found", cartId)))
                 )
                 .flatMap(cartDto ->
-                        callAPI.receiverUserDto(cartDto.getUserDto().getId())
+                        callAPI.receiverUserDto(cartDto.getUserDto().getId(), JwtTokenFilter.getTokenFromRequest())
                                 .map(userDto -> {
                                     cartDto.setUserDto(userDto);
                                     return cartDto;

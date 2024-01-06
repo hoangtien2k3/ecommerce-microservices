@@ -44,8 +44,7 @@ public class CategoryServiceImpl implements CategoryService {
     public Flux<List<CategoryDto>> findAll() {
         log.info("Category List Service, fetch all category");
         return Flux.just(categoryRepository.findAll())
-                .flatMap(categories ->
-                        Flux.fromIterable(categories)
+                .flatMap(categories -> Flux.fromIterable(categories)
                                 .map(CategoryMappingHelper::map)
                                 .distinct()
                                 .collectList()

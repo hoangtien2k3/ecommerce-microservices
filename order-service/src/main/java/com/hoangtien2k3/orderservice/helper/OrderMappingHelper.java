@@ -1,7 +1,8 @@
 package com.hoangtien2k3.orderservice.helper;
 
-import com.hoangtien2k3.orderservice.dto.CartDto;
-import com.hoangtien2k3.orderservice.dto.OrderDto;
+import com.hoangtien2k3.orderservice.dto.order.CartDto;
+import com.hoangtien2k3.orderservice.dto.order.OrderDto;
+import com.hoangtien2k3.orderservice.dto.product.ProductDto;
 import com.hoangtien2k3.orderservice.entity.Cart;
 import com.hoangtien2k3.orderservice.entity.Order;
 
@@ -13,6 +14,7 @@ public interface OrderMappingHelper {
                 .orderDate(order.getOrderDate())
                 .orderDesc(order.getOrderDesc())
                 .orderFee(order.getOrderFee())
+                .productId(order.getProductId())
                 .cartDto(CartDto.builder()
                         .cartId(order.getCart().getCartId())
                         .userId(order.getCart().getUserId())
@@ -27,6 +29,7 @@ public interface OrderMappingHelper {
                 .orderDate(orderDto.getOrderDate())
                 .orderDesc(orderDto.getOrderDesc())
                 .orderFee(orderDto.getOrderFee())
+                .productId(orderDto.getProductId())
                 .cart(Cart.builder()
                         .cartId(orderDto.getCartDto().getCartId())
                         .userId(orderDto.getCartDto().getUserId())

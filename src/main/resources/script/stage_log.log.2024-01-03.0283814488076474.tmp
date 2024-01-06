@@ -7273,19 +7273,19 @@
 2024-01-04 15:01:49.297 DEBUG 38737 --- [http-nio-8084-exec-5] o.s.web.client.RestTemplate              : HTTP GET http://USER-SERVICE/user-service/api/users/101
 2024-01-04 15:01:49.306 DEBUG 38737 --- [http-nio-8084-exec-5] o.s.web.client.RestTemplate              : Accept=[application/json, application/*+json]
 2024-01-04 15:01:49.751 DEBUG 38737 --- [http-nio-8084-exec-5] o.s.web.client.RestTemplate              : Response 202 ACCEPTED
-2024-01-04 15:01:49.751 DEBUG 38737 --- [http-nio-8084-exec-5] o.s.web.client.RestTemplate              : Reading to [com.hoangtien2k3.orderservice.dto.UserDto]
+2024-01-04 15:01:49.751 DEBUG 38737 --- [http-nio-8084-exec-5] o.s.web.client.RestTemplate              : Reading to [com.hoangtien2k3.orderservice.dto.user.UserDto]
 2024-01-04 15:01:49.753 DEBUG 38737 --- [http-nio-8084-exec-5] o.s.web.client.RestTemplate              : HTTP GET http://USER-SERVICE/user-service/api/users/2
 2024-01-04 15:01:49.753 DEBUG 38737 --- [http-nio-8084-exec-5] o.s.web.client.RestTemplate              : Accept=[application/json, application/*+json]
 2024-01-04 15:01:49.762 DEBUG 38737 --- [http-nio-8084-exec-5] o.s.web.client.RestTemplate              : Response 202 ACCEPTED
-2024-01-04 15:01:49.763 DEBUG 38737 --- [http-nio-8084-exec-5] o.s.web.client.RestTemplate              : Reading to [com.hoangtien2k3.orderservice.dto.UserDto]
+2024-01-04 15:01:49.763 DEBUG 38737 --- [http-nio-8084-exec-5] o.s.web.client.RestTemplate              : Reading to [com.hoangtien2k3.orderservice.dto.user.UserDto]
 2024-01-04 15:01:49.763 DEBUG 38737 --- [http-nio-8084-exec-5] o.s.web.client.RestTemplate              : HTTP GET http://USER-SERVICE/user-service/api/users/3
 2024-01-04 15:01:49.763 DEBUG 38737 --- [http-nio-8084-exec-5] o.s.web.client.RestTemplate              : Accept=[application/json, application/*+json]
 2024-01-04 15:01:49.769 DEBUG 38737 --- [http-nio-8084-exec-5] o.s.web.client.RestTemplate              : Response 202 ACCEPTED
-2024-01-04 15:01:49.769 DEBUG 38737 --- [http-nio-8084-exec-5] o.s.web.client.RestTemplate              : Reading to [com.hoangtien2k3.orderservice.dto.UserDto]
+2024-01-04 15:01:49.769 DEBUG 38737 --- [http-nio-8084-exec-5] o.s.web.client.RestTemplate              : Reading to [com.hoangtien2k3.orderservice.dto.user.UserDto]
 2024-01-04 15:01:49.769 DEBUG 38737 --- [http-nio-8084-exec-5] o.s.web.client.RestTemplate              : HTTP GET http://USER-SERVICE/user-service/api/users/2
 2024-01-04 15:01:49.770 DEBUG 38737 --- [http-nio-8084-exec-5] o.s.web.client.RestTemplate              : Accept=[application/json, application/*+json]
 2024-01-04 15:01:49.775 DEBUG 38737 --- [http-nio-8084-exec-5] o.s.web.client.RestTemplate              : Response 202 ACCEPTED
-2024-01-04 15:01:49.775 DEBUG 38737 --- [http-nio-8084-exec-5] o.s.web.client.RestTemplate              : Reading to [com.hoangtien2k3.orderservice.dto.UserDto]
+2024-01-04 15:01:49.775 DEBUG 38737 --- [http-nio-8084-exec-5] o.s.web.client.RestTemplate              : Reading to [com.hoangtien2k3.orderservice.dto.user.UserDto]
 2024-01-04 15:01:49.778 DEBUG 38737 --- [http-nio-8084-exec-5] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
 2024-01-04 15:01:49.789 DEBUG 38737 --- [http-nio-8084-exec-5] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [DtoCollectionResponse(collection=[CartDto(cartId=1, userId=101, orderDtos=null, userDto=UserDto(user (truncated)...]
 2024-01-04 15:01:49.792 DEBUG 38737 --- [http-nio-8084-exec-5] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
@@ -7437,7 +7437,7 @@
 2024-01-04 15:09:49.065 DEBUG 38737 --- [http-nio-8084-exec-1] o.s.web.client.RestTemplate              : HTTP GET http://USER-SERVICE/user-service/api/users/2
 2024-01-04 15:09:49.065 DEBUG 38737 --- [http-nio-8084-exec-1] o.s.web.client.RestTemplate              : Accept=[application/json, application/*+json]
 2024-01-04 15:09:49.075 DEBUG 38737 --- [http-nio-8084-exec-1] o.s.web.client.RestTemplate              : Response 202 ACCEPTED
-2024-01-04 15:09:49.076 DEBUG 38737 --- [http-nio-8084-exec-1] o.s.web.client.RestTemplate              : Reading to [com.hoangtien2k3.orderservice.dto.UserDto]
+2024-01-04 15:09:49.076 DEBUG 38737 --- [http-nio-8084-exec-1] o.s.web.client.RestTemplate              : Reading to [com.hoangtien2k3.orderservice.dto.user.UserDto]
 2024-01-04 15:09:49.078 DEBUG 38737 --- [http-nio-8084-exec-1] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
 2024-01-04 15:09:49.078 DEBUG 38737 --- [http-nio-8084-exec-1] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [CartDto(cartId=4, userId=2, orderDtos=null, userDto=UserDto(userId=null, fullname=null, email=null,  (truncated)...]
 2024-01-04 15:09:49.079 DEBUG 38737 --- [http-nio-8084-exec-1] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
@@ -7456,7 +7456,7 @@
 2024-01-04 15:10:06.434 DEBUG 38737 --- [http-nio-8084-exec-2] o.s.web.client.RestTemplate              : HTTP GET http://USER-SERVICE/user-service/api/users/4
 2024-01-04 15:10:06.434 DEBUG 38737 --- [http-nio-8084-exec-2] o.s.web.client.RestTemplate              : Accept=[application/json, application/*+json]
 2024-01-04 15:10:06.438 DEBUG 38737 --- [http-nio-8084-exec-2] o.s.web.client.RestTemplate              : Response 202 ACCEPTED
-2024-01-04 15:10:06.438 DEBUG 38737 --- [http-nio-8084-exec-2] o.s.web.client.RestTemplate              : Reading to [com.hoangtien2k3.orderservice.dto.UserDto]
+2024-01-04 15:10:06.438 DEBUG 38737 --- [http-nio-8084-exec-2] o.s.web.client.RestTemplate              : Reading to [com.hoangtien2k3.orderservice.dto.user.UserDto]
 2024-01-04 15:10:06.440 DEBUG 38737 --- [http-nio-8084-exec-2] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
 2024-01-04 15:10:06.441 DEBUG 38737 --- [http-nio-8084-exec-2] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [CartDto(cartId=5, userId=4, orderDtos=null, userDto=UserDto(userId=null, fullname=null, email=null,  (truncated)...]
 2024-01-04 15:10:06.442 DEBUG 38737 --- [http-nio-8084-exec-2] o.s.web.servlet.DispatcherServlet        : Completed 200 OK

@@ -1,8 +1,8 @@
 package com.hoangtien2k3.orderservice.helper;
 
-import com.hoangtien2k3.orderservice.dto.CartDto;
-import com.hoangtien2k3.orderservice.dto.OrderDto;
-import com.hoangtien2k3.orderservice.dto.UserDto;
+import com.hoangtien2k3.orderservice.dto.order.CartDto;
+import com.hoangtien2k3.orderservice.dto.order.OrderDto;
+import com.hoangtien2k3.orderservice.dto.user.UserDto;
 import com.hoangtien2k3.orderservice.entity.Cart;
 import com.hoangtien2k3.orderservice.entity.Order;
 
