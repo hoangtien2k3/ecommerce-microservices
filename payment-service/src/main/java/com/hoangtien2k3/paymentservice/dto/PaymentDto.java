@@ -23,8 +23,10 @@ public class PaymentDto implements Serializable {
     private Boolean isPayed;
     private PaymentStatus paymentStatus;
 
-    @JsonProperty("order") // tên bảng hiển thị ở JSON
-    @JsonInclude(JsonInclude.Include.NON_NULL) // nếu orderDto là null thì nó sẽ không được hiển thị ở JSON và ngược lại thì sẽ đươc hiển thị ở JSON
+    private Integer orderId;
+
+    @JsonProperty("order")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private OrderDto orderDto;
 
 }

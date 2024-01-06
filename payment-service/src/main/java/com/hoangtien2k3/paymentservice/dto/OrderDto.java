@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class OrderDto implements Serializable {
+
     @Serial
     private static final long serialVersionUID = 1L;
 
