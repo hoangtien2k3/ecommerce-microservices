@@ -1,7 +1,9 @@
 package com.hoangtien2k3.paymentservice.api;
 
+import com.hoangtien2k3.paymentservice.dto.OrderDto;
 import com.hoangtien2k3.paymentservice.dto.PaymentDto;
 import com.hoangtien2k3.paymentservice.service.PaymentService;
+import com.hoangtien2k3.paymentservice.service.impl.PaymentServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -29,6 +31,9 @@ public class PaymentController {
 
     @Autowired
     private final PaymentService paymentService;
+
+    @Autowired
+    private final PaymentServiceImpl paymentServiceImpl;
 
     @ApiOperation(value = "Get all payment", notes = "Retrieve a list of all payment.")
     @ApiResponses({
@@ -73,6 +78,13 @@ public class PaymentController {
         log.info("*** PaymentDto, resource; fetch cart by id *");
         return ResponseEntity.ok(paymentService.findById(Integer.parseInt(paymentId)));
     }
+
+
+    @GetMapping("/getOrder/{orderId}")
+    public ResponseEntity<Mono<OrderDto>> getOrderDto(@PathVariable("orderId") final Integer orderId) {
+        return ResponseEntity.ok(paymentServiceImpl.getOrderDto(orderId));
+    }
+
 
     @ApiOperation(value = "Save payment", notes = "Save a new payment.")
     @ApiResponses({

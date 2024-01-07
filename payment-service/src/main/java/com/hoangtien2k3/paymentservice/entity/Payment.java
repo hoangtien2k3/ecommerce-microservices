@@ -26,6 +26,9 @@ public class Payment extends AbstractMappedEntity implements Serializable {
     @Column(name = "order_id")
     private Integer orderId;
 
+    @Column(name = "user_id")
+    private Long userId;
+
     @Column(name = "is_payed")
     private Boolean isPayed;
 

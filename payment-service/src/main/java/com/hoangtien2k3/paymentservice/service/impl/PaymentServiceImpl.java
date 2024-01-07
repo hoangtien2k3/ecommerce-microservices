@@ -1,6 +1,8 @@
 package com.hoangtien2k3.paymentservice.service.impl;
 
+import com.hoangtien2k3.paymentservice.dto.OrderDto;
 import com.hoangtien2k3.paymentservice.dto.PaymentDto;
+import com.hoangtien2k3.paymentservice.dto.UserDto;
 import com.hoangtien2k3.paymentservice.exception.wrapper.PaymentNotFoundException;
 import com.hoangtien2k3.paymentservice.helper.PaymentMappingHelper;
 import com.hoangtien2k3.paymentservice.repository.PaymentRepository;
@@ -45,7 +47,7 @@ public class PaymentServiceImpl implements PaymentService {
                         .flatMap(paymentDto ->
                                 callAPI.receiverPaymentDto(paymentDto.getOrderId(), JwtTokenFilter.getTokenFromRequest())
                                         .map(orderDto -> {
-                                            paymentDto.setOrderDto(orderDto);
+                                            paymentDto.setOrderDto(modelMapper.map(orderDto, OrderDto.class));
                                             return paymentDto;
                                         })
                                         .onErrorResume(throwable -> {
@@ -69,7 +71,7 @@ public class PaymentServiceImpl implements PaymentService {
                         .flatMap(paymentDto ->
                                 callAPI.receiverPaymentDto(paymentDto.getOrderId(), JwtTokenFilter.getTokenFromRequest())
                                         .map(orderDto -> {
-                                            paymentDto.setOrderDto(orderDto);
+                                            paymentDto.setOrderDto(modelMapper.map(orderDto, OrderDto.class));
                                             return paymentDto;
                                         })
                                         .onErrorResume(throwable -> {
@@ -90,16 +92,28 @@ public class PaymentServiceImpl implements PaymentService {
                         .orElseThrow(() -> new PaymentNotFoundException(String.format("Order with id: %d not found", paymentId)))
                 )
                 .flatMap(paymentDto ->
-                        callAPI.receiverPaymentDto(paymentDto.getOrderId(), JwtTokenFilter.getTokenFromRequest())
-                                .map(orderDto -> {
-                                    paymentDto.setOrderDto(orderDto);
-                                    return paymentDto;
+                        callAPI.receiverPaymentDto(paymentDto.getOrderDto().getOrderId(), JwtTokenFilter.getTokenFromRequest())
+                                .flatMap(orderDto -> {
+                                    paymentDto.setOrderDto(modelMapper.map(orderDto, OrderDto.class));
+
+                                    return callAPI.receiverUserDto(paymentDto.getUserId(), JwtTokenFilter.getTokenFromRequest())
+                                            .map(userDto -> {
+                                                paymentDto.setUserDto(modelMapper.map(userDto, UserDto.class));
+                                                return paymentDto;
+                                            })
+                                            .switchIfEmpty(Mono.just(paymentDto));
+
                                 })
                                 .onErrorResume(throwable -> {
-                                    log.error("Error fetching order info: {}", throwable.getMessage());
+                                    log.error("Error fetching order or user info: {}", throwable.getMessage());
                                     return Mono.just(paymentDto);
                                 })
                 );
+    }
+
+    public Mono<OrderDto> getOrderDto(Integer orderId) {
+        return callAPI.receiverPaymentDto(orderId, JwtTokenFilter.getTokenFromRequest())
+                .map(orderDto -> modelMapper.map(orderDto, OrderDto.class));
     }
 
     @Override

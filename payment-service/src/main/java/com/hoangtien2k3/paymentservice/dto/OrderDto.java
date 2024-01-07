@@ -1,6 +1,9 @@
 package com.hoangtien2k3.paymentservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -31,8 +34,9 @@ public class OrderDto implements Serializable {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonFormat(pattern = AppConstant.LOCAL_DATE_TIME_FORMAT, shape = JsonFormat.Shape.STRING)
     @DateTimeFormat(pattern = AppConstant.LOCAL_DATE_TIME_FORMAT)
-    private LocalDateTime orderDate;
-    private String orderDesc;
-    private Double orderFee;
+    @JsonInclude(Include.NON_NULL) private LocalDateTime orderDate;
+    @JsonInclude(Include.NON_NULL) private String orderDesc;
+    @JsonInclude(Include.NON_NULL) private Double orderFee;
+    @JsonInclude(Include.NON_NULL) private Integer productId;
 
 }
