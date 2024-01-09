@@ -29,6 +29,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+import reactor.util.context.Context;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -109,58 +111,55 @@ public class UserServiceImpl implements UserService {
     @Override
     public Mono<JwtResponseMessage> login(Login signInForm) {
         return Mono.fromCallable(() -> {
-                    String usernameOrEmail = signInForm.getUsername();
-                    boolean isEmail = usernameOrEmail.contains("@gmail.com");
+            String usernameOrEmail = signInForm.getUsername();
+            boolean isEmail = usernameOrEmail.contains("@gmail.com");
 
-                    UserDetails userDetails;
-                    if (isEmail) {
-                        userDetails = userDetailsService.loadUserByEmail(usernameOrEmail);
-                    } else {
-                        userDetails = userDetailsService.loadUserByUsername(usernameOrEmail);
-                    }
+            UserDetails userDetails;
+            if (isEmail) {
+                userDetails = userDetailsService.loadUserByEmail(usernameOrEmail);
+            } else {
+                userDetails = userDetailsService.loadUserByUsername(usernameOrEmail);
+            }
 
-                    // check username
-                    if (userDetails == null) {
-                        throw new UserNotFoundException("User not found");
-                    }
+            // check username
+            if (userDetails == null) {
+                throw new UserNotFoundException("User not found");
+            }
 
-                    // Check password
-                    if (!passwordEncoder.matches(signInForm.getPassword(), userDetails.getPassword())) {
-                        throw new PasswordNotFoundException("Incorrect password");
-                    }
+            // Check password
+            if (!passwordEncoder.matches(signInForm.getPassword(), userDetails.getPassword())) {
+                throw new PasswordNotFoundException("Incorrect password");
+            }
 
-                    Authentication authentication = new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            signInForm.getPassword(),
-                            userDetails.getAuthorities()
-                    );
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    userDetails,
+                    signInForm.getPassword(),
+                    userDetails.getAuthorities()
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                    String accessToken = jwtProvider.createToken(authentication);
-                    String refreshToken = jwtProvider.createRefreshToken(authentication);
+            String accessToken = jwtProvider.createToken(authentication);
+            String refreshToken = jwtProvider.createRefreshToken(authentication);
 
-                    UserPrinciple userPrinciple = (UserPrinciple) userDetails;
+            UserPrinciple userPrinciple = (UserPrinciple) userDetails;
 
-                    JwtResponseMessage jwtResponseMessage = JwtResponseMessage.builder()
-                            .accessToken(accessToken)
-                            .refreshToken(refreshToken)
-                            .information(InformationMessage.builder()
-                                    .id(userPrinciple.id())
-                                    .fullname(userPrinciple.fullname())
-                                    .username(userPrinciple.username())
-                                    .email(userPrinciple.email())
-                                    .phone(userPrinciple.phone())
-                                    .gender(userPrinciple.gender())
-                                    .avatar(userPrinciple.avatar())
-                                    .roles(userPrinciple.roles())
-                                    .build())
-                            .build();
-
-                    return Mono.just(jwtResponseMessage);
-                })
-                .flatMap(Mono::just)
-                .onErrorResume(Mono::error).block();
+            return JwtResponseMessage.builder()
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .information(InformationMessage.builder()
+                            .id(userPrinciple.id())
+                            .fullname(userPrinciple.fullname())
+                            .username(userPrinciple.username())
+                            .email(userPrinciple.email())
+                            .phone(userPrinciple.phone())
+                            .gender(userPrinciple.gender())
+                            .avatar(userPrinciple.avatar())
+                            .roles(userPrinciple.roles())
+                            .build())
+                    .build();
+        }).onErrorResume(Mono::error);
     }
+
 
     @Override
     public Mono<Void> logout() {
@@ -228,9 +227,11 @@ public class UserServiceImpl implements UserService {
                     userRepository.save(existingUser);
 
                     // send email through kafka client
-                    eventProducer.send(KafkaConstant.PROFILE_ONBOARDING_TOPIC, gson.toJson(emailDetailsConfig(username))).subscribe();
+                    EmailDetails emailDetails = emailDetailsConfig(username);
 
-                    return Mono.just("Password changed successfully");
+                    return eventProducer.send(KafkaConstant.PROFILE_ONBOARDING_TOPIC, gson.toJson(emailDetails))
+                            .thenReturn("Password changed successfully")
+                            .publishOn(Schedulers.boundedElastic());
                 }
 
                 return Mono.just("Password changed failed.");
