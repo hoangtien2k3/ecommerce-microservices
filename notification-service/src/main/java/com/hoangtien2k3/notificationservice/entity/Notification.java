@@ -2,6 +2,7 @@ package com.hoangtien2k3.notificationservice.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -9,9 +10,9 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
 
-//@Entity
 @Setter
-@Getter@AllArgsConstructor
+@Getter
+@AllArgsConstructor
 @Document(collection = "notifications")
 public class Notification {
 

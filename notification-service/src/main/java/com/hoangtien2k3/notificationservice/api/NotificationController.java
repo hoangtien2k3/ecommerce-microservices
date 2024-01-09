@@ -40,9 +40,9 @@ public class NotificationController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteNotification(@PathVariable String id) {
+    public ResponseEntity<Boolean> deleteNotification(@PathVariable String id) {
         notificationService.deleteNotificationById(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(true, HttpStatus.OK);
     }
 
 }

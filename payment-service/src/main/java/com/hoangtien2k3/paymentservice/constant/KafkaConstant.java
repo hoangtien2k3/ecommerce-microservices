@@ -1,4 +1,4 @@
-package com.hoangtien2k3.notificationservice.config;
+package com.hoangtien2k3.paymentservice.constant;
 
 public class KafkaConstant {
     public static final String PROFILE_ONBOARDING_TOPIC = "profileOnboarding";

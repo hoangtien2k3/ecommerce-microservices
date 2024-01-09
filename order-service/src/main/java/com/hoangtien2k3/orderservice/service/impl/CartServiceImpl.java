@@ -143,7 +143,6 @@ public class CartServiceImpl implements CartService {
     @Override
     public Mono<Void> deleteById(final Integer cartId) {
         log.info("Void, service; delete cart by id");
-
         cartRepository.findById(cartId)
                 .ifPresent(cart -> {
                     orderRepository.deleteAllByCart(cart);

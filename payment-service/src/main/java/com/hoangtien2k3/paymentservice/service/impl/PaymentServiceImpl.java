@@ -1,8 +1,12 @@
 package com.hoangtien2k3.paymentservice.service.impl;
 
+import com.google.gson.Gson;
+import com.hoangtien2k3.paymentservice.constant.KafkaConstant;
+import com.hoangtien2k3.paymentservice.dto.KafkaPaymentDto;
 import com.hoangtien2k3.paymentservice.dto.OrderDto;
 import com.hoangtien2k3.paymentservice.dto.PaymentDto;
 import com.hoangtien2k3.paymentservice.dto.UserDto;
+import com.hoangtien2k3.paymentservice.event.EventProducer;
 import com.hoangtien2k3.paymentservice.exception.wrapper.PaymentNotFoundException;
 import com.hoangtien2k3.paymentservice.helper.PaymentMappingHelper;
 import com.hoangtien2k3.paymentservice.repository.PaymentRepository;
@@ -17,6 +21,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -35,6 +40,10 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Autowired
     private final CallAPI callAPI;
+
+    Gson gson = new Gson(); // google.code.gson
+    @Autowired
+    private EventProducer eventProducer;
 
     @Override
     public Mono<List<PaymentDto>> findAll() {
@@ -116,18 +125,35 @@ public class PaymentServiceImpl implements PaymentService {
                 .map(orderDto -> modelMapper.map(orderDto, OrderDto.class));
     }
 
+
     @Override
     public Mono<PaymentDto> save(PaymentDto paymentDto) {
         log.info("PaymentDto, service; save order");
+
         return Mono.just(paymentDto)
                 .filter(dto -> !paymentRepository.existsByOrderIdAndIsPayed(dto.getOrderId()))
                 .switchIfEmpty(Mono.error(new PaymentNotFoundException("Order has already been paid.")))
-                .flatMap(dto -> Mono.fromSupplier(() -> PaymentMappingHelper.map(paymentRepository.save(PaymentMappingHelper.map(dto)))))
+                .flatMap(dto -> Mono.fromCallable(() -> PaymentMappingHelper.map(paymentRepository.save(PaymentMappingHelper.map(dto)))))
+                .flatMap(savedPaymentDto -> {
+                    KafkaPaymentDto newPaymentDto = KafkaPaymentDto.builder()
+                            .paymentId(savedPaymentDto.getPaymentId())
+                            .isPayed(savedPaymentDto.getIsPayed())
+                            .paymentStatus(savedPaymentDto.getPaymentStatus())
+                            .orderId(savedPaymentDto.getOrderId())
+                            .userId(savedPaymentDto.getUserId())
+                            .build();
+
+                    // Send Kafka notifications without waiting
+                    return eventProducer.send(KafkaConstant.STATUS_PAYMENT_SUCCESSFUL, gson.toJson(newPaymentDto))
+                            .thenReturn(savedPaymentDto);
+                })
                 .onErrorResume(throwable -> {
-                    log.error("Error saving payment: {}", throwable.getMessage());
+                    log.error("Error saving payment or sending Kafka message: {}", throwable.getMessage());
                     return Mono.error(throwable);
-                });
+                })
+                .subscribeOn(Schedulers.boundedElastic()); // run on another thread
     }
+
 
     @Override
     public Mono<PaymentDto> update(PaymentDto paymentDto) {
