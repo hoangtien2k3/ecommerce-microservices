@@ -2,6 +2,7 @@ package com.hoangtien2k3.paymentservice.api;
 
 import com.hoangtien2k3.paymentservice.dto.OrderDto;
 import com.hoangtien2k3.paymentservice.dto.PaymentDto;
+import com.hoangtien2k3.paymentservice.http.HeaderGenerator;
 import com.hoangtien2k3.paymentservice.service.PaymentService;
 import com.hoangtien2k3.paymentservice.service.impl.PaymentServiceImpl;
 import io.swagger.annotations.ApiOperation;
@@ -35,6 +36,9 @@ public class PaymentController {
     @Autowired
     private final PaymentServiceImpl paymentServiceImpl;
 
+    @Autowired
+    private final HeaderGenerator headerGenerator;
+
     @ApiOperation(value = "Get all payment", notes = "Retrieve a list of all payment.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Payments retrieved successfully", response = List.class),
@@ -62,7 +66,7 @@ public class PaymentController {
                                                           @RequestParam(defaultValue = "asc") String sortOrder) {
         return paymentService.findAll(page, size, sortBy, sortOrder)
                 .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.noContent().build());
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @ApiOperation(value = "Get payment by ID", notes = "Retrieve cart information based on the provided ID.")
