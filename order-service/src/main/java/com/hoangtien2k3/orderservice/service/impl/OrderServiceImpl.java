@@ -1,6 +1,7 @@
 package com.hoangtien2k3.orderservice.service.impl;
 
 import com.hoangtien2k3.orderservice.dto.order.OrderDto;
+import com.hoangtien2k3.orderservice.entity.Order;
 import com.hoangtien2k3.orderservice.exception.wrapper.CartNotFoundException;
 import com.hoangtien2k3.orderservice.exception.wrapper.OrderNotFoundException;
 import com.hoangtien2k3.orderservice.helper.OrderMappingHelper;
@@ -19,6 +20,7 @@ import reactor.core.publisher.Mono;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Transactional
 @Slf4j
@@ -101,6 +103,12 @@ public class OrderServiceImpl implements OrderService {
                                     return Mono.just(orderDto);
                                 })
                 );
+    }
+
+    // check orderId in exist in database.
+    @Override
+    public Boolean existsByOrderId(Integer orderId) {
+         return orderRepository.findById(orderId).isPresent();
     }
 
     @Override

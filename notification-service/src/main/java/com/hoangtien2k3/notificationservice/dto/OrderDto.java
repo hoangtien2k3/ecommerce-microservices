@@ -1,4 +1,4 @@
-package com.hoangtien2k3.orderservice.dto.order;
+package com.hoangtien2k3.notificationservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -7,8 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.hoangtien2k3.orderservice.constrant.AppConstant;
-import com.hoangtien2k3.orderservice.dto.product.ProductDto;
+import com.hoangtien2k3.notificationservice.constant.AppConstant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,15 +37,14 @@ public class OrderDto implements Serializable {
 
     private String orderDesc;
     private Double orderFee;
-
     private Integer productId;
 
-    @JsonProperty("product")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private ProductDto productDto;
-
-    @JsonProperty("cart")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private CartDto cartDto;
+//    @JsonProperty("product")
+//    @JsonInclude(JsonInclude.Include.NON_NULL)
+//    private ProductDto productDto;
+//
+//    @JsonProperty("cart")
+//    @JsonInclude(JsonInclude.Include.NON_NULL)
+//    private CartDto cartDto;
 
 }

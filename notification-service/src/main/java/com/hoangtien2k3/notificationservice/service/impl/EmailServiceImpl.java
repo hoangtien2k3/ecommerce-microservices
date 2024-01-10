@@ -77,7 +77,6 @@ public class EmailServiceImpl implements EmailService {
         return Mono.fromCallable(() -> {
                     MimeMessage mimeMessage = javaMailSender.createMimeMessage();
                     MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-
                     mimeMessageHelper.setFrom(fromEmail);
                     mimeMessageHelper.setTo(to);
                     mimeMessageHelper.setCc(cc);
@@ -91,7 +90,6 @@ public class EmailServiceImpl implements EmailService {
                     }
 
                     javaMailSender.send(mimeMessage);
-
                     return "Email sent successfully to " + Arrays.toString(cc);
                 })
                 .onErrorResume(Exception.class, ex -> {

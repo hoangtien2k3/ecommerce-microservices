@@ -140,4 +140,10 @@ public class OrderController {
                 .defaultIfEmpty(ResponseEntity.status(HttpStatus.NOT_FOUND).body(false));
     }
 
+
+    @GetMapping("/existOrderId")
+    public Boolean existsByOrderId(Integer orderId) {
+        return orderService.existsByOrderId(orderId);
+    }
+
 }

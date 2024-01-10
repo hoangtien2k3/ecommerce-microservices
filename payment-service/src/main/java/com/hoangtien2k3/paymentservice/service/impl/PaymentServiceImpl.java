@@ -21,6 +21,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
 import javax.transaction.Transactional;
@@ -109,7 +110,7 @@ public class PaymentServiceImpl implements PaymentService {
                                             .map(userDto -> {
                                                 paymentDto.setUserDto(modelMapper.map(userDto, UserDto.class));
                                                 return paymentDto;
-                                            })
+                                            }).publishOn(Schedulers.boundedElastic())
                                             .switchIfEmpty(Mono.just(paymentDto));
 
                                 })
@@ -124,7 +125,6 @@ public class PaymentServiceImpl implements PaymentService {
         return callAPI.receiverPaymentDto(orderId, JwtTokenFilter.getTokenFromRequest())
                 .map(orderDto -> modelMapper.map(orderDto, OrderDto.class));
     }
-
 
     @Override
     public Mono<PaymentDto> save(PaymentDto paymentDto) {

@@ -20,4 +20,6 @@ public interface OrderService {
     Mono<OrderDto> update(final Integer orderId, final OrderDto orderDto);
 
     Mono<Void> deleteById(final Integer orderId);
+
+    Boolean existsByOrderId(Integer orderId);
 }
