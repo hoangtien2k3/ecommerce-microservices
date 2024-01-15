@@ -36,7 +36,7 @@ public class OrderController {
             @ApiResponse(code = 204, message = "No content", response = ResponseEntity.class)
     })
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     public Mono<ResponseEntity<List<OrderDto>>> findAll() {
         log.info("*** OrderDto List, controller; fetch all orders *");
         return orderService.findAll()

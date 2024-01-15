@@ -1,8 +1,22 @@
-## zookeeper
-## broker
-## kafka
 version: '2'
 services:
+  mysql:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 12042003
+      MYSQL_DATABASE: my_database
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 12042003
+    ports:
+      - "3306:3306"
+
+  mongodb:
+      image: mongo
+      volumes:
+        - ./mongo_data:/data/db
+      ports:
+        - "27017:27017"
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.3
     hostname: zookeeper

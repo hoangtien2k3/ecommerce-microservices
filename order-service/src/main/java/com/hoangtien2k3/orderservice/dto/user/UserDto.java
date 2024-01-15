@@ -1,9 +1,5 @@
 package com.hoangtien2k3.orderservice.dto.user;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.hoangtien2k3.orderservice.dto.order.CartDto;
 import lombok.*;
 
 import java.io.Serial;
@@ -25,9 +21,5 @@ public class UserDto implements Serializable {
     private String gender;
     private String phone;
     private String avatar;
-
-    @JsonProperty("cart")
-    @JsonInclude(Include.NON_NULL)
-    private CartDto cartDto;
 
 }
