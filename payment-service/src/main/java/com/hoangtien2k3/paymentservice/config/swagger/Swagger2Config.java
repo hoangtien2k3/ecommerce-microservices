@@ -29,6 +29,7 @@ import java.util.List;
 @Configuration
 @EnableSwagger2
 public class Swagger2Config {
+
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)

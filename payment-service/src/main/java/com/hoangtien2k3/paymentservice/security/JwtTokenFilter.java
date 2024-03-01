@@ -4,9 +4,11 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
+import org.json.HTTP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -33,7 +35,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         String token = extractToken(request);
 
+
+
         try {
+
             if (token != null && jwtProvider.validateToken(token)) {
                 Authentication authentication = jwtProvider.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -46,9 +51,13 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             }
         } catch (ExpiredJwtException e) {
             logger.error("Token has expired for request: {}", request.getRequestURI());
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token has expired");
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getWriter().write("Token has expired for request");
+//            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token has expired");
         } catch (MalformedJwtException | SignatureException | UnsupportedJwtException | IllegalArgumentException e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+
+//            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
         }
     }
 

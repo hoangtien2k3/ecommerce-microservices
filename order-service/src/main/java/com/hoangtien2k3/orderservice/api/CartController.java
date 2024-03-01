@@ -41,7 +41,7 @@ public class CartController {
             @ApiResponse(code = 204, message = "No content", response = ResponseEntity.class)
     })
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN') and hasAuthority('USER')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     public Mono<ResponseEntity<List<CartDto>>> findAll() {
         log.info("*** CartDto List, controller; fetch all categories *");
         return cartService.findAll()
@@ -55,7 +55,7 @@ public class CartController {
             @ApiResponse(code = 204, message = "No content", response = ResponseEntity.class)
     })
     @GetMapping("/all")
-    @PreAuthorize("hasAuthority('ADMIN') and hasAuthority('USER')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     public Mono<ResponseEntity<Page<CartDto>>> findAll(@RequestParam(defaultValue = "0") int page,
                                                        @RequestParam(defaultValue = "10") int size,
                                                        @RequestParam(defaultValue = "cartId") String sortBy,

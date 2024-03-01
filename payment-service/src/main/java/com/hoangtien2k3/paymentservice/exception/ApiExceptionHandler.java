@@ -54,5 +54,4 @@ public class ApiExceptionHandler {
                                 .now(ZoneId.systemDefault()))
                         .build(), badRequest);
     }
-
 }

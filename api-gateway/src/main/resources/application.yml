@@ -21,10 +21,15 @@ spring:
             - Path=/api/inventory/**
 
         # NOTIFY-SERVICE
-        - id: notification-service
+        - id: notification-service-notifications
           uri: lb://NOTIFICATION-SERVICE
           predicates:
             - Path=/api/email/**
+
+        - id: notification-service-payments
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/api/payments/**
 
         # ORDER-SERVICE
         - id: order-service-carts

@@ -13,6 +13,8 @@ public class FavouriteServiceApplication {
 	public static void main(String[] args) {
 		TimeZone.setDefault(TimeZone.getTimeZone("GMT +0:00"));
 		SpringApplication.run(FavouriteServiceApplication.class, args);
+
+
 	}
 
 }

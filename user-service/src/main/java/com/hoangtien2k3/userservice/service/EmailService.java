@@ -26,5 +26,6 @@ public class EmailService {
                 .bodyToMono(String.class)
                 .block();
     }
+
 }
 

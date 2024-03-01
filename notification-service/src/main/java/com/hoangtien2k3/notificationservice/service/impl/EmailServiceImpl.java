@@ -71,7 +71,6 @@ public class EmailServiceImpl implements EmailService {
                 });
     }
 
-
     @Override
     public Mono<String> sendMail(MultipartFile[] files, String to, String[] cc, String subject, String body) {
         return Mono.fromCallable(() -> {
@@ -97,6 +96,5 @@ public class EmailServiceImpl implements EmailService {
                     return Mono.just("Error while Sending Email");
                 });
     }
-
 
 }
