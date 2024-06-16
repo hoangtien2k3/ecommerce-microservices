@@ -87,6 +87,8 @@ automated `API documentation`.
 
 If you would like to contribute to the development of this project, please follow our contribution guidelines.
 
+![Alt](https://repobeats.axiom.co/api/embed/1897bc523b54b43aefb19c65195f32377f8aab85.svg "Repobeats analytics image")
+
 ## License
 
 This project is licensed under the [`MIT License`](LICENSE).
