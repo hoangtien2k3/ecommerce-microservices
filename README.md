@@ -83,6 +83,16 @@ Follow these steps to set up and run the backend:
 Document the API endpoints and their functionalities. You can use tools like `Swagger` for
 automated `API documentation`.
 
+## Star History
+
+<a href="https://star-history.com/#hoangtien2k3/ecommerce-microservices&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=hoangtien2k3/ecommerce-microservices&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=hoangtien2k3/ecommerce-microservices&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=hoangtien2k3/ecommerce-microservices&type=Date" />
+ </picture>
+</a>
+
 ## Contributing
 
 If you would like to contribute to the development of this project, please follow our contribution guidelines.
