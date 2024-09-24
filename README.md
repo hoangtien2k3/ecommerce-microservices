@@ -72,6 +72,9 @@ Follow these steps to set up and run the backend:
   gradle bootRun
 ```
 
+## Demo
+![1715441188385](https://github.com/user-attachments/assets/ea07616a-5404-4ccd-bab0-b472b67a061a)
+
 ## Technologies Used
 
 - `Java`: The primary programming language.
