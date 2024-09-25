@@ -8,9 +8,10 @@ import com.hoangtien2k3.promotion.model.enumeration.ApplyTo;
 import com.hoangtien2k3.promotion.model.enumeration.DiscountType;
 import com.hoangtien2k3.promotion.model.enumeration.UsageType;
 import com.hoangtien2k3.promotion.viewmodel.PromotionDto;
-import jakarta.validation.ConstraintValidatorContext;
 import java.util.Collections;
 import org.junit.jupiter.api.Test;
+
+import javax.validation.ConstraintValidatorContext;
 
 class PromotionValidatorTest {
 

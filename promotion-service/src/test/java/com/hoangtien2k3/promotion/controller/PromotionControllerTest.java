@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +36,8 @@ import com.hoangtien2k3.promotion.viewmodel.PromotionDetailVm;
 import com.hoangtien2k3.promotion.viewmodel.PromotionListVm;
 import com.hoangtien2k3.promotion.viewmodel.PromotionPostVm;
 import com.hoangtien2k3.promotion.viewmodel.PromotionPutVm;
+
+import javax.validation.constraints.NotNull;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = PromotionController.class)

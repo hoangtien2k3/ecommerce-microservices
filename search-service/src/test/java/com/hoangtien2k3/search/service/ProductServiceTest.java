@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -33,6 +32,8 @@ import org.springframework.data.elasticsearch.core.SearchPage;
 import org.springframework.data.elasticsearch.core.SearchShardStatistics;
 import org.springframework.data.elasticsearch.core.TotalHitsRelation;
 import org.springframework.data.elasticsearch.core.suggest.response.Suggest;
+
+import javax.validation.constraints.NotNull;
 
 class ProductServiceTest {
 

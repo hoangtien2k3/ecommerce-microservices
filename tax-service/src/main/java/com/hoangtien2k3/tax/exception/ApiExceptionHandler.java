@@ -1,7 +1,6 @@
 package com.hoangtien2k3.tax.exception;
 
 import com.hoangtien2k3.tax.viewmodel.error.ErrorVm;
-import jakarta.validation.ConstraintViolationException;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.NestedExceptionUtils;
@@ -14,6 +13,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
+
+import javax.validation.ConstraintViolationException;
 
 @ControllerAdvice
 @Slf4j

@@ -3,7 +3,7 @@ package com.hoangtien2k3.rating;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest(useMainMethod = SpringBootTest.UseMainMethod.ALWAYS)
+@SpringBootTest()
 class RatingApplicationTest {
 
     @Test
