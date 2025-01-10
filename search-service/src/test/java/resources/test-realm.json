@@ -44,7 +44,7 @@
     "realm" : [
       {
         "id": "f2da71cd-654f-4beb-8ec8-fa78d6fc1219",
-        "name": "default-roles-yas",
+        "name": "default-roles-hoangtien2k3",
         "description": "${role_default-roles}",
         "composite": true,
         "composites": {
@@ -54,7 +54,7 @@
           ]
         },
         "clientRole": false,
-        "containerId": "Yas",
+        "containerId": "hoangtien2k3",
         "attributes": {}
       },
       {
@@ -62,7 +62,7 @@
         "name": "ADMIN",
         "composite": false,
         "clientRole": false,
-        "containerId": "Yas",
+        "containerId": "hoangtien2k3",
         "attributes": {}
       },
       {
@@ -395,7 +395,7 @@
     } ],
     "disableableCredentialTypes" : [ ],
     "requiredActions" : [ ],
-    "realmRoles": ["default-roles-yas", "ADMIN"],
+    "realmRoles": ["default-roles-hoangtien2k3", "ADMIN"],
     "clientRoles" : {
       "account" : [ "view-profile", "manage-account" ]
     },

@@ -27,7 +27,7 @@ class OrderServiceTest {
 
     private RestClient.ResponseSpec responseSpec;
 
-    private static final String ORDER_URL = "http://api.yas.local/order";
+    private static final String ORDER_URL = "http://api.hoangtien2k3.local/order";
 
     @BeforeEach
     void setUp() {

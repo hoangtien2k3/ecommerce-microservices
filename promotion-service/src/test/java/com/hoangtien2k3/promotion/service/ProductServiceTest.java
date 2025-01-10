@@ -34,7 +34,7 @@ class ProductServiceTest {
 
     private RestClient.ResponseSpec responseSpec;
 
-    private static final String PRODUCT_URL = "http://api.yas.local/product";
+    private static final String PRODUCT_URL = "http://api.hoangtien2k3.local/product";
 
     @BeforeEach
     void setUp() {

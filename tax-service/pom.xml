@@ -15,7 +15,7 @@
     <properties>
         <sonar.organization>nashtech-garage</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <sonar.projectKey>nashtech-garage_yas-tax</sonar.projectKey>
+        <sonar.projectKey>nashtech-garage_hoangtien2k3-tax</sonar.projectKey>
     </properties>
     <dependencies>
         <dependency>

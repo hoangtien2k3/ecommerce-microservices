@@ -22,7 +22,7 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 class ProductSyncDataServiceTest {
-    private static final String PRODUCT_URL = "http://api.yas.local/product";
+    private static final String PRODUCT_URL = "http://api.hoangtien2k3.local/product";
 
     private ProductRepository productRepository;
 
