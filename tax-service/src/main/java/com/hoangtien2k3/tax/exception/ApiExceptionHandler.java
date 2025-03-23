@@ -89,7 +89,8 @@ public class ApiExceptionHandler {
 
     private String getServletPath(WebRequest webRequest) {
         ServletWebRequest servletRequest = (ServletWebRequest) webRequest;
-        return servletRequest.getRequest().getServletPath();
+        String servletPath = servletRequest.getRequest().getServletPath();
+        return servletPath.replaceAll("[\\r\\n]", "");
     }
 
     private ResponseEntity<ErrorVm> handleBadRequest(Exception ex, boolean isUsingNestedException, WebRequest request) {
