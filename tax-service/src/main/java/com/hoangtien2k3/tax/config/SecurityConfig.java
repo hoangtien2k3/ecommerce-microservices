@@ -27,8 +27,7 @@ public class SecurityConfig {
                         .antMatchers("/storefront/**").permitAll()
                         .antMatchers("/backoffice/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
-                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
-                .csrf().disable();
+                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
         return http.build();
     }
 
