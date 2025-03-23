@@ -59,8 +59,14 @@ public class EmailServiceImpl implements EmailService {
                     mimeMessageHelper.setText(details.getMsgBody());
                     mimeMessageHelper.setSubject(details.getSubject());
 
-                    FileSystemResource file = new FileSystemResource(new File(details.getAttachment()));
-                    mimeMessageHelper.addAttachment(Objects.requireNonNull(file.getFilename()), file);
+                    String attachmentPath = details.getAttachment();
+                    File baseDir = new File("/path/to/attachments");
+                    File file = new File(baseDir, attachmentPath).getCanonicalFile();
+                    if (!file.getPath().startsWith(baseDir.getCanonicalPath() + File.separator)) {
+                        throw new IllegalArgumentException("Invalid attachment path");
+                    }
+                    FileSystemResource fileResource = new FileSystemResource(file);
+                    mimeMessageHelper.addAttachment(Objects.requireNonNull(fileResource.getFilename()), fileResource);
 
                     javaMailSender.send(mimeMessage);
                     return "Mail Sent Successfully";
