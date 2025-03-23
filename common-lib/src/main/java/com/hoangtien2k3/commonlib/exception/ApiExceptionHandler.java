@@ -159,7 +159,8 @@ public class ApiExceptionHandler {
 
     private String getServletPath(WebRequest webRequest) {
         ServletWebRequest servletRequest = (ServletWebRequest) webRequest;
-        return servletRequest.getRequest().getServletPath();
+        String servletPath = servletRequest.getRequest().getServletPath();
+        return sanitizeInput(servletPath);
     }
 
     private ResponseEntity<ErrorVm> handleBadRequest(Exception ex, WebRequest request) {
@@ -179,5 +180,13 @@ public class ApiExceptionHandler {
         }
         log.error(message, ex);
         return ResponseEntity.status(status).body(errorVm);
+    }
+
+    private String sanitizeInput(String input) {
+        if (input == null) {
+            return null;
+        }
+        // Replace new-line characters and other control characters
+        return input.replaceAll("[\\r\\n]", "_");
     }
 }
