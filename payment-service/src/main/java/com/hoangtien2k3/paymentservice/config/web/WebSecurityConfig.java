@@ -40,7 +40,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeRequests()
                 .antMatchers("/api/orders/**").authenticated()
                 .antMatchers("/api/carts/**").authenticated()
