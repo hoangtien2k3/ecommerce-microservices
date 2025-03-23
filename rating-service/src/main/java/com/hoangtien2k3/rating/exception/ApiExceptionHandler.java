@@ -18,6 +18,10 @@ import javax.validation.ConstraintViolationException;
 public class ApiExceptionHandler {
     private static final String ERROR_LOG_FORMAT = "Error: URI: {}, ErrorCode: {}, Message: {}";
 
+    private String sanitizeInput(String input) {
+        return input.replaceAll("[\\r\\n]", "");
+    }
+
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorVm> handleNotFoundException(NotFoundException ex, WebRequest request) {
         HttpStatus status = HttpStatus.NOT_FOUND;
@@ -84,7 +88,8 @@ public class ApiExceptionHandler {
 
     private String getServletPath(WebRequest webRequest) {
         ServletWebRequest servletRequest = (ServletWebRequest) webRequest;
-        return servletRequest.getRequest().getServletPath();
+        String servletPath = servletRequest.getRequest().getServletPath();
+        return sanitizeInput(servletPath);
     }
 
     private ResponseEntity<ErrorVm> handleBadRequest(Exception ex, WebRequest request) {
@@ -100,9 +105,9 @@ public class ApiExceptionHandler {
             new ErrorVm(status.toString(), title.isEmpty() ? status.getReasonPhrase() : title, message, errors);
 
         if (request != null) {
-            log.error(ERROR_LOG_FORMAT, this.getServletPath(request), statusCode, message);
+            log.error(ERROR_LOG_FORMAT, this.getServletPath(request), statusCode, sanitizeInput(message));
         }
-        log.error(message, ex);
+        log.error(sanitizeInput(message), ex);
         return ResponseEntity.status(status).body(errorVm);
     }
 }
