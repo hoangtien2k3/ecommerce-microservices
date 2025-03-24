@@ -127,7 +127,7 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
-			<version>3.0.0</version>
+			<version>3.2.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
