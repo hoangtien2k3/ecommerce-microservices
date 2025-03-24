@@ -82,7 +82,8 @@ public class ControllerAdvisor {
 
     private String getServletPath(WebRequest webRequest) {
         ServletWebRequest servletRequest = (ServletWebRequest) webRequest;
-        return servletRequest.getRequest().getServletPath();
+        String servletPath = servletRequest.getRequest().getServletPath();
+        return servletPath.replaceAll("[\\r\\n]", "_");
     }
 
     private ResponseEntity<ErrorVm> buildErrorResponse(HttpStatus status, String message, List<String> errors,
