@@ -19,7 +19,7 @@ public class ApiExceptionHandler {
     private static final String ERROR_LOG_FORMAT = "Error: URI: {}, ErrorCode: {}, Message: {}";
 
     private String sanitizeInput(String input) {
-        return input.replaceAll("[\\r\\n]", "");
+        return input.replaceAll("[\\r\\n]", "").replaceAll("[\\t\\0\\x0B\\f]", "").replaceAll("[\\x00-\\x1F\\x7F]", "");
     }
 
     @ExceptionHandler(NotFoundException.class)
