@@ -19,7 +19,12 @@ public class ApiExceptionHandler {
     private static final String ERROR_LOG_FORMAT = "Error: URI: {}, ErrorCode: {}, Message: {}";
 
     private String sanitizeInput(String input) {
-        return input.replaceAll("[\\r\\n]", "").replaceAll("[\\t\\0\\x0B\\f]", "").replaceAll("[\\x00-\\x1F\\x7F]", "");
+        return input.replaceAll("[\\r\\n]", "")
+                    .replaceAll("[\\t\\0\\x0B\\f]", "")
+                    .replaceAll("[\\x00-\\x1F\\x7F]", "")
+                    .replaceAll("[\\x80-\\x9F]", "")  // Additional control characters
+                    .replaceAll("[\\u2028\\u2029]", "")  // Line separator characters
+                    .replaceAll("[\\u0000-\\u001F\\u007F-\\u009F]", "");  // More control characters
     }
 
     @ExceptionHandler(NotFoundException.class)
@@ -105,7 +110,7 @@ public class ApiExceptionHandler {
             new ErrorVm(status.toString(), title.isEmpty() ? status.getReasonPhrase() : title, message, errors);
 
         if (request != null) {
-            log.error(ERROR_LOG_FORMAT, this.getServletPath(request), statusCode, sanitizeInput(message));
+            log.error(ERROR_LOG_FORMAT, sanitizeInput(this.getServletPath(request)), statusCode, sanitizeInput(message));
         }
         log.error(sanitizeInput(message), ex);
         return ResponseEntity.status(status).body(errorVm);
