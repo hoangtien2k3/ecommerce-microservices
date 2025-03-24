@@ -55,7 +55,7 @@
         <paypal-checkout-sdk.version>2.0.0</paypal-checkout-sdk.version>
         <testcontainers-keycloak.version>3.3.0</testcontainers-keycloak.version>
         <rest-assured.version>5.4.0</rest-assured.version>
-        <instancio-junit.version>4.8.1</instancio-junit.version>
+        <instancio-junit.version>5.4.1</instancio-junit.version>
     </properties>
     <dependencyManagement>
         <dependencies>
