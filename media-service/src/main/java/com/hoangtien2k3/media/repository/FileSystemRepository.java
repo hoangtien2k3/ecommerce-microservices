@@ -29,7 +29,8 @@ public class FileSystemRepository {
 
         Path filePath = buildFilePath(filename);
         Files.write(filePath, content);
-        log.info("File saved: {}", filename);
+        String sanitizedFilename = filename.replace("\n", "").replace("\r", "");
+        log.info("File saved: {}", sanitizedFilename);
         return filePath.toString();
     }
 
