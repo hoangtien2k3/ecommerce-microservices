@@ -80,7 +80,7 @@ public class ApiExceptionHandler {
 
     private String getServletPath(WebRequest webRequest) {
         ServletWebRequest servletRequest = (ServletWebRequest) webRequest;
-        return servletRequest.getRequest().getServletPath();
+        return servletRequest.getRequest().getServletPath().replace("\n", "").replace("\r", "");
     }
 
     private ResponseEntity<ErrorVm> handleBadRequest(Exception ex, boolean isUsingNestedException, WebRequest request) {
@@ -97,7 +97,7 @@ public class ApiExceptionHandler {
             new ErrorVm(status.toString(), status.getReasonPhrase(), message, errors);
 
         if (request != null) {
-            log.error(ERROR_LOG_FORMAT, this.getServletPath(request), statusCode, message);
+            log.error(ERROR_LOG_FORMAT, this.getServletPath(request), statusCode, message.replace("\n", "").replace("\r", ""));
         }
         log.error(message, ex);
         return ResponseEntity.status(status).body(errorVm);
