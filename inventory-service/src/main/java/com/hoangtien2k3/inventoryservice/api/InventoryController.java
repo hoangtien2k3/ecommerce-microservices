@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/inventory")
@@ -33,8 +34,9 @@ public class InventoryController {
     public List<InventoryResponse> isInStockNoAccessToken(@RequestHeader(name = "Authorization") String authorizationHeader,
                                                           @RequestParam List<String> productName) {
         if (jwtValidate.validateTokenUserService(authorizationHeader)) {
-            log.info("Received inventory check request for skuCode: {}", productName);
-            return inventoryService.isInStock(productName);
+            List<String> sanitizedProductNames = sanitizeProductNames(productName);
+            log.info("Received inventory check request for skuCode: {}", sanitizedProductNames);
+            return inventoryService.isInStock(sanitizedProductNames);
         }
         return List.of(new InventoryResponse(null, false));
     }
@@ -49,4 +51,9 @@ public class InventoryController {
         }
     }
 
+    private List<String> sanitizeProductNames(List<String> productNames) {
+        return productNames.stream()
+                .map(name -> name.replace("\n", "").replace("\r", ""))
+                .collect(Collectors.toList());
+    }
 }
