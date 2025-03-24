@@ -186,7 +186,7 @@ public class ApiExceptionHandler {
         if (input == null) {
             return null;
         }
-        // Replace new-line characters and other control characters
-        return input.replaceAll("[\\r\\n]", "_");
+        // Allow only alphanumeric characters and a few safe symbols
+        return input.replaceAll("[^a-zA-Z0-9-_./]", "_");
     }
 }
