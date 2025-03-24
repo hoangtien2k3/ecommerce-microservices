@@ -14,23 +14,22 @@
     <packaging>pom</packaging>
     <name>ecommerce-microservices</name>
 
-    <modules>
-        <module>shipping-service</module>
-        <module>notification-service</module>
-        <module>order-service</module>
-        <module>payment-service</module>
-        <module>product-service</module>
-        <module>inventory-service</module>
-        <module>favourite-service</module>
-        <module>search-service</module>
-        <module>product-service</module>
-        <module>user-service</module>
-        <module>api-gateway</module>
-        <module>discovery-service</module>
-        <module>promotion-service</module>
-        <module>rating-service</module>
-        <module>tax-service</module>
-    </modules>
+   <modules>
+             <module>api-gateway</module>
+             <module>discovery-service</module>
+             <module>favourite-service</module>
+             <module>inventory-service</module>
+             <module>notification-service</module>
+             <module>order-service</module>
+             <module>payment-service</module>
+             <module>product-service</module>
+             <module>promotion-service</module>
+             <module>rating-service</module>
+             <module>search-service</module>
+             <module>shipping-service</module>
+             <module>tax-service</module>
+             <module>user-service</module>
+    </modules>     
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
