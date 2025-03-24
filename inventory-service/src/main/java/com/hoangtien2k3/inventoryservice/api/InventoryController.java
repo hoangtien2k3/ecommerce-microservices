@@ -29,7 +29,7 @@ public class InventoryController {
 
     // http://localhost:8083/api/inventory?productName=iphone_13&productName=iphone13_red
 
-    @GetMapping
+    @PostMapping
     @ResponseStatus(HttpStatus.OK)
     public List<InventoryResponse> isInStockNoAccessToken(@RequestHeader(name = "Authorization") String authorizationHeader,
                                                           @RequestParam List<String> productName) {
