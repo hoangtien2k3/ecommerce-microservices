@@ -104,14 +104,13 @@ If you would like to contribute to the development of this project, please follo
 
 ![Alt](https://repobeats.axiom.co/api/embed/1897bc523b54b43aefb19c65195f32377f8aab85.svg "Repobeats analytics image")
 
-## License
+## Stargazers
 
-This project is licensed under the [`MIT License`](LICENSE).
+[![Stargazers repo roster for @hoangtien2k3/ecommerce-microservices](http://reporoster.com/stars/dark/hoangtien2k3/ecommerce-microservices)](https://github.com/hoangtien2k3/ecommerce-microservices/stargazers)
 
-```text
-MIT License
-Copyright (c) 2024 Hoàng Anh Tiến
-```
+## Forkers
+
+[![Forkers repo roster for @hoangtien2k3/ecommerce-microservices](http://reporoster.com/forks/dark/hoangtien2k3/ecommerce-microservices)](https://github.com/hoangtien2k3/ecommerce-microservices/network/members)
 
 ## Contributors ✨
 
@@ -130,3 +129,11 @@ Copyright (c) 2024 Hoàng Anh Tiến
 <!-- prettier-ignore-end -->
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
+## License
+
+This project is licensed under the [`MIT License`](LICENSE).
+
+```text
+MIT License
+Copyright (c) 2024 Hoàng Anh Tiến
+```
