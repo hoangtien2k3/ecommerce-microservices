@@ -3,7 +3,6 @@ package com.hoangtien2k3.inventoryservice.util;
 import com.hoangtien2k3.inventoryservice.model.Inventory;
 import com.hoangtien2k3.inventoryservice.repository.InventoryRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class DataLoader implements CommandLineRunner {
 
-    @Autowired
     private final InventoryRepository inventoryRepository;
 
     @Override

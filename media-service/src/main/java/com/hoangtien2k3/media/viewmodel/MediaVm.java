@@ -16,5 +16,4 @@ public class MediaVm {
         this.mediaType = mediaType;
         this.url = url;
     }
-
 }

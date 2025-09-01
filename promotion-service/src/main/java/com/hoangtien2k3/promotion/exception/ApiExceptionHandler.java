@@ -2,6 +2,8 @@ package com.hoangtien2k3.promotion.exception;
 
 import com.hoangtien2k3.promotion.viewmodel.error.ErrorVm;
 import java.util.List;
+
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -12,8 +14,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
-
-import javax.validation.ConstraintViolationException;
 
 @ControllerAdvice
 @Slf4j

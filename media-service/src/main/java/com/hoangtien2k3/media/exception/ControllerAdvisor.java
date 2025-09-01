@@ -1,10 +1,11 @@
 package com.hoangtien2k3.media.exception;
 
-import com.hoangtien2k3.commonlib.exception.NotFoundException;
+//import com.hoangtien2k3.commonlib.exception.NotFoundException;
 import com.hoangtien2k3.media.viewmodel.ErrorVm;
 import jakarta.validation.ConstraintViolationException;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -29,8 +30,8 @@ public class ControllerAdvisor {
         return buildErrorResponse(status, message, null, ex, request, 400, "Unsupported media type");
     }
 
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ErrorVm> handleNotFoundException(NotFoundException ex, WebRequest request) {
+    @ExceptionHandler(ChangeSetPersister.NotFoundException.class)
+    public ResponseEntity<ErrorVm> handleNotFoundException(ChangeSetPersister.NotFoundException ex, WebRequest request) {
         HttpStatus status = HttpStatus.NOT_FOUND;
         String message = ex.getMessage();
 

@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class MapperConfig {
+
     @Bean
     public ObjectMapper objectsMapper() {
         return new JsonMapper().enable(SerializationFeature.INDENT_OUTPUT);

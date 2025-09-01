@@ -5,13 +5,13 @@ import com.hoangtien2k3.promotion.model.enumeration.ApplyTo;
 import com.hoangtien2k3.promotion.model.enumeration.DiscountType;
 import com.hoangtien2k3.promotion.model.enumeration.UsageType;
 import java.util.List;
+
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
-import javax.validation.constraints.Max;
-import javax.validation.constraints.NotNull;
 
 @Data
 @SuperBuilder

@@ -22,12 +22,8 @@ public class JwtValidate {
     }
 
     public Boolean validateTokenUserService(String authorizationHeader) {
-
-        // Sử dụng JWT từ tiêu đề "Authorization" của yêu cầu gọi API
         String jwtToken = authorizationHeader.replace("Bearer ", "");
-
-        // Token hợp lệ, tiếp tục gọi API từ user-service
-        Boolean responseToken = webClientBuilder.baseUrl(userServiceBaseUrl + "/api/auth")
+        return webClientBuilder.baseUrl(userServiceBaseUrl + "/api/auth")
                 .build()
                 .get()
                 .uri("/validateToken")
@@ -35,9 +31,6 @@ public class JwtValidate {
                 .retrieve()
                 .bodyToMono(Boolean.class)
                 .block();
-
-        return responseToken;
-
     }
 
 }

@@ -12,7 +12,5 @@ import java.util.Collection;
 @Data
 @Builder
 public class DtoCollectionResponse<T> {
-
     private Collection<T> collection;
-
 }

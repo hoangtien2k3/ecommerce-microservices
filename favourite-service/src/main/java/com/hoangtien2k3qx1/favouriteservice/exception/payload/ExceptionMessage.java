@@ -12,7 +12,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 
-// update replacement POJO old objectrecord class between
 @Builder
 public record ExceptionMessage(
         @JsonSerialize(using = ZonedDateTimeSerializer.class)

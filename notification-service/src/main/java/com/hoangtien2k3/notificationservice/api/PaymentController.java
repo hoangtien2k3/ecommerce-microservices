@@ -3,22 +3,18 @@ package com.hoangtien2k3.notificationservice.api;
 import com.hoangtien2k3.notificationservice.dto.PaymentDto;
 import com.hoangtien2k3.notificationservice.entity.Payment;
 import com.hoangtien2k3.notificationservice.service.PaymentService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/payments")
 public class PaymentController {
 
     private final PaymentService paymentService;
-
-    @Autowired
-    public PaymentController(PaymentService paymentService) {
-        this.paymentService = paymentService;
-    }
 
     @PostMapping
     public Mono<Payment> savePayment(@RequestBody PaymentDto paymentDto) {

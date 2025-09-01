@@ -1,10 +1,10 @@
 package com.hoangtien2k3qx1.favouriteservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.Column;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import javax.persistence.Column;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;

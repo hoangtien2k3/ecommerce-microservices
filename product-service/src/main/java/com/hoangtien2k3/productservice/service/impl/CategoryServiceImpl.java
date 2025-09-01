@@ -2,11 +2,8 @@ package com.hoangtien2k3.productservice.service.impl;
 
 import com.hoangtien2k3.productservice.dto.CategoryDto;
 import com.hoangtien2k3.productservice.entity.Category;
-import com.hoangtien2k3.productservice.entity.Product;
 import com.hoangtien2k3.productservice.exception.wrapper.CategoryNotFoundException;
-import com.hoangtien2k3.productservice.exception.wrapper.ProductNotFoundException;
 import com.hoangtien2k3.productservice.helper.CategoryMappingHelper;
-import com.hoangtien2k3.productservice.helper.ProductMappingHelper;
 import com.hoangtien2k3.productservice.repository.CategoryRepository;
 import com.hoangtien2k3.productservice.repository.CategoryRepositoryPagingAndSorting;
 import com.hoangtien2k3.productservice.service.CategoryService;
@@ -21,13 +18,11 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Transactional
 @Slf4j
 @RequiredArgsConstructor
 @Service

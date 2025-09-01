@@ -6,16 +6,13 @@ import com.hoangtien2k3.notificationservice.dto.EmailDetails;
 import com.hoangtien2k3.notificationservice.dto.PaymentDto;
 import com.hoangtien2k3.notificationservice.entity.PaymentStatus;
 import com.hoangtien2k3.notificationservice.service.EmailService;
-import com.hoangtien2k3.notificationservice.service.NotificationService;
 import com.hoangtien2k3.notificationservice.service.PaymentService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.kafka.receiver.KafkaReceiver;
 import reactor.kafka.receiver.ReceiverOptions;
 import reactor.kafka.receiver.ReceiverRecord;
 
-import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -26,18 +23,16 @@ import java.util.function.Consumer;
 @Slf4j
 public class EventConsumer {
 
-    Gson gson = new Gson(); // convert Json -> DTO
+    Gson gson = new Gson();
 
-    @Autowired
-    private EmailService emailService;
+    private final EmailService emailService;
+    private final PaymentService paymentService;
+    private final EventProducer eventProducer;
 
-    @Autowired
-    private PaymentService paymentService;
-
-    @Autowired
-    private EventProducer eventProducer;
-
-    public EventConsumer(ReceiverOptions<String, String> receiverOptions) {
+    public EventConsumer(ReceiverOptions<String, String> receiverOptions, EmailService emailService, PaymentService paymentService, EventProducer eventProducer) {
+        this.emailService = emailService;
+        this.paymentService = paymentService;
+        this.eventProducer = eventProducer;
         subscribeToTopic(receiverOptions, KafkaConstant.PROFILE_ONBOARDING_TOPIC, this::sendEmailKafkaOnboarding);
         subscribeToTopic(receiverOptions, KafkaConstant.STATUS_PAYMENT_SUCCESSFUL, this::paymentOrderKafkaOnboarding);
     }

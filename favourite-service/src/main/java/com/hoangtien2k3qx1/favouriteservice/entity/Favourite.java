@@ -4,14 +4,13 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.Table;
-
 import com.hoangtien2k3qx1.favouriteservice.constant.ConfigConstant;
 import com.hoangtien2k3qx1.favouriteservice.entity.id.FavouriteId;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.Table;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -22,15 +21,16 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @IdClass(FavouriteId.class)
-@Getter
-@Setter
 @Entity
 @Table(name = "favourites")
 public class Favourite implements Serializable {
+
     @Serial
     private static final long serialVersionUID = 1L;
 

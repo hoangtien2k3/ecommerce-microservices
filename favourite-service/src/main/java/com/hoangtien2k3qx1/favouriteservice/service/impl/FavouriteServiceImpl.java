@@ -42,12 +42,10 @@ public class FavouriteServiceImpl implements FavouriteService {
                 .peek(f -> {
                     f.setUserDto(restTemplate.getForObject(
                                     ConfigConstant.DiscoveredDomainsApi.USER_SERVICE_API_URL + "/" + f.getUserId(),
-                                    UserDto.class)
-                    );
+                                    UserDto.class));
                     f.setProductDto(restTemplate.getForObject(
                                     ConfigConstant.DiscoveredDomainsApi.PRODUCT_SERVICE_API_URL + "/" + f.getProductId(),
-                                    ProductDto.class)
-                    );
+                                    ProductDto.class));
                 })
                 .distinct()
                 .toList();

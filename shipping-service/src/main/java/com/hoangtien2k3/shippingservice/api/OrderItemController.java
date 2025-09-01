@@ -5,15 +5,13 @@ import com.hoangtien2k3.shippingservice.dto.OrderItemDto;
 import com.hoangtien2k3.shippingservice.dto.response.collection.DtoCollectionResponse;
 import com.hoangtien2k3.shippingservice.security.JwtValidate;
 import com.hoangtien2k3.shippingservice.service.OrderItemService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -21,9 +19,7 @@ import javax.validation.constraints.NotNull;
 @RequestMapping("/api/shippings")
 public class OrderItemController {
 
-    @Autowired
     private final OrderItemService orderItemService;
-    @Autowired
     private final JwtValidate jwtValidate;
 
     @GetMapping

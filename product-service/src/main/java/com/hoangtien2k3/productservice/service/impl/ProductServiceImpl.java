@@ -1,8 +1,6 @@
 package com.hoangtien2k3.productservice.service.impl;
 
-import com.hoangtien2k3.productservice.dto.CategoryDto;
 import com.hoangtien2k3.productservice.dto.ProductDto;
-import com.hoangtien2k3.productservice.entity.Category;
 import com.hoangtien2k3.productservice.entity.Product;
 import com.hoangtien2k3.productservice.exception.wrapper.ProductNotFoundException;
 import com.hoangtien2k3.productservice.helper.CategoryMappingHelper;
@@ -17,18 +15,13 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
-import javax.swing.text.html.Option;
-import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 
-@Transactional
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    @Autowired
     private final ProductRepository productRepository;
 
     @Override

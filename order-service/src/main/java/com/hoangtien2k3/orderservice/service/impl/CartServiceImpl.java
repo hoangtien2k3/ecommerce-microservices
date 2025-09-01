@@ -18,10 +18,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
-@Transactional
 @Slf4j
 @RequiredArgsConstructor
 @Service

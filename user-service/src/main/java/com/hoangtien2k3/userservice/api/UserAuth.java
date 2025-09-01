@@ -15,6 +15,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -22,7 +24,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
@@ -31,19 +32,12 @@ import java.util.List;
 @Api(value = "User Authentication API",
         description = "APIs for user registration, login, and authentication"
 )
+@RequiredArgsConstructor
 public class UserAuth {
 
     private final UserService userService;
     private final JwtProvider jwtProvider;
-
-    @Autowired
-    private EmailService emailService;
-
-    @Autowired
-    public UserAuth(UserService userService, JwtProvider jwtProvider) {
-        this.userService = userService;
-        this.jwtProvider = jwtProvider;
-    }
+    private final EmailService emailService;
 
     @ApiOperation(value = "Register a new user", notes = "Registers a new user with the provided details.")
     @ApiResponses({

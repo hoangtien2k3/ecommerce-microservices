@@ -51,26 +51,27 @@ public class InventoryService {
     }
 
     public String getTokenUserService(String authorizationHeader) {
-        // Sử dụng JWT từ tiêu đề "Authorization" của yêu cầu gọi API
         String jwtToken = authorizationHeader.replace("Bearer ", "");
 
-        // Token hợp lệ, tiếp tục gọi API từ user-service
-        String responseToken = webClientBuilder.baseUrl(userServiceBaseUrl + "/api/manager")
-                .build()    // chuyển WebClientBuilder -> WebClient
+        // chuyển WebClientBuilder -> WebClient
+        // Endpoint
+        // title
+        // call HTTP and return ClientResponse
+        // transaction content ClientResponse for Mono.
+        //  Chờ cho đến khi Mono hoàn thành và trả về giá trị cuối cùng của nó.
+        return webClientBuilder.baseUrl(userServiceBaseUrl + "/api/manager").build()
                 .get()
-                .uri("/token")  // Endpoint
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken)    // title
-                .retrieve() // call HTTP and return ClientResponse
-                .bodyToMono(String.class) // transaction content ClientResponse for Mono.
-                .block();   //  Chờ cho đến khi Mono hoàn thành và trả về giá trị cuối cùng của nó.
-
-        return responseToken;
+                .uri("/token")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
     }
 
     @Transactional(readOnly = true)
     @SneakyThrows
     public List<InventoryResponse> isInStock(List<String> productName) {
-        log.info("Checking Inventory"); // còn hàng hay không
+        log.info("Checking Inventory");
         return inventoryRepository.findByProductNameIn(productName)
                 .stream()
                 .map(inventory ->

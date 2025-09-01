@@ -11,9 +11,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Set;
 
-/*
-*  User defined using system properties
-* */
 @Data
 @Builder
 @NoArgsConstructor

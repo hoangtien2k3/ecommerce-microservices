@@ -1,12 +1,10 @@
 package com.hoangtien2k3.orderservice.service.impl;
 
 import com.hoangtien2k3.orderservice.dto.order.OrderDto;
-import com.hoangtien2k3.orderservice.entity.Order;
 import com.hoangtien2k3.orderservice.exception.wrapper.CartNotFoundException;
 import com.hoangtien2k3.orderservice.exception.wrapper.OrderNotFoundException;
 import com.hoangtien2k3.orderservice.helper.OrderMappingHelper;
 import com.hoangtien2k3.orderservice.repository.OrderRepository;
-import com.hoangtien2k3.orderservice.security.JwtTokenFilter;
 import com.hoangtien2k3.orderservice.service.CallAPI;
 import com.hoangtien2k3.orderservice.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +16,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 
-@Transactional
 @Slf4j
 @RequiredArgsConstructor
 @Service

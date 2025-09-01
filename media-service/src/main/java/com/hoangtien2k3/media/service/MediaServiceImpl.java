@@ -1,7 +1,5 @@
 package com.hoangtien2k3.media.service;
 
-import com.hoangtien2k3.commonlib.exception.NotFoundException;
-import com.hoangtien2k3.media.config.hoangtien2k3Config;
 import com.hoangtien2k3.media.mapper.MediaVmMapper;
 import com.hoangtien2k3.media.model.Media;
 import com.hoangtien2k3.media.model.dto.MediaDto;
@@ -27,7 +25,6 @@ public class MediaServiceImpl implements MediaService {
     private final MediaVmMapper mediaVmMapper;
     private final MediaRepository mediaRepository;
     private final FileSystemRepository fileSystemRepository;
-    private final hoangtien2k3Config hoangtien2k3Config;
 
     @Override
     @SneakyThrows
@@ -51,10 +48,11 @@ public class MediaServiceImpl implements MediaService {
     @Override
     public void removeMedia(Long id) {
         NoFileMediaVm noFileMediaVm = mediaRepository.findByIdWithoutFileInReturn(id);
-        if (noFileMediaVm == null) {
-            throw new NotFoundException(String.format("Media %s is not found", id));
+        try {
+            mediaRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        mediaRepository.deleteById(id);
     }
 
     @Override

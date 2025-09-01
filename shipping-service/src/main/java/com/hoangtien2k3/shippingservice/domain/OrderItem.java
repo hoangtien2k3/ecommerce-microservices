@@ -1,9 +1,13 @@
 package com.hoangtien2k3.shippingservice.domain;
 
 import com.hoangtien2k3.shippingservice.domain.id.OrderItemId;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.Table;
 import lombok.*;
 
-import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 

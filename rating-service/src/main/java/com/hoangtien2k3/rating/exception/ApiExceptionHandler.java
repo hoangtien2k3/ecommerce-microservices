@@ -2,6 +2,8 @@ package com.hoangtien2k3.rating.exception;
 
 import com.hoangtien2k3.rating.viewmodel.ErrorVm;
 import java.util.List;
+
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,11 +13,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
-import javax.validation.ConstraintViolationException;
-
 @ControllerAdvice
 @Slf4j
 public class ApiExceptionHandler {
+
     private static final String ERROR_LOG_FORMAT = "Error: URI: {}, ErrorCode: {}, Message: {}";
 
     @ExceptionHandler(NotFoundException.class)

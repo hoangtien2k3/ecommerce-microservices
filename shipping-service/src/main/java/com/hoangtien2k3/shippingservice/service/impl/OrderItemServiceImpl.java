@@ -14,11 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
-@Transactional
 @Slf4j
 @RequiredArgsConstructor
 public class OrderItemServiceImpl implements OrderItemService {
@@ -32,12 +30,11 @@ public class OrderItemServiceImpl implements OrderItemService {
         return this.orderItemRepository.findAll()
                 .stream()
                 .map(OrderItemMappingHelper::map)
-                .map(o -> {
+                .peek(o -> {
                     o.setProductDto(this.restTemplate.getForObject(AppConstant.DiscoveredDomainsApi
                             .PRODUCT_SERVICE_API_URL + "/" + o.getProductDto().getProductId(), ProductDto.class));
                     o.setOrderDto(this.restTemplate.getForObject(AppConstant.DiscoveredDomainsApi
                             .ORDER_SERVICE_API_URL + "/" + o.getOrderDto().getOrderId(), OrderDto.class));
-                    return o;
                 })
                 .distinct()
                 .toList();
