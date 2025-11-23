@@ -18,7 +18,7 @@ public class CallAPI {
     }
 
     public Mono<UserDto> receiverUserDto(Long userId, String token) {
-        return webClientBuilder.baseUrl("http://localhost:8088").build()
+        return webClientBuilder.baseUrl("http://USER-SERVICE").build()
                 .get()
                 .uri("/api/manager/user/" + userId)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
@@ -27,7 +27,7 @@ public class CallAPI {
     }
 
     public Mono<ProductDto> receiverProductDto(Integer productId) {
-        return webClientBuilder.baseUrl("http://localhost:8086").build()
+        return webClientBuilder.baseUrl("http://PRODUCT-SERVICE").build()
                 .get()
                 .uri("/api/products/" + productId)
                 .retrieve()

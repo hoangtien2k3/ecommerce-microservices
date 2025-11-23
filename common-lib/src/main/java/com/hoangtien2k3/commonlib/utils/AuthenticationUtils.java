@@ -20,7 +20,9 @@ public final class AuthenticationUtils {
             throw new AccessDeniedException(ApiConstant.ACCESS_DENIED);
         }
 
-        JwtAuthenticationToken contextHolder = (JwtAuthenticationToken) authentication;
+        if (!(authentication instanceof JwtAuthenticationToken contextHolder)) {
+            throw new AccessDeniedException(ApiConstant.ACCESS_DENIED);
+        }
 
         return contextHolder.getToken().getSubject();
     }

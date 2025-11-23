@@ -29,22 +29,20 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/api/auth")
-@Api(value = "User Authentication API",
-        description = "APIs for user registration, login, and authentication"
-)
+@Api(value = "User Authentication API", description = "APIs for user registration, login, and authentication")
 @RequiredArgsConstructor
 public class UserAuth {
 
     private final UserService userService;
-    private final JwtProvider jwtProvider;
-    private final EmailService emailService;
+    private final TokenValidate tokenValidate;
+    private final AuthorityTokenUtil authorityTokenUtil;
 
     @ApiOperation(value = "Register a new user", notes = "Registers a new user with the provided details.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "User created successfully", response = ResponseMessage.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = ResponseMessage.class)
     })
-    @PostMapping({"/signup", "/register"})
+    @PostMapping({ "/signup", "/register" })
     public Mono<ResponseMessage> register(@Valid @RequestBody SignUp signUp) {
         return userService.register(signUp)
                 .map(user -> new ResponseMessage("Create user: " + signUp.getUsername() + " successfully."))
@@ -56,7 +54,7 @@ public class UserAuth {
             @ApiResponse(code = 200, message = "Login successful", response = JwtResponseMessage.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = ResponseEntity.class)
     })
-    @PostMapping({"/signin", "/login"})
+    @PostMapping({ "/signin", "/login" })
     public Mono<ResponseEntity<JwtResponseMessage>> login(@Valid @RequestBody Login signInForm) {
         return userService.login(signInForm)
                 .map(ResponseEntity::ok)
@@ -64,8 +62,7 @@ public class UserAuth {
                     JwtResponseMessage errorjwtResponseMessage = new JwtResponseMessage(
                             null,
                             null,
-                            new InformationMessage()
-                    );
+                            new InformationMessage());
                     return Mono.just(new ResponseEntity<>(errorjwtResponseMessage, HttpStatus.INTERNAL_SERVER_ERROR));
                 });
     }
@@ -87,43 +84,18 @@ public class UserAuth {
                 });
     }
 
-
-//    @PostMapping("/reset-password")
-//    public Mono<ResponseEntity<String>> resetPassword(@RequestParam("token") String token, @RequestBody ResetPasswordRequest resetPasswordRequest) {
-//        if (isValidToken(token)) {
-//            // Token hợp lệ, đặt mật khẩu mới và cập nhật trong cơ sở dữ liệu
-//            updatePassword(userEmail, resetPasswordRequest.getNewPassword());
-//            return Mono.just(ResponseEntity.ok("Password reset successful"));
-//        } else {
-//            // Token không hợp lệ
-//            return Mono.just(ResponseEntity.badRequest().body("Invalid token"));
-//        }
-//    }
-
-
-//    @PostMapping({"/refresh", "/refresh-token"})
-//    public Mono<ResponseEntity<JwtResponseMessage>> refresh(@RequestHeader("Refresh-Token") String refreshToken) {
-//        return userService.refreshToken(refreshToken)
-//                .map(newAccessToken -> {
-//                    JwtResponseMessage jwtResponseMessage = new JwtResponseMessage(newAccessToken, null, null);
-//                    return ResponseEntity.ok(jwtResponseMessage);
-//                })
-//                .onErrorResume(error -> Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()));
-//    }
-
     @ApiOperation(value = "Validate JWT token", notes = "Validates the provided JWT token.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Token is valid", response = Boolean.class),
             @ApiResponse(code = 401, message = "Unauthorized", response = TokenValidationResponse.class)
     })
-    @GetMapping({"/validateToken", "/validate-token"})
-    public Boolean validateToken(@RequestHeader(name = "Authorization") String authorizationToken) {
-        TokenValidate validate = new TokenValidate();
-        if (validate.validateToken(authorizationToken)) {
-            return ResponseEntity.ok(new TokenValidationResponse("Valid token")).hasBody();
+    @GetMapping({ "/validateToken", "/validate-token" })
+    public ResponseEntity<?> validateToken(@RequestHeader(name = "Authorization") String authorizationToken) {
+        if (tokenValidate.validateToken(authorizationToken)) {
+            return ResponseEntity.ok(new TokenValidationResponse("Valid token"));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new TokenValidationResponse("Invalid token")).hasBody();
+                    .body(new TokenValidationResponse("Invalid token"));
         }
     }
 
@@ -132,16 +104,15 @@ public class UserAuth {
             @ApiResponse(code = 200, message = "Role access API", response = Boolean.class),
             @ApiResponse(code = 401, message = "Unauthorized", response = TokenValidationResponse.class)
     })
-    @GetMapping({"/hasAuthority", "/authorization"})
-    public Boolean getAuthority(@RequestHeader(name = "Authorization") String authorizationToken,
-                                String requiredRole) {
-        AuthorityTokenUtil authorityTokenUtil = new AuthorityTokenUtil();
+    @GetMapping({ "/hasAuthority", "/authorization" })
+    public ResponseEntity<?> getAuthority(@RequestHeader(name = "Authorization") String authorizationToken,
+            @RequestParam String requiredRole) {
         List<String> authorities = authorityTokenUtil.checkPermission(authorizationToken);
 
         if (authorities.contains(requiredRole)) {
-            return ResponseEntity.ok(new TokenValidationResponse("Role access api")).hasBody();
+            return ResponseEntity.ok(new TokenValidationResponse("Role access api"));
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new TokenValidationResponse("Invalid token")).hasBody();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new TokenValidationResponse("Invalid token"));
         }
     }
 

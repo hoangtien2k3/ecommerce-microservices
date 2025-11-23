@@ -24,75 +24,88 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ApiExceptionHandler {
 
-    @ExceptionHandler(value = {
-            MethodArgumentNotValidException.class,
-            HttpMessageNotReadableException.class
-    })
-    public <T extends BindException> ResponseEntity<ExceptionMessage> handleValidationException(final T e) {
-        log.info("ApiExceptionHandler controller, handle validation exception\n");
-        final var badRequest = HttpStatus.BAD_REQUEST;
+        @ExceptionHandler(value = {
+                        MethodArgumentNotValidException.class,
+                        HttpMessageNotReadableException.class
+        })
+        public <T extends BindException> ResponseEntity<ExceptionMessage> handleValidationException(final T e) {
+                log.info("ApiExceptionHandler controller, handle validation exception\n");
+                final var badRequest = HttpStatus.BAD_REQUEST;
 
-        return new ResponseEntity<>(
-                ExceptionMessage.builder()
-                        .msg("*" + Objects.requireNonNull(e.getBindingResult().getFieldError()).getDefaultMessage() + "!**")
-                        .httpStatus(badRequest)
-                        .timestamp(ZonedDateTime
-                                .now(ZoneId.systemDefault()))
-                        .build(), badRequest);
-    }
+                return new ResponseEntity<>(
+                                ExceptionMessage.builder()
+                                                .msg("*" + Objects.requireNonNull(e.getBindingResult().getFieldError())
+                                                                .getDefaultMessage() + "!**")
+                                                .httpStatus(badRequest)
+                                                .timestamp(ZonedDateTime
+                                                                .now(ZoneId.systemDefault()))
+                                                .build(),
+                                badRequest);
+        }
 
-    @ExceptionHandler(value = {
-            UserNotFoundException.class,
-            RoleNotFoundException.class,
-            PasswordNotFoundException.class,
-            EmailOrUsernameNotFoundException.class,
-            PhoneNumberNotFoundException.class
-    })
-    public <T extends RuntimeException> ResponseEntity<ExceptionMessage> handleApiRequestException(final T e) {
-        log.info("ApiExceptionHandler controller, handle API request\n");
-        final var badRequest = HttpStatus.BAD_REQUEST;
+        @ExceptionHandler(value = {
+                        UserNotFoundException.class,
+                        RoleNotFoundException.class,
+                        PasswordNotFoundException.class,
+                        EmailOrUsernameNotFoundException.class,
+                        PhoneNumberNotFoundException.class
+        })
+        public <T extends RuntimeException> ResponseEntity<ExceptionMessage> handleApiRequestException(final T e) {
+                log.info("ApiExceptionHandler controller, handle API request\n");
+                final var badRequest = HttpStatus.BAD_REQUEST;
 
-        return new ResponseEntity<>(
-                ExceptionMessage.builder()
-                        .msg(e.getMessage())
-                        .httpStatus(badRequest)
-                        .timestamp(ZonedDateTime
-                                .now(ZoneId.systemDefault()))
-                        .build(), badRequest);
-    }
+                return new ResponseEntity<>(
+                                ExceptionMessage.builder()
+                                                .msg(e.getMessage())
+                                                .httpStatus(badRequest)
+                                                .timestamp(ZonedDateTime
+                                                                .now(ZoneId.systemDefault()))
+                                                .build(),
+                                badRequest);
+        }
 
-    @ExceptionHandler({AccessDeniedException.class, BadCredentialsException.class})
-    public ResponseEntity<ExceptionMessage> handleAccessDeniedException(Exception ex) {
-        log.error("Access denied: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(ExceptionMessage.builder()
-                        .msg("Access denied: " + ex.getMessage())
-                        .httpStatus(HttpStatus.FORBIDDEN)
-                        .timestamp(ZonedDateTime.now(ZoneId.systemDefault()))
-                        .build());
-    }
+        @ExceptionHandler({ AccessDeniedException.class, BadCredentialsException.class })
+        public ResponseEntity<ExceptionMessage> handleAccessDeniedException(Exception ex) {
+                log.error("Access denied: {}", ex.getMessage());
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                                .body(ExceptionMessage.builder()
+                                                .msg("Access denied: " + ex.getMessage())
+                                                .httpStatus(HttpStatus.FORBIDDEN)
+                                                .timestamp(ZonedDateTime.now(ZoneId.systemDefault()))
+                                                .build());
+        }
 
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ExceptionMessage> handleAuthenticationException(AuthenticationException ex) {
-        log.error("Authentication failed: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(ExceptionMessage.builder()
-                        .msg("Authentication failed: " + ex.getMessage())
-                        .httpStatus(HttpStatus.UNAUTHORIZED)
-                        .timestamp(ZonedDateTime.now(ZoneId.systemDefault()))
-                        .build());
-    }
+        @ExceptionHandler(AuthenticationException.class)
+        public ResponseEntity<ExceptionMessage> handleAuthenticationException(AuthenticationException ex) {
+                log.error("Authentication failed: {}", ex.getMessage());
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                                .body(ExceptionMessage.builder()
+                                                .msg("Authentication failed: " + ex.getMessage())
+                                                .httpStatus(HttpStatus.UNAUTHORIZED)
+                                                .timestamp(ZonedDateTime.now(ZoneId.systemDefault()))
+                                                .build());
+        }
 
-    @ExceptionHandler(UserNotAuthenticatedException.class)
-    public ResponseEntity<String> handleUserNotAuthenticatedException(UserNotAuthenticatedException ex) {
-        log.error("User not authenticated: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
-    }
+        @ExceptionHandler(UserNotAuthenticatedException.class)
+        public ResponseEntity<ExceptionMessage> handleUserNotAuthenticatedException(UserNotAuthenticatedException ex) {
+                log.error("User not authenticated: {}", ex.getMessage());
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                                .body(ExceptionMessage.builder()
+                                                .msg("User not authenticated: " + ex.getMessage())
+                                                .httpStatus(HttpStatus.UNAUTHORIZED)
+                                                .timestamp(ZonedDateTime.now(ZoneId.systemDefault()))
+                                                .build());
+        }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleGenericException(Exception ex) {
-        log.error("Unexpected error: {}", ex.getMessage(), ex);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred");
-    }
+        @ExceptionHandler(Exception.class)
+        public ResponseEntity<ExceptionMessage> handleGenericException(Exception ex) {
+                log.error("Unexpected error: {}", ex.getMessage(), ex);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(ExceptionMessage.builder()
+                                                .msg("An unexpected error occurred: " + ex.getMessage())
+                                                .httpStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+                                                .timestamp(ZonedDateTime.now(ZoneId.systemDefault()))
+                                                .build());
+        }
 
 }

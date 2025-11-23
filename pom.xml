@@ -15,21 +15,22 @@
     <name>ecommerce-microservices</name>
 
     <modules>
-        <module>shipping-service</module>
-        <module>notification-service</module>
-        <module>order-service</module>
-        <module>payment-service</module>
-        <module>product-service</module>
-        <module>inventory-service</module>
-        <module>favourite-service</module>
-        <module>search-service</module>
-        <module>product-service</module>
-        <module>user-service</module>
+        <module>common-lib</module>
         <module>api-gateway</module>
         <module>discovery-service</module>
-        <module>promotion-service</module>
+        <module>user-service</module>
+        <module>product-service</module>
+        <module>order-service</module>
+        <module>payment-service</module>
+        <module>inventory-service</module>
+        <module>shipping-service</module>
+        <module>notification-service</module>
         <module>rating-service</module>
+        <module>search-service</module>
+        <module>promotion-service</module>
         <module>tax-service</module>
+        <module>favourite-service</module>
+        <module>media-service</module>
     </modules>
 
     <properties>
@@ -42,14 +43,13 @@
 
         <sonar.organization>nashtech-garage</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <springdoc-openapi-starter-webmvc-ui.version>2.0.2</springdoc-openapi-starter-webmvc-ui.version>
-        <org.mapstruct.version>1.4.1.Final</org.mapstruct.version>
-        <org.lombok.version>1.18.30</org.lombok.version>
+        <springdoc-openapi-starter-webmvc-ui.version>2.6.0</springdoc-openapi-starter-webmvc-ui.version>
+        <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
+        <org.lombok.version>1.18.34</org.lombok.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
         <opentelemetry-logback.vesion>1.30.0-alpha</opentelemetry-logback.vesion>
         <spring-cloud.version>2023.0.3</spring-cloud.version>
-        <springdoc-openapi-starter-webmvc-ui.version>2.0.2</springdoc-openapi-starter-webmvc-ui.version>
 
         <commons-validator.version>1.7</commons-validator.version>
         <org.elasticsearch.version>8.14.0</org.elasticsearch.version>
@@ -183,7 +183,7 @@
                             <path>
                                 <groupId>org.projectlombok</groupId>
                                 <artifactId>lombok</artifactId>
-                                <version>${lombok.version}</version>
+                                <version>${org.lombok.version}</version>
                             </path>
                             <path>
                                 <groupId>org.projectlombok</groupId>

@@ -23,35 +23,51 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ApiExceptionHandler {
 
-    @ExceptionHandler(value = {
-            MethodArgumentNotValidException.class,
-            HttpMessageNotReadableException.class,
-    })
-    public <T extends BindException> ResponseEntity<ExceptionMessage> handleValidationException(final T e) {
-        log.info("**ApiExceptionHandler controller, handle validation exception*\n");
-        final var badRequest = HttpStatus.BAD_REQUEST;
+        @ExceptionHandler(value = {
+                        MethodArgumentNotValidException.class,
+                        HttpMessageNotReadableException.class,
+        })
+        public <T extends BindException> ResponseEntity<ExceptionMessage> handleValidationException(final T e) {
+                log.info("**ApiExceptionHandler controller, handle validation exception*\n");
+                final var badRequest = HttpStatus.BAD_REQUEST;
 
-        return new ResponseEntity<>(
-                ExceptionMessage.builder()
-                        .message("*" + Objects.requireNonNull(e.getBindingResult().getFieldError()).getDefaultMessage() + "!**")
-                        .httpStatus(badRequest)
-                        .timestamp(ZonedDateTime
-                                .now(ZoneId.systemDefault()))
-                        .build(), badRequest);
-    }
+                return new ResponseEntity<>(
+                                ExceptionMessage.builder()
+                                                .message("*" + Objects
+                                                                .requireNonNull(e.getBindingResult().getFieldError())
+                                                                .getDefaultMessage() + "!**")
+                                                .httpStatus(badRequest)
+                                                .timestamp(ZonedDateTime
+                                                                .now(ZoneId.systemDefault()))
+                                                .build(),
+                                badRequest);
+        }
 
-    @ExceptionHandler(value = {CategoryNotFoundException.class, ProductNotFoundException.class,})
-    public <T extends RuntimeException> ResponseEntity<ExceptionMessage> handleApiRequestException(final T e) {
-        log.info("**ApiExceptionHandler controller, handle API request*\n");
-        final var badRequest = HttpStatus.BAD_REQUEST;
+        @ExceptionHandler(value = { CategoryNotFoundException.class, ProductNotFoundException.class, })
+        public <T extends RuntimeException> ResponseEntity<ExceptionMessage> handleApiRequestException(final T e) {
+                log.info("**ApiExceptionHandler controller, handle API request*\n");
+                final var badRequest = HttpStatus.BAD_REQUEST;
 
-        return new ResponseEntity<>(
-                ExceptionMessage.builder()
-                        .message("#### " + e.getMessage() + "! ####")
-                        .httpStatus(badRequest)
-                        .timestamp(ZonedDateTime
-                                .now(ZoneId.systemDefault()))
-                        .build(), badRequest);
-    }
+                return new ResponseEntity<>(
+                                ExceptionMessage.builder()
+                                                .message("#### " + e.getMessage() + "! ####")
+                                                .httpStatus(badRequest)
+                                                .timestamp(ZonedDateTime
+                                                                .now(ZoneId.systemDefault()))
+                                                .build(),
+                                badRequest);
+        }
+
+        @ExceptionHandler(Exception.class)
+        public ResponseEntity<ExceptionMessage> handleGenericException(Exception ex) {
+                log.error("Unexpected error: {}", ex.getMessage(), ex);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(ExceptionMessage.builder()
+                                                .message("#### An unexpected error occurred: " + ex.getMessage()
+                                                                + "! ####")
+                                                .httpStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+                                                .timestamp(ZonedDateTime.now(ZoneId.systemDefault()))
+                                                .build());
+        }
 
 }
