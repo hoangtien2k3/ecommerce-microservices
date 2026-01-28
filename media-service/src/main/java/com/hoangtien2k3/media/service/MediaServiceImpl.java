@@ -16,7 +16,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import com.hoangtien2k3.media.config.Hoangtien2k3Config;
 import org.springframework.web.util.UriComponentsBuilder;
+
 
 @RequiredArgsConstructor
 @Service
@@ -25,6 +27,7 @@ public class MediaServiceImpl implements MediaService {
     private final MediaVmMapper mediaVmMapper;
     private final MediaRepository mediaRepository;
     private final FileSystemRepository fileSystemRepository;
+    private final Hoangtien2k3Config hoangtien2k3Config; // Added this
 
     @Override
     @SneakyThrows

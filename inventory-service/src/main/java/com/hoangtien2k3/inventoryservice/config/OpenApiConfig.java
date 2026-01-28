@@ -1,4 +1,4 @@
-package com.hoangtien2k3qx1.favouriteservice.config;
+package com.hoangtien2k3.inventoryservice.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -13,12 +13,12 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 @Configuration
-public class Swagger2Config {
+public class OpenApiConfig {
 
     @Value("${server.port:8080}")
     private String serverPort;
 
-    @Value("${spring.application.name:favourite-service}")
+    @Value("${spring.application.name:inventory-service}")
     private String applicationName;
 
     @Bean
@@ -30,20 +30,21 @@ public class Swagger2Config {
 
     private Info apiInfo() {
         return new Info()
-                .title("FAVORITE SERVICE API")
+                .title("INVENTORY SERVICE API")
                 .description("""
-                        ## Favorite Service API Documentation
+                        ## Inventory Service API Documentation
                         
-                        This service handles all favorite-related operations including:
-                        - Managing user favorites
-                        - Tracking favorite items
-                        - Favorite lists and collections
+                        This service handles all inventory-related operations including:
+                        - Product inventory management
+                        - Stock level tracking
+                        - Inventory updates and synchronization
+                        - Product availability checks
                         
                         ### Features
-                        - Add/remove items to favorites
-                        - Organize favorites into lists
-                        - Share favorite collections
-                        - Integration with product and user services
+                        - Real-time inventory tracking
+                        - Multi-warehouse support
+                        - Stock alerts and notifications
+                        - Integration with order and product services
                         """)
                 .version("1.0.0")
                 .contact(new Contact()
@@ -61,7 +62,7 @@ public class Swagger2Config {
                 .description("Local development server");
 
         Server productionServer = new Server()
-                .url("https://api.yourdomain.com/favourite-service")
+                .url("https://api.yourdomain.com/inventory-service")
                 .description("Production server");
 
         return List.of(localServer, productionServer);

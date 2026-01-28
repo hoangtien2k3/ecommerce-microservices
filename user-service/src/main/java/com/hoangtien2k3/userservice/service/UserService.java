@@ -11,21 +11,16 @@ import reactor.core.publisher.Mono;
 
 public interface UserService {
     Mono<User> register(SignUp signUp);
-
     Mono<JwtResponseMessage> login(Login signInForm);
-
     Mono<Void> logout();
-
     Mono<User> update(Long userId, SignUp update);
-
     Mono<String> changePassword(ChangePasswordRequest request);
-
-    // Mono<String> resetPassword(ResetPasswordRequest resetPasswordRequest);
     Mono<String> delete(Long id);
-
     Mono<User> findById(Long userId);
-
     Mono<User> findByUsername(String userName);
-
     Mono<Page<UserDto>> findAllUsers(int page, int size, String sortBy, String sortOrder);
+    
+    boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
+    boolean existsByPhoneNumber(String phone);
 }

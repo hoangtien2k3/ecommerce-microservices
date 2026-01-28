@@ -1,4 +1,4 @@
-package com.hoangtien2k3.userservice.config;
+package com.hoangtien2k3.paymentservice.config.swagger;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -15,10 +15,13 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 @Configuration
-public class Swagger2Config {
+public class SwaggerConfig {
 
     @Value("${server.port:8080}")
     private String serverPort;
+
+    @Value("${spring.application.name:payment-service}")
+    private String applicationName;
 
     @Bean
     public OpenAPI customOpenAPI() {
@@ -32,14 +35,15 @@ public class Swagger2Config {
 
     private Info apiInfo() {
         return new Info()
-                .title("USER SERVICE API")
+                .title("PAYMENT SERVICE API")
                 .description("""
-                        ## User Service API Documentation
+                        ## Payment Service API Documentation
                         
-                        This service handles all user-related operations including:
-                        - User registration and authentication
-                        - Profile management
-                        - Role and permission management
+                        This service handles all payment-related operations including:
+                        - Payment processing and management
+                        - Payment status tracking
+                        - Integration with order service
+                        - Transaction history
                         
                         ### Authentication
                         All endpoints require JWT Bearer token authentication.
@@ -72,7 +76,7 @@ public class Swagger2Config {
                 .description("Local development server");
 
         Server productionServer = new Server()
-                .url("https://api.yourdomain.com/user-service")
+                .url("https://api.yourdomain.com/payment-service")
                 .description("Production server");
 
         return List.of(localServer, productionServer);

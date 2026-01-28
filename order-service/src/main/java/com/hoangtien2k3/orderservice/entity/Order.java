@@ -13,7 +13,7 @@ import com.hoangtien2k3.orderservice.dto.product.ProductDto;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serial;
 import java.time.LocalDateTime;
 

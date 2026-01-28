@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.*;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,13 +30,14 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -45,30 +45,31 @@ public class UserServiceImpl implements UserService {
     private final UserDetailService userDetailsService;
     private final ModelMapper modelMapper;
     private final RoleService roleService;
-
-    Gson gson = new Gson(); // google.code.gson
-    @Autowired
-    EventProducer eventProducer;
-
-    @Autowired
-    private WebClient.Builder webClientBuilder;
-
+    private final WebClient.Builder webClientBuilder;
+    private final EventProducer eventProducer;
+    
+    private final Gson gson = new Gson();
+    
     @Value("${refresh.token.url}")
     private String refreshTokenUrl;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
-            PasswordEncoder passwordEncoder,
-            JwtProvider jwtProvider,
-            UserDetailService userDetailsService,
-            ModelMapper modelMapper,
-            RoleService roleService) {
+                           PasswordEncoder passwordEncoder,
+                           JwtProvider jwtProvider,
+                           UserDetailService userDetailsService,
+                           ModelMapper modelMapper,
+                           RoleService roleService,
+                           WebClient.Builder webClientBuilder,
+                           EventProducer eventProducer) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtProvider = jwtProvider;
         this.userDetailsService = userDetailsService;
         this.modelMapper = modelMapper;
         this.roleService = roleService;
+        this.webClientBuilder = webClientBuilder;
+        this.eventProducer = eventProducer;
     }
 
     @Override
@@ -112,7 +113,7 @@ public class UserServiceImpl implements UserService {
     public Mono<JwtResponseMessage> login(Login signInForm) {
         return Mono.fromCallable(() -> {
             String usernameOrEmail = signInForm.getUsername();
-            boolean isEmail = usernameOrEmail.contains("@gmail.com");
+            boolean isEmail = usernameOrEmail.contains("@");
 
             UserDetails userDetails;
             if (isEmail) {
@@ -156,7 +157,7 @@ public class UserServiceImpl implements UserService {
                             .roles(userPrinciple.roles())
                             .build())
                     .build();
-        }).subscribeOn(Schedulers.boundedElastic()).onErrorResume(Mono::error);
+        }).subscribeOn(Schedulers.boundedElastic());
     }
 
     @Override
@@ -168,7 +169,7 @@ public class UserServiceImpl implements UserService {
 
             String currentToken = getCurrentToken();
 
-            if (authentication != null && authentication.isAuthenticated()) {
+            if (authentication != null && authentication.isAuthenticated() && currentToken != null) {
                 // Invalidate the current token by reducing its expiration time
                 String updatedToken = jwtProvider.reduceTokenExpiration(currentToken);
             }
@@ -191,7 +192,6 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
-    @Transactional
     @Override
     public Mono<User> update(Long id, SignUp updateDTO) {
         return Mono.fromCallable(() -> {
@@ -205,7 +205,6 @@ public class UserServiceImpl implements UserService {
         }).subscribeOn(Schedulers.boundedElastic());
     }
 
-    @Transactional
     @Override
     public Mono<String> changePassword(ChangePasswordRequest request) {
         return Mono.fromCallable(() -> {
@@ -271,23 +270,19 @@ public class UserServiceImpl implements UserService {
         return Objects.equals(newPassword, confirmPassword);
     }
 
-    @Transactional
     @Override
     public Mono<String> delete(Long id) {
-        return Mono.fromRunnable(() -> userRepository.findById(id)
-                .ifPresentOrElse(
-                        user -> {
-                            try {
-                                userRepository.delete(user);
-                            } catch (DataAccessException e) {
-                                throw new RuntimeException("Error deleting user with userId: " + id, e);
-                            }
-                        },
-                        () -> {
-                            throw new UserNotFoundException("User not found for userId: " + id);
-                        }))
-                .subscribeOn(Schedulers.boundedElastic())
-                .then(Mono.just("User with id " + id + " deleted successfully."));
+        return Mono.fromCallable(() -> {
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new UserNotFoundException("User not found for userId: " + id));
+            
+            try {
+                userRepository.delete(user);
+                return "User with id " + id + " deleted successfully.";
+            } catch (DataAccessException e) {
+                throw new RuntimeException("Error deleting user with userId: " + id, e);
+            }
+        }).subscribeOn(Schedulers.boundedElastic());
     }
 
     public Mono<String> refreshToken(String refreshToken) {
@@ -296,10 +291,12 @@ public class UserServiceImpl implements UserService {
                 .uri(refreshTokenUrl)
                 .header("Refresh-Token", refreshToken)
                 .retrieve()
-                .onStatus(HttpStatus::is4xxClientError,
-                        clientResponse -> Mono.error(new IllegalArgumentException("Refresh token không hợp lệ")))
+                .onStatus(
+                    status -> status.value() >= 400 && status.value() < 500,
+                    response -> Mono.error(new IllegalArgumentException("Refresh token không hợp lệ"))
+                )
                 .bodyToMono(JwtResponseMessage.class)
-                .map(JwtResponseMessage::getAccessToken); // Sử dụng getAccessToken để lấy token từ JwtResponse
+                .map(JwtResponseMessage::getAccessToken);
     }
 
     @Override
@@ -326,16 +323,18 @@ public class UserServiceImpl implements UserService {
         }).subscribeOn(Schedulers.boundedElastic());
     }
 
+    @Override
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
     }
 
+    @Override
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
 
+    @Override
     public boolean existsByPhoneNumber(String phone) {
         return userRepository.existsByPhoneNumber(phone);
     }
-
 }

@@ -2,7 +2,7 @@ package com.hoangtien2k3.userservice.model.dto.response;
 
 import lombok.*;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 @Getter
 @Setter
