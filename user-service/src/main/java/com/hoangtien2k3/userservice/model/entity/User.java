@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.NaturalId;
 
-import javax.persistence.*;
-import javax.validation.constraints.*;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.util.HashSet;
 import java.util.Set;
 

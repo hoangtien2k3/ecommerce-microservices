@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 
 @ControllerAdvice
 @Slf4j

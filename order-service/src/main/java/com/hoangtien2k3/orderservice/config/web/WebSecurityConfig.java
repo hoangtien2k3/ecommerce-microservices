@@ -6,18 +6,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+@EnableMethodSecurity(prePostEnabled = true)
+public class WebSecurityConfig {
 
     private final JwtEntryPoint jwtEntryPoint;
 
@@ -32,27 +32,38 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    @Override
-    public AuthenticationManager authenticationManager() throws Exception {
-        return super.authenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
-    @Override
-    protected void configure(HttpSecurity httpSecurity) throws Exception {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeRequests()
-                .antMatchers("/api/orders/**").authenticated()
-                .antMatchers("/api/carts/**").authenticated()
-                .antMatchers("/v2/api-docs", "/swagger-ui/**", "/swagger-resources/**", "/webjars/**").permitAll()
-                .anyRequest().permitAll()
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .exceptionHandling().authenticationEntryPoint(jwtEntryPoint)
-                .and()
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/orders/**").authenticated()
+                        .requestMatchers("/api/carts/**").authenticated()
+                        // SpringDoc OpenAPI endpoints
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/swagger-resources/**",
+                                "/webjars/**",
+                                "/api-docs/**"
+                        ).permitAll()
+                        // Actuator endpoints (optional)
+                        .requestMatchers("/actuator/**").permitAll()
+                        .anyRequest().permitAll()
+                )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(jwtEntryPoint)
+                )
                 .addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-    }
 
+        return httpSecurity.build();
+    }
 }

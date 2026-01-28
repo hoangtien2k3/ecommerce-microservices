@@ -2,6 +2,8 @@ package com.hoangtien2k3.notificationservice.service.impl;
 
 import com.hoangtien2k3.notificationservice.dto.EmailDetails;
 import com.hoangtien2k3.notificationservice.service.EmailService;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,8 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Objects;
@@ -65,7 +65,7 @@ public class EmailServiceImpl implements EmailService {
                     javaMailSender.send(mimeMessage);
                     return "Mail Sent Successfully";
                 })
-                .onErrorResume(MessagingException.class, ex -> {
+                .onErrorResume(ex -> {
                     log.error("Error while sending mail with attachment", ex);
                     return Mono.just("Error while Sending Mail with Attachment");
                 });
@@ -96,5 +96,4 @@ public class EmailServiceImpl implements EmailService {
                     return Mono.just("Error while Sending Email");
                 });
     }
-
 }

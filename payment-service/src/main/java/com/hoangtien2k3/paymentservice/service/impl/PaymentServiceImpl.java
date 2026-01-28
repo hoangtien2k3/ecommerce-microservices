@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.List;
 
 @Service

@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping(ApiConstant.TAX_CLASS_URL)
