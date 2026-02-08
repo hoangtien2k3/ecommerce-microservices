@@ -1,0 +1,22 @@
+spring:
+  jpa:
+    open-in-view: true
+    hibernate:
+      ddl-auto: update
+  liquibase:
+    enabled: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: test
+
+server:
+  servlet:
+    context-path: /v1
+  port: 8080
+
+springdoc:
+  oauthflow:
+    authorization-url: test
+    token-url: test

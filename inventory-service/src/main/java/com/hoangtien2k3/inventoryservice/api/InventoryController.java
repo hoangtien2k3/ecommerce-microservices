@@ -5,7 +5,6 @@ import com.hoangtien2k3.inventoryservice.security.JwtValidate;
 import com.hoangtien2k3.inventoryservice.service.InventoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,10 +16,8 @@ import java.util.List;
 @Slf4j
 public class InventoryController {
 
-    @Autowired
     private final InventoryService inventoryService;
 
-    @Autowired
     private final JwtValidate jwtValidate;
 
 

@@ -1,0 +1,83 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: PAYMENT-SERVICE
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/paymentservice?useSSL=false
+    username: root
+    password: ${MYSQL_PASSWORD:12042003}
+
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+        use_sql_comments: false
+        format_sql: false
+
+  kafka:
+    bootstrap-servers: ${KAFKA_SERVERS:localhost:9092}
+    producer:
+      retries: 3
+      batch-size: 16384
+      buffer-memory: 33554432
+
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+
+  # SLEUTH & ZIPKIN
+  zipkin:
+    base-url: ${ZIPKIN_URL:http://localhost:9411}
+  sleuth:
+    sampler:
+      probability: 1.0
+
+payment:
+  kafka:
+    consumer-group-id: payment-groupId
+
+jwt:
+  secret: ${JWT_SECRET:L8KwmXTT/ByT7e9ZiO0s5cGedE7cSfS5YKpC0Qn/qO8=}
+  expiration: 86400
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  file:
+    name: src/main/resources/script/prod_log.log
+  level:
+    org:
+      hibernate:
+        SQL: INFO
+      springframework:
+        web: INFO
+        data: INFO
+        boot:
+          autoconfigure:
+            data:
+              rest: INFO
+            orm: INFO

@@ -1,0 +1,24 @@
+server:
+  servlet:
+    context-path: /common-library
+
+spring:
+  application:
+    name: common-library
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://identity/realms/Yas
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+
+springdoc:
+  oauthflow:
+    authorization-url: http://identity/realms/Yas/protocol/openid-connect/auth
+    token-url: http://identity/realms/Yas/protocol/openid-connect/token
+
+cors:
+  allowed-origins: "*"

@@ -1,0 +1,98 @@
+server:
+  port: 8088
+
+spring:
+  application:
+    name: USER-SERVICE
+  
+  datasource:
+    url: jdbc:mysql://localhost:3306/userservice?useSSL=false&useUnicode=yes&characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: ${MYSQL_PASSWORD:12042003}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+        id:
+          new_generator_mapping: false
+        show_sql: false
+        format_sql: false
+    generate-ddl: false
+
+  kafka:
+    bootstrap-servers: ${KAFKA_SERVERS:localhost:9092}
+    producer:
+      retries: 3
+      batch-size: 16384
+      buffer-memory: 33554432 # 32MB
+
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration
+
+  # Sleuth/Zipkin tracing
+  zipkin:
+    base-url: ${ZIPKIN_URL:http://localhost:9411}
+  sleuth:
+    sampler:
+      probability: 1.0
+
+# Security/JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:L8KwmXTT/ByT7e9ZiO0s5cGedE7cSfS5YKpC0Qn/qO8=}
+  expiration: 86400
+  refreshExpiration: 172800
+
+refresh:
+  token:
+    url: http://localhost:8080/api/auth/refresh
+
+api:
+  gateway:
+    url: http://localhost:8080
+
+payment:
+  kafka:
+    consumer-group-id: userService-groupId
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          description:
+            sql:
+              BasicBinder: TRACE
