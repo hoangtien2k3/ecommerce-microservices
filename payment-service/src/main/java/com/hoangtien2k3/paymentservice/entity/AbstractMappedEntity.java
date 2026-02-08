@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import javax.persistence.Column;
+import jakarta.persistence.Column;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;

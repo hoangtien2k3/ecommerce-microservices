@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration;
 
 @EnableConfigurationProperties(ServiceUrlConfig.class)
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.hoangtien2k3")
 @Configuration
 public class ElasticsearchApplication {
 

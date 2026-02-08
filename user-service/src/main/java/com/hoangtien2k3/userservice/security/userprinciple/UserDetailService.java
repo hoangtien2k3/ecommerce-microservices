@@ -3,18 +3,18 @@ package com.hoangtien2k3.userservice.security.userprinciple;
 import com.hoangtien2k3.userservice.exception.wrapper.EmailOrUsernameNotFoundException;
 import com.hoangtien2k3.userservice.model.entity.User;
 import com.hoangtien2k3.userservice.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
+@RequiredArgsConstructor
 @Service
 public class UserDetailService implements UserDetailsService {
 
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
     @Transactional
