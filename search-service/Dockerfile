@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:21.0.10_7-jre-alpine
 RUN apk add --no-cache bash
 COPY target/search*.jar app.jar
 COPY wait-for-it.sh wait-for-it.sh
