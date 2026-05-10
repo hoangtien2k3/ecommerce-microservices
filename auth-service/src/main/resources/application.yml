@@ -1,0 +1,75 @@
+server:
+  port: 8088
+
+spring:
+  application:
+    name: AUTH-SERVICE
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/authservice
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        id:
+          new_generator_mapping: false
+        show_sql: false
+        format_sql: false
+    generate-ddl: false
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI:http://identity/realms/hoangtien2k3}
+
+keycloak:
+  client:
+    server-url: ${KEYCLOAK_SERVER_URL:http://localhost:8089}
+    realm: ${KEYCLOAK_REALM:ecommerce}
+    client-id: ${KEYCLOAK_CLIENT_ID:ecommerce-client}
+    client-secret: ${KEYCLOAK_CLIENT_SECRET:}
+    admin-realm: ${KEYCLOAK_ADMIN_REALM:master}
+    admin-client-id: ${KEYCLOAK_ADMIN_CLIENT_ID:admin-cli}
+    admin-username: ${KEYCLOAK_ADMIN_USERNAME:admin}
+    admin-password: ${KEYCLOAK_ADMIN_PASSWORD:admin}
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          description:
+            sql:
+              BasicBinder: TRACE

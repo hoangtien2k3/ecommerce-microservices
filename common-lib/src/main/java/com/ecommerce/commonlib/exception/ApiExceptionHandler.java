@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -22,12 +23,9 @@ public class ApiExceptionHandler {
     private static final String ERROR_LOG_FORMAT = "Error: URI: {}, ErrorCode: {}, Message: {}";
     private static final String INVALID_REQUEST_INFORMATION_MESSAGE = "Request information is not valid";
 
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ErrorVm> handleNotFoundException(NotFoundException ex, WebRequest request) {
-        HttpStatus status = HttpStatus.NOT_FOUND;
-        String message = ex.getMessage();
-
-        return buildErrorResponse(status, message, null, ex, request, 404);
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ErrorVm> handleBusinessException(BusinessException ex, WebRequest request) {
+        return buildErrorResponse(ex.getStatus(), ex.getMessage(), null, ex, request, ex.getStatus().value());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -60,19 +58,6 @@ public class ApiExceptionHandler {
         return buildErrorResponse(status, INVALID_REQUEST_INFORMATION_MESSAGE, errors, ex, null, status.value());
     }
 
-    @ExceptionHandler(Exception.class)
-    protected ResponseEntity<ErrorVm> handleOtherException(Exception ex, WebRequest request) {
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        String message = ex.getMessage();
-
-        return buildErrorResponse(status, message, null, ex, request, 500);
-    }
-
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ErrorVm> handleBadRequestException(BadRequestException ex, WebRequest request) {
-        return handleBadRequest(ex, request);
-    }
-
     @ExceptionHandler({ConstraintViolationException.class})
     public ResponseEntity<ErrorVm> handleConstraintViolation(ConstraintViolationException ex) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
@@ -92,69 +77,42 @@ public class ApiExceptionHandler {
         return handleBadRequest(ex, null);
     }
 
-    @ExceptionHandler(DuplicatedException.class)
-    protected ResponseEntity<ErrorVm> handleDuplicated(DuplicatedException ex) {
-        return handleBadRequest(ex, null);
-    }
-
-    @ExceptionHandler(InternalServerErrorException.class)
-    protected ResponseEntity<ErrorVm> handleInternalServerErrorException(InternalServerErrorException e) {
-        log.error("Internal server error exception: ", e);
-        ErrorVm errorVm = new ErrorVm(HttpStatus.INTERNAL_SERVER_ERROR.toString(),
-            HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), e.getMessage());
-        return ResponseEntity.internalServerError().body(errorVm);
-    }
-
     @ExceptionHandler(MissingServletRequestParameterException.class)
     protected ResponseEntity<ErrorVm> handleMissingParams(MissingServletRequestParameterException e) {
         return handleBadRequest(e, null);
     }
 
-    @ExceptionHandler(ResourceExistedException.class)
-    public ResponseEntity<ErrorVm> handleResourceExistedException(ResourceExistedException ex, WebRequest request) {
-        HttpStatus status = HttpStatus.CONFLICT;
-        String message = ex.getMessage();
-
-        return buildErrorResponse(status, message, null, ex, request, 409);
-    }
-
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorVm> handleAccessDeniedException(AccessDeniedException ex, WebRequest request) {
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<ErrorVm> handleSecurityAccessDeniedException(
+        org.springframework.security.access.AccessDeniedException ex, WebRequest request) {
         HttpStatus status = HttpStatus.FORBIDDEN;
         String message = ex.getMessage();
 
         return buildErrorResponse(status, message, null, ex, request, 403);
     }
 
-    @ExceptionHandler(WrongEmailFormatException.class)
-    public ResponseEntity<ErrorVm> handleWrongEmailFormatException(WrongEmailFormatException ex, WebRequest request) {
-        return handleBadRequest(ex, request);
-    }
-
-    @ExceptionHandler(CreateGuestUserException.class)
-    public ResponseEntity<ErrorVm> handleCreateGuestUserException(CreateGuestUserException ex, WebRequest request) {
-        return handleBadRequest(ex, request);
-    }
-
-    @ExceptionHandler(StockExistingException.class)
-    public ResponseEntity<ErrorVm> handleStockExistingException(StockExistingException ex, WebRequest request) {
-        return handleBadRequest(ex, request);
-    }
-
-    @ExceptionHandler({SignInRequiredException.class})
-    public ResponseEntity<ErrorVm> handleSignInRequired(SignInRequiredException ex) {
-        HttpStatus status = HttpStatus.FORBIDDEN;
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorVm> handleAuthenticationException(AuthenticationException ex, WebRequest request) {
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
         String message = ex.getMessage();
 
-        return buildErrorResponse(status, message, null, ex, null, 403);
+        return buildErrorResponse(status, message, null, ex, request, 401);
     }
 
-    @ExceptionHandler({Forbidden.class})
-    public ResponseEntity<ErrorVm> handleForbidden(Forbidden ex, WebRequest request) {
-        HttpStatus status = HttpStatus.FORBIDDEN;
+    @ExceptionHandler(RuntimeException.class)
+    protected ResponseEntity<ErrorVm> handleRuntimeException(RuntimeException ex, WebRequest request) {
+        HttpStatus status = resolveStatusFromExceptionName(ex);
         String message = ex.getMessage();
 
-        return buildErrorResponse(status, message, null, ex, request, 403);
+        return buildErrorResponse(status, message, null, ex, request, status.value());
+    }
+
+    @ExceptionHandler(Exception.class)
+    protected ResponseEntity<ErrorVm> handleOtherException(Exception ex, WebRequest request) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        String message = ex.getMessage();
+
+        return buildErrorResponse(status, message, null, ex, request, 500);
     }
 
     private String getServletPath(WebRequest webRequest) {
@@ -179,5 +137,37 @@ public class ApiExceptionHandler {
         }
         log.error(message, ex);
         return ResponseEntity.status(status).body(errorVm);
+    }
+
+    private HttpStatus resolveStatusFromExceptionName(RuntimeException ex) {
+        String exceptionName = ex.getClass().getSimpleName().toLowerCase();
+
+        if (exceptionName.contains("notfound")) {
+            return HttpStatus.NOT_FOUND;
+        }
+        if (exceptionName.contains("forbidden") || exceptionName.contains("accessdenied")) {
+            return HttpStatus.FORBIDDEN;
+        }
+        if (exceptionName.contains("unauthorized")
+            || exceptionName.contains("authentication")
+            || exceptionName.contains("notauthenticated")
+            || exceptionName.contains("signinrequired")) {
+            return HttpStatus.UNAUTHORIZED;
+        }
+        if (exceptionName.contains("duplicated")
+            || exceptionName.contains("alreadyexists")
+            || exceptionName.contains("existed")
+            || exceptionName.contains("conflict")) {
+            return HttpStatus.CONFLICT;
+        }
+        if (exceptionName.contains("badrequest")
+            || exceptionName.contains("invalid")
+            || exceptionName.contains("unsupportedmedia")
+            || exceptionName.contains("wrongemail")
+            || exceptionName.contains("stockexisting")
+            || exceptionName.contains("multipart")) {
+            return HttpStatus.BAD_REQUEST;
+        }
+        return HttpStatus.INTERNAL_SERVER_ERROR;
     }
 }

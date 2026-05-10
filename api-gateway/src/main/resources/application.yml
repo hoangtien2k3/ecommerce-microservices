@@ -65,19 +65,19 @@ spring:
           predicates:
             - Path=/api/shippings/**
 
-        # USER-SERVICE
-        - id: user-service-auth
-          uri: lb://USER-SERVICE
+        # AUTH-SERVICE
+        - id: auth-service-auth
+          uri: lb://AUTH-SERVICE
           predicates:
             - Path=/api/auth/**
 
-        - id: user-service-information
-          uri: lb://USER-SERVICE
+        - id: auth-service-information
+          uri: lb://AUTH-SERVICE
           predicates:
             - Path=/api/role/**
 
-        - id: user-service-manager
-          uri: lb://USER-SERVICE
+        - id: auth-service-manager
+          uri: lb://AUTH-SERVICE
           predicates:
             - Path=/api/manager/**
 

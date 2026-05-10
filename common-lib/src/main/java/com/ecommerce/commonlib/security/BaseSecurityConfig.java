@@ -25,7 +25,14 @@ public class BaseSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**", "/actuator/**")
                         .permitAll()
-                        .requestMatchers("/api/auth/signup", "/api/auth/register")
+                        .requestMatchers(
+                                "/api/auth/signup",
+                                "/api/auth/register",
+                                "/api/auth/signin",
+                                "/api/auth/login",
+                                "/api/auth/refresh",
+                                "/api/auth/refresh-token",
+                                "/api/auth/logout")
                         .permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)));

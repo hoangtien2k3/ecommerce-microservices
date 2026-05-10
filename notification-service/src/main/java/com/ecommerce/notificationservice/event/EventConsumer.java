@@ -45,7 +45,7 @@ public class EventConsumer {
     }
 
     public void sendEmailKafkaOnboarding(ReceiverRecord<String, String> receiverRecord) {
-        log.info("USER-SERVICE Onboarding event send email on notification service.");
+        log.info("AUTH-SERVICE Onboarding event send email on notification service.");
         EmailDetails emailDetails = gson.fromJson(receiverRecord.value(), EmailDetails.class);
 
         emailService.sendSimpleMail(emailDetails).subscribe(email -> {

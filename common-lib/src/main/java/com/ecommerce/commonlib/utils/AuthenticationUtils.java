@@ -1,7 +1,7 @@
 package com.ecommerce.commonlib.utils;
 
 import com.ecommerce.commonlib.constants.ApiConstant;
-import com.ecommerce.commonlib.exception.AccessDeniedException;
+import com.ecommerce.commonlib.exception.BusinessException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,11 +17,11 @@ public final class AuthenticationUtils {
         Authentication authentication = getAuthentication();
 
         if (authentication instanceof AnonymousAuthenticationToken) {
-            throw new AccessDeniedException(ApiConstant.ACCESS_DENIED);
+            throw BusinessException.forbidden(ApiConstant.ACCESS_DENIED);
         }
 
         if (!(authentication instanceof JwtAuthenticationToken contextHolder)) {
-            throw new AccessDeniedException(ApiConstant.ACCESS_DENIED);
+            throw BusinessException.forbidden(ApiConstant.ACCESS_DENIED);
         }
 
         return contextHolder.getToken().getSubject();

@@ -27,7 +27,7 @@ public class CallAPI {
     }
 
     public Mono<UserDto> receiverUserDto(Long userId, String token) {
-        return webClientBuilder.baseUrl("http://USER-SERVICE").build()
+        return webClientBuilder.baseUrl("http://AUTH-SERVICE").build()
                 .get()
                 .uri("/api/manager/user/" + userId)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
