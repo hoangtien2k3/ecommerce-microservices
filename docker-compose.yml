@@ -48,7 +48,7 @@ services:
       - ecommerce-network
 
   kafka:
-    image: apache/kafka:3.9.0
+    image: apache/kafka:3.9.2
     container_name: kafka
     ports:
       - "9092:9092"
