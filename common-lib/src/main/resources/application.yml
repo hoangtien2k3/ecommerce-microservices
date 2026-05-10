@@ -9,7 +9,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://identity/realms/Yas
+          issuer-uri: ${JWT_ISSUER_URI:http://identity/realms/hoangtien2k3}
 
 logging:
   pattern:
@@ -17,8 +17,8 @@ logging:
 
 springdoc:
   oauthflow:
-    authorization-url: http://identity/realms/Yas/protocol/openid-connect/auth
-    token-url: http://identity/realms/Yas/protocol/openid-connect/token
+    authorization-url: ${JWT_AUTH_URL:http://identity/realms/hoangtien2k3/protocol/openid-connect/auth}
+    token-url: ${JWT_TOKEN_URL:http://identity/realms/hoangtien2k3/protocol/openid-connect/token}
 
 cors:
   allowed-origins: "*"

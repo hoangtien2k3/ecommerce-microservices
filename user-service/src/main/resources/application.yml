@@ -6,22 +6,30 @@ spring:
     name: USER-SERVICE
   
   datasource:
-    url: jdbc:mysql://localhost:3306/userservice?useSSL=false&useUnicode=yes&characterEncoding=UTF-8&serverTimezone=UTC
-    username: root
-    password: ${MYSQL_PASSWORD:12042003}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:postgresql://localhost:5432/userservice
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL5Dialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
         id:
           new_generator_mapping: false
         show_sql: false
         format_sql: false
     generate-ddl: false
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI:http://identity/realms/hoangtien2k3}
 
   kafka:
     bootstrap-servers: ${KAFKA_SERVERS:localhost:9092}
@@ -46,12 +54,6 @@ spring:
   sleuth:
     sampler:
       probability: 1.0
-
-# Security/JWT Configuration
-jwt:
-  secret: ${JWT_SECRET:L8KwmXTT/ByT7e9ZiO0s5cGedE7cSfS5YKpC0Qn/qO8=}
-  expiration: 86400
-  refreshExpiration: 172800
 
 refresh:
   token:

@@ -5,14 +5,11 @@ import com.ecommerce.userservice.constant.KafkaConstant;
 import com.ecommerce.userservice.event.EventProducer;
 import com.ecommerce.userservice.exception.wrapper.*;
 import com.ecommerce.userservice.model.dto.request.*;
-import com.ecommerce.userservice.model.dto.response.InformationMessage;
 import com.ecommerce.userservice.model.dto.response.JwtResponseMessage;
 import com.ecommerce.userservice.model.entity.RoleName;
 import com.ecommerce.userservice.model.entity.User;
 import com.ecommerce.userservice.repository.UserRepository;
-import com.ecommerce.userservice.security.jwt.JwtProvider;
 import com.ecommerce.userservice.security.userprinciple.UserDetailService;
-import com.ecommerce.userservice.security.userprinciple.UserPrinciple;
 import com.ecommerce.userservice.service.RoleService;
 import com.ecommerce.userservice.service.UserService;
 import org.modelmapper.ModelMapper;
@@ -20,9 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.*;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -42,7 +37,6 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtProvider jwtProvider;
     private final UserDetailService userDetailsService;
     private final ModelMapper modelMapper;
     private final RoleService roleService;
@@ -60,13 +54,11 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
             PasswordEncoder passwordEncoder,
-            JwtProvider jwtProvider,
             UserDetailService userDetailsService,
             ModelMapper modelMapper,
             RoleService roleService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.jwtProvider = jwtProvider;
         this.userDetailsService = userDetailsService;
         this.modelMapper = modelMapper;
         this.roleService = roleService;
@@ -111,85 +103,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Mono<JwtResponseMessage> login(Login signInForm) {
-        return Mono.fromCallable(() -> {
-            String usernameOrEmail = signInForm.getUsername();
-            boolean isEmail = usernameOrEmail.contains("@gmail.com");
-
-            UserDetails userDetails;
-            if (isEmail) {
-                userDetails = userDetailsService.loadUserByEmail(usernameOrEmail);
-            } else {
-                userDetails = userDetailsService.loadUserByUsername(usernameOrEmail);
-            }
-
-            // check username
-            if (userDetails == null) {
-                throw new UserNotFoundException("User not found");
-            }
-
-            // Check password
-            if (!passwordEncoder.matches(signInForm.getPassword(), userDetails.getPassword())) {
-                throw new PasswordNotFoundException("Incorrect password");
-            }
-
-            Authentication authentication = new UsernamePasswordAuthenticationToken(
-                    userDetails,
-                    signInForm.getPassword(),
-                    userDetails.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            String accessToken = jwtProvider.createToken(authentication);
-            String refreshToken = jwtProvider.createRefreshToken(authentication);
-
-            UserPrinciple userPrinciple = (UserPrinciple) userDetails;
-
-            return JwtResponseMessage.builder()
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .information(InformationMessage.builder()
-                            .id(userPrinciple.id())
-                            .fullname(userPrinciple.fullname())
-                            .username(userPrinciple.username())
-                            .email(userPrinciple.email())
-                            .phone(userPrinciple.phone())
-                            .gender(userPrinciple.gender())
-                            .avatar(userPrinciple.avatar())
-                            .roles(userPrinciple.roles())
-                            .build())
-                    .build();
-        }).subscribeOn(Schedulers.boundedElastic()).onErrorResume(Mono::error);
+        return Mono.error(new UnsupportedOperationException("Legacy login is disabled. Use Keycloak."));
     }
 
     @Override
     public Mono<Void> logout() {
-        return Mono.fromRunnable(() -> {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-            SecurityContextHolder.getContext().setAuthentication(null);
-
-            String currentToken = getCurrentToken();
-
-            if (authentication != null && authentication.isAuthenticated()) {
-                // Invalidate the current token by reducing its expiration time
-                String updatedToken = jwtProvider.reduceTokenExpiration(currentToken);
-            }
-
-            SecurityContextHolder.clearContext();
-        }).subscribeOn(Schedulers.boundedElastic()).then();
-    }
-
-    private String getCurrentToken() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication != null && authentication.isAuthenticated()) {
-            Object credentials = authentication.getCredentials();
-
-            if (credentials instanceof String) {
-                return (String) credentials;
-            }
-        }
-
-        return null;
+        return Mono.empty();
     }
 
     @Transactional

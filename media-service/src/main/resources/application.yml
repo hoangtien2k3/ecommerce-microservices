@@ -29,7 +29,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://identity/realms/hoangtien2k3
+          issuer-uri: ${JWT_ISSUER_URI:http://identity/realms/hoangtien2k3}
 
 eureka:
   client:

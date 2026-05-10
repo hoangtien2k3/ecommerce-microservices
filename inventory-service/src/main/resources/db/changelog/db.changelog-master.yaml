@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: inventory-service-0001-bootstrap
+      author: codex
+      comment: Bootstrap Liquibase for inventory-service.
+      changes:
+        - sql:
+            sql: SELECT 1;

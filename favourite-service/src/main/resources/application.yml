@@ -6,19 +6,28 @@ spring:
     name: FAVOURITE-SERVICE
 
   datasource:
-    url: jdbc:mysql://localhost:3306/favouriteservice?allowPublicKeyRetrieval=true&useSSL=false
-    username: root
-    password: ${MYSQL_PASSWORD:12042003}
+    url: jdbc:postgresql://localhost:5432/favouriteservice
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     show-sql: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
         use_sql_comments: false
         format_sql: false
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI:http://identity/realms/hoangtien2k3}
 
   # ZIPKIN & SLEUTH
   zipkin:

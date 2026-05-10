@@ -1,15 +1,14 @@
 version: '3'
 
 services:
-  mysql:
-    image: mysql:latest
+  postgres:
+    image: postgres:16
     environment:
-      MYSQL_ROOT_PASSWORD: 12042003
-      MYSQL_DATABASE: shippingservice
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: 12042003
+      POSTGRES_DB: shippingservice
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
-      - "3307:3306"
+      - "5433:5432"
 
   springboot-app:
     image: shipping-service:latest
@@ -18,15 +17,15 @@ services:
       - ./shipping_service_database.sql:/docker-entrypoint-initdb.d/init/sql
     environment:
       SPRING_PROFILES_ACTIVE: application
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/shippingservice?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: admin
-      SPRING_DATASOURCE_PASSWORD: 12042003
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/shippingservice
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
     working_dir: /home/app
     ports:
       - "8888:8888"
     entrypoint: [ "java", "-jar", "shipping-service-0.0.1-SNAPSHOT.jar" ]
     depends_on:
-      - mysql
+      - postgres
     build:
       context: .
       args:

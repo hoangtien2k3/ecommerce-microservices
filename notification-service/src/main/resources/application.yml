@@ -34,6 +34,11 @@ spring:
       host: ${MONGO_HOST:localhost}
       port: ${MONGO_PORT:27017}
       database: notificationservice
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI:http://identity/realms/hoangtien2k3}
 
   # SLEUTH & ZIPKIN
   zipkin:

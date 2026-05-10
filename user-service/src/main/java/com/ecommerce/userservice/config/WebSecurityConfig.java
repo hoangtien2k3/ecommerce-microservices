@@ -1,9 +1,8 @@
 package com.ecommerce.userservice.config;
 
-import com.ecommerce.userservice.security.jwt.JwtEntryPoint;
+import com.ecommerce.commonlib.security.KeycloakRealmRoleConverter;
 import com.ecommerce.userservice.security.userprinciple.UserDetailService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,15 +16,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
 @EnableWebSecurity
@@ -34,10 +26,6 @@ import javax.crypto.spec.SecretKeySpec;
 public class WebSecurityConfig {
 
     private final UserDetailService userDetailService;
-    private final JwtEntryPoint jwtEntryPoint;
-
-    @Value("${jwt.secret}")
-    private String jwtSecret;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -61,7 +49,6 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/api/manager/user/**", "/v3/api-docs/**", "/swagger-ui/**",
@@ -72,29 +59,16 @@ public class WebSecurityConfig {
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt
-                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
-                                .decoder(jwtDecoder())));
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())));
 
         http.authenticationProvider(authenticationProvider());
         return http.build();
     }
 
     @Bean
-    public JwtDecoder jwtDecoder() {
-        SecretKey secretKey = new SecretKeySpec(jwtSecret.getBytes(), "HmacSHA512");
-        return NimbusJwtDecoder.withSecretKey(secretKey)
-                .macAlgorithm(MacAlgorithm.HS512)
-                .build();
-    }
-
-    @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        grantedAuthoritiesConverter.setAuthoritiesClaimName("authorities");
-        grantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
-
-        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
-        return jwtAuthenticationConverter;
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(new KeycloakRealmRoleConverter());
+        return converter;
     }
 }

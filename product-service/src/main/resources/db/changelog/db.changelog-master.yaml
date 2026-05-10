@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: product-service-0001-bootstrap
+      author: codex
+      comment: Bootstrap Liquibase for product-service.
+      changes:
+        - sql:
+            sql: SELECT 1;

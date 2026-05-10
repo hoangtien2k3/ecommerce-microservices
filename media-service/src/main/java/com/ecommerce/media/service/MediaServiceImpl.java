@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -25,6 +26,8 @@ public class MediaServiceImpl implements MediaService {
     private final MediaVmMapper mediaVmMapper;
     private final MediaRepository mediaRepository;
     private final FileSystemRepository fileSystemRepository;
+    @Value("${hoangtien2k3.publicUrl:http://localhost:8083}")
+    private String publicUrl;
 
     @Override
     @SneakyThrows
@@ -102,7 +105,7 @@ public class MediaServiceImpl implements MediaService {
     }
 
     private String getMediaUrl(Long mediaId, String fileName) {
-        return UriComponentsBuilder.fromUriString(hoangtien2k3Config.publicUrl())
+        return UriComponentsBuilder.fromUriString(publicUrl)
                 .path(String.format("/medias/%1$s/file/%2$s", mediaId, fileName))
                 .build().toUriString();
     }

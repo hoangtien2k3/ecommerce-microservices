@@ -6,19 +6,28 @@ spring:
     name: PAYMENT-SERVICE
 
   datasource:
-    url: jdbc:mysql://localhost:3306/paymentservice?useSSL=false
-    username: root
-    password: ${MYSQL_PASSWORD:12042003}
+    url: jdbc:postgresql://localhost:5432/paymentservice
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     show-sql: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL5Dialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
         use_sql_comments: false
         format_sql: false
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI:http://identity/realms/hoangtien2k3}
 
   kafka:
     bootstrap-servers: ${KAFKA_SERVERS:localhost:9092}
@@ -41,10 +50,6 @@ spring:
 payment:
   kafka:
     consumer-group-id: payment-groupId
-
-jwt:
-  secret: ${JWT_SECRET:L8KwmXTT/ByT7e9ZiO0s5cGedE7cSfS5YKpC0Qn/qO8=}
-  expiration: 86400
 
 eureka:
   client:

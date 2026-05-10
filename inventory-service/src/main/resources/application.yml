@@ -6,21 +6,29 @@ spring:
     name: INVENTORY-SERVICE
 
   datasource:
-    url: jdbc:mysql://localhost:3306/inventoryservice?useSSL=false
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    password: ${MYSQL_PASSWORD:12042003}
+    url: jdbc:postgresql://localhost:5432/inventoryservice
+    driver-class-name: org.postgresql.Driver
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
 
   jpa:
     show-sql: false
     format-sql: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL5Dialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
         show_sql: false
         format_sql: false
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI:http://identity/realms/hoangtien2k3}
 
   # ZIPKIN & SLEUTH
   zipkin:
@@ -45,8 +53,3 @@ management:
     health:
       show-details: always
 
-jwt:
-  secret-key: ${JWT_SECRET:vip2023}
-
-user-service:
-  base-url: http://localhost:8080

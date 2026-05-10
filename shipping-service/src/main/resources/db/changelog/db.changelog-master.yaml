@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: shipping-service-0001-bootstrap
+      author: codex
+      comment: Bootstrap Liquibase for shipping-service.
+      changes:
+        - sql:
+            sql: SELECT 1;

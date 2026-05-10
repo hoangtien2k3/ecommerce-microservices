@@ -1,16 +1,15 @@
 version: '3.9'
 
 services:
-  #mysql
-  mysql:
-    image: mysql
+  #postgresql
+  postgres:
+    image: postgres:16
     environment:
-      MYSQL_ROOT_PASSWORD: 12042003
-      MYSQL_DATABASE: my_database
-      MYSQL_USER: root
-      MYSQL_PASSWORD: 12042003
+      POSTGRES_DB: ecommerce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
-      - "3306:3306"
+      - "5432:5432"
     networks:
       - ecommerce-network
 

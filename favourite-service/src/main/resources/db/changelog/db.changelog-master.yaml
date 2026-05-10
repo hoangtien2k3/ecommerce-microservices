@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: favourite-service-0001-bootstrap
+      author: codex
+      comment: Bootstrap Liquibase for favourite-service.
+      changes:
+        - sql:
+            sql: SELECT 1;
