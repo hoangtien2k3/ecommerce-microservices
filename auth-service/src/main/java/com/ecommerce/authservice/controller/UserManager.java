@@ -81,7 +81,7 @@ public class UserManager {
         @GetMapping("/info")
         public ResponseEntity<UserDto> getUserInfo(@AuthenticationPrincipal Jwt jwt) {
                 if (jwt == null) {
-                        throw BusinessException.unauthorized("Token error or access timeout");
+                        throw BusinessException.unauthorized("auth.token.error.or.timeout");
                 }
                 String username = jwt.getSubject();
                 UserDto userDto = modelMapper.map(userService.findByUsername(username), UserDto.class);

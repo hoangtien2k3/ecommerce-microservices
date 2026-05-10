@@ -93,7 +93,7 @@ public class KeycloakAuthClient {
             .getLocation();
 
         if (location == null) {
-            throw BusinessException.badRequest("Could not create user in Keycloak.");
+            throw BusinessException.badRequest("keycloak.create.user.failed");
         }
 
         String keycloakUserId = extractUserIdFromLocation(location.toString());
@@ -146,7 +146,7 @@ public class KeycloakAuthClient {
             .body(KeycloakTokenResponse.class));
 
         if (tokenResponse == null || tokenResponse.getAccessToken() == null || tokenResponse.getAccessToken().isBlank()) {
-            throw BusinessException.unauthorized("Could not get admin token from Keycloak.");
+            throw BusinessException.unauthorized("keycloak.admin.token.failed");
         }
         return tokenResponse.getAccessToken();
     }
@@ -181,7 +181,7 @@ public class KeycloakAuthClient {
     private String extractUserIdFromLocation(String location) {
         int idx = location.lastIndexOf('/');
         if (idx < 0 || idx == location.length() - 1) {
-            throw BusinessException.badRequest("Invalid Keycloak user location header.");
+            throw BusinessException.badRequest("keycloak.invalid.user.location");
         }
         return location.substring(idx + 1);
     }
@@ -192,21 +192,21 @@ public class KeycloakAuthClient {
         } catch (RestClientResponseException ex) {
             int status = ex.getStatusCode().value();
             if (status == 400) {
-                throw BusinessException.badRequest(ex.getResponseBodyAsString());
+                throw BusinessException.badRequest("keycloak.bad.request", ex.getResponseBodyAsString());
             }
             if (status == 401) {
-                throw BusinessException.unauthorized("Unauthorized request to Keycloak.");
+                throw BusinessException.unauthorized("keycloak.unauthorized");
             }
             if (status == 403) {
-                throw BusinessException.forbidden("Forbidden request to Keycloak.");
+                throw BusinessException.forbidden("keycloak.forbidden");
             }
             if (status == 404) {
-                throw BusinessException.notFound("Keycloak resource not found.");
+                throw BusinessException.notFound("keycloak.not.found");
             }
             if (status == 409) {
-                throw BusinessException.conflict("Keycloak resource already exists.");
+                throw BusinessException.conflict("keycloak.conflict");
             }
-            throw BusinessException.badRequest("Keycloak request failed: " + ex.getMessage());
+            throw BusinessException.badRequest("keycloak.request.failed", ex.getMessage());
         }
     }
 

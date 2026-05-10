@@ -4,9 +4,12 @@ server:
 spring:
   application:
     name: AUTH-SERVICE
+  web:
+    locale: vi_VN
+    locale-resolver: accept-header
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/auth
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/auth}
     username: ${POSTGRES_USER:postgres}
     password: ${POSTGRES_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver

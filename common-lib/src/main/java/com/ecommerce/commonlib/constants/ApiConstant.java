@@ -21,7 +21,7 @@ public final class ApiConstant {
 
     public static final String CODE_403 = "403";
     public static final String FORBIDDEN = "Forbidden";
-    public static final String ACCESS_DENIED = "ACCESS_DENIED";
+    public static final String ACCESS_DENIED = "access.denied";
 
     public static final String CODE_404 = "404";
     public static final String NOT_FOUND = "Not found";

@@ -28,17 +28,17 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Optional<Role> findByName(RoleName name) {
         return Optional.ofNullable(roleRepository.findByName(name)
-                .orElseThrow(() -> BusinessException.notFound("Role Not Found with name: " + name)));
+                .orElseThrow(() -> BusinessException.notFound("auth.role.not.found.with.name", name)));
     }
 
     @Transactional
     @Override
     public boolean assignRole(Long userId, String roleName) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> BusinessException.notFound("User not found with ID: " + userId));
+                .orElseThrow(() -> BusinessException.notFound("auth.user.not.found.with.id", userId));
 
         Role role = roleRepository.findByName(mapToRoleName(roleName))
-                .orElseThrow(() -> BusinessException.notFound("Role not found in system: " + roleName));
+                .orElseThrow(() -> BusinessException.notFound("auth.role.not.found.in.system", roleName));
 
         if (user.getRoles().contains(role))
             return false;
@@ -52,7 +52,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public boolean revokeRole(Long id, String roleName) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> BusinessException.notFound("User not found."));
+                .orElseThrow(() -> BusinessException.notFound("auth.user.not.found"));
 
         if (user.getRoles().removeIf(role -> role.name().equals(mapToRoleName(roleName)))) {
             userRepository.save(user);
@@ -64,7 +64,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public List<String> getUserRoles(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> BusinessException.notFound("User not found."));
+                .orElseThrow(() -> BusinessException.notFound("auth.user.not.found"));
 
         List<String> roleNames = new ArrayList<>();
         user.getRoles().forEach(userRole -> roleNames.add(userRole.name().toString()));
@@ -76,7 +76,7 @@ public class RoleServiceImpl implements RoleService {
             case "ADMIN", "admin", "Admin" -> RoleName.ADMIN;
             case "PM", "pm", "Pm" -> RoleName.PM;
             case "USER", "user", "User" -> RoleName.USER;
-            default -> throw BusinessException.badRequest("Unsupported role: " + roleName);
+            default -> throw BusinessException.badRequest("auth.unsupported.role", roleName);
         };
     }
 
