@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @ConfigurationProperties(prefix = "keycloak.client")
 public class KeycloakClientProperties {
-    private String serverUrl = "http://localhost:8089";
+    private String serverUrl = "http://localhost:8080";
     private String realm = "ecommerce";
     private String clientId = "ecommerce-client";
     private String clientSecret;

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Usage:
-#   KEYCLOAK_URL=http://localhost:8089 \
+#   KEYCLOAK_URL=http://localhost:8080 \
 #   REALM=ecommerce \
 #   CLIENT_ID=ecommerce-client \
 #   USERNAME=testuser \
@@ -10,7 +10,7 @@ set -euo pipefail
 #   GATEWAY_URL=http://localhost:8080 \
 #   ./scripts/smoke-keycloak-gateway.sh
 
-: "${KEYCLOAK_URL:=http://localhost:8089}"
+: "${KEYCLOAK_URL:=http://localhost:8080}"
 : "${REALM:=ecommerce}"
 : "${CLIENT_ID:=ecommerce-client}"
 : "${CLIENT_SECRET:=}"

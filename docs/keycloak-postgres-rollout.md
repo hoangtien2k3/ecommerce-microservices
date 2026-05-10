@@ -12,8 +12,8 @@
 
 Set tối thiểu các biến môi trường sau trước khi chạy:
 
-- `JWT_ISSUER_URI` (vd: `http://localhost:8089/realms/ecommerce`)
-- `KEYCLOAK_SERVER_URL` (vd: `http://localhost:8089`)
+- `JWT_ISSUER_URI` (vd: `http://localhost:8080/realms/ecommerce`)
+- `KEYCLOAK_SERVER_URL` (vd: `http://localhost:8080`)
 - `KEYCLOAK_REALM` (mặc định: `ecommerce`)
 - `KEYCLOAK_CLIENT_ID` (mặc định: `ecommerce-client`)
 - `KEYCLOAK_CLIENT_SECRET` (để trống với public client)
@@ -23,12 +23,12 @@ Set tối thiểu các biến môi trường sau trước khi chạy:
 
 ## 2.1) Boot Keycloak with preloaded realm
 
-Repo đã có sẵn realm import mẫu tại `keycloak/import/ecommerce-realm.json`.
+Repo đã có sẵn realm import mẫu tại `docker/keycloak/import/ecommerce-realm.json`.
 
 Chạy Keycloak local:
 
 ```bash
-docker compose -f docker-compose.keycloak.yml up -d
+docker compose -f docker-compose.yml up -d keycloak
 ```
 
 Tài khoản quản trị Keycloak:
@@ -82,7 +82,7 @@ Sau khi service đã chạy:
 Hoặc override runtime:
 
 ```bash
-KEYCLOAK_URL=http://localhost:8089 \
+KEYCLOAK_URL=http://localhost:8080 \
 REALM=ecommerce \
 CLIENT_ID=ecommerce-client \
 USERNAME=testuser \

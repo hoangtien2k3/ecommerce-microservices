@@ -4,9 +4,9 @@ server:
 spring:
   application:
     name: AUTH-SERVICE
-  
+
   datasource:
-    url: jdbc:postgresql://localhost:5432/authservice
+    url: jdbc:postgresql://localhost:5432/auth
     username: ${POSTGRES_USER:postgres}
     password: ${POSTGRES_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
@@ -33,7 +33,7 @@ spring:
 
 keycloak:
   client:
-    server-url: ${KEYCLOAK_SERVER_URL:http://localhost:8089}
+    server-url: ${KEYCLOAK_SERVER_URL:http://localhost:8080}
     realm: ${KEYCLOAK_REALM:ecommerce}
     client-id: ${KEYCLOAK_CLIENT_ID:ecommerce-client}
     client-secret: ${KEYCLOAK_CLIENT_SECRET:}

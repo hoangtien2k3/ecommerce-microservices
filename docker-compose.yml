@@ -10,6 +10,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres -d ecommerce" ]
       interval: 5s
@@ -21,16 +22,25 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:26.0
     container_name: keycloak
-    command: start-dev --http-port=8089 --import-realm
+    command: start-dev --http-port=8080 --import-realm
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL_HOST: postgres
+      KC_DB_URL_PORT: 5432
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: postgres
     volumes:
       - ./docker/keycloak/import:/opt/keycloak/data/import:ro
     ports:
-      - "8089:8089"
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:8089/realms/master/.well-known/openid-configuration || exit 1" ]
+      test: [ "CMD-SHELL", "curl -f http://localhost:8080/realms/master/.well-known/openid-configuration || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 30
