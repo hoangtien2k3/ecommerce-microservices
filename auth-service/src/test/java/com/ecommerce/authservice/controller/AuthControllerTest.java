@@ -3,7 +3,6 @@ package com.ecommerce.authservice.controller;
 import com.ecommerce.authservice.model.dto.request.Login;
 import com.ecommerce.authservice.model.dto.request.RefreshTokenRequest;
 import com.ecommerce.authservice.model.dto.request.SignUp;
-import com.ecommerce.authservice.model.dto.response.JwtResponseMessage;
 import com.ecommerce.authservice.model.dto.response.ResponseMessage;
 import com.ecommerce.authservice.model.entity.User;
 import com.ecommerce.authservice.service.UserService;
@@ -25,7 +24,7 @@ class AuthControllerTest {
         login.setUsername("testuser");
         login.setPassword("testpass");
 
-        ResponseEntity<JwtResponseMessage> response = authController.login(login);
+        ResponseEntity<KeycloakTokenResponse> response = authController.login(login);
         assertNotNull(response);
         assertTrue(response.getStatusCode().is2xxSuccessful());
         assertNotNull(response.getBody());
@@ -39,7 +38,7 @@ class AuthControllerTest {
         RefreshTokenRequest request = new RefreshTokenRequest();
         request.setRefreshToken("old-refresh-token");
 
-        ResponseEntity<JwtResponseMessage> response = authController.refreshToken(request);
+        ResponseEntity<KeycloakTokenResponse> response = authController.refreshToken(request);
         assertNotNull(response);
         assertTrue(response.getStatusCode().is2xxSuccessful());
         assertNotNull(response.getBody());
