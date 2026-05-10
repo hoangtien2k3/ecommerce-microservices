@@ -2,9 +2,6 @@ package com.ecommerce.orderservice.api;
 
 import com.ecommerce.orderservice.dto.order.OrderDto;
 import com.ecommerce.orderservice.service.OrderService;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,11 +27,6 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @ApiOperation(value = "Get all orders", notes = "Retrieve a list of all orders.")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Orders retrieved successfully", response = List.class),
-            @ApiResponse(code = 204, message = "No content", response = ResponseEntity.class)
-    })
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     public Mono<ResponseEntity<List<OrderDto>>> findAll() {
@@ -125,11 +117,6 @@ public class OrderController {
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    @ApiOperation(value = "Delete order by ID", notes = "Delete an order based on the provided ID.")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Order deleted successfully", response = Boolean.class),
-            @ApiResponse(code = 404, message = "Order not found", response = ResponseEntity.class)
-    })
     @DeleteMapping("/{orderId}")
     @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
     public Mono<ResponseEntity<Boolean>> deleteById(@PathVariable("orderId") final String orderId) {

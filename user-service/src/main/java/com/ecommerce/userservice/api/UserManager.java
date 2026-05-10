@@ -8,7 +8,6 @@ import com.ecommerce.userservice.model.dto.request.UserDto;
 import com.ecommerce.userservice.model.dto.response.ResponseMessage;
 import com.ecommerce.userservice.security.jwt.JwtProvider;
 import com.ecommerce.userservice.service.UserService;
-import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,6 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @RestController
 @RequestMapping("/api/manager")
-@Api(value = "User API", description = "Operations related to users")
 public class UserManager {
         private final ModelMapper modelMapper;
 
@@ -39,11 +37,6 @@ public class UserManager {
                 this.modelMapper = modelMapper;
         }
 
-        @ApiOperation(value = "Update user information", notes = "Update the user information with the provided details.")
-        @ApiResponses({
-                        @ApiResponse(code = 200, message = "User updated successfully", response = ResponseMessage.class),
-                        @ApiResponse(code = 400, message = "Bad Request", response = ResponseMessage.class)
-        })
         @PutMapping("update/{id}")
         @PreAuthorize("isAuthenticated() and hasAuthority('USER')")
         public Mono<ResponseEntity<ResponseMessage>> update(@PathVariable("id") Long id,
@@ -61,50 +54,46 @@ public class UserManager {
                                                                 HttpStatus.BAD_REQUEST)));
         }
 
-        @ApiOperation(value = "Change user password", notes = "Change the password for the authenticated user.")
-        @ApiResponse(code = 200, message = "Password changed successfully", response = String.class)
         @PutMapping("/change-password")
         @PreAuthorize("isAuthenticated() and hasAuthority('USER')")
         public Mono<String> changePassword(@RequestBody ChangePasswordRequest request) {
                 return userService.changePassword(request);
         }
 
-        @ApiOperation(value = "Delete user", notes = "Delete a user with the specified ID.")
         @DeleteMapping("delete/{id}")
         @PreAuthorize("isAuthenticated() and (hasAuthority('USER') or hasAuthority('ADMIN'))")
         public Mono<String> delete(@PathVariable("id") Long id) {
                 return userService.delete(id);
         }
 
-        @ApiOperation(value = "Get user by username", notes = "Retrieve user information based on the provided username.")
         @GetMapping("/user")
         @PreAuthorize("(isAuthenticated() and (hasAuthority('USER') and principal.username == #username) or hasAuthority('ADMIN'))")
-        public Mono<ResponseEntity<?>> getUserByUsername(@RequestParam(value = "username") String username) {
+        public Mono<?> getUserByUsername(@RequestParam(value = "username") String username) {
                 return userService.findByUsername(username)
-                                .map(user -> modelMapper.map(user, UserDto.class))
-                                .map(userDto -> new ResponseEntity<>(userDto,
-                                                headerGenerator.getHeadersForSuccessGetMethod(), HttpStatus.OK))
+                                .map(user -> {
+                                        UserDto userDto = modelMapper.map(user, UserDto.class);
+                                        return new ResponseEntity<UserDto>(userDto,
+                                                headerGenerator.getHeadersForSuccessGetMethod(), HttpStatus.OK);
+                                })
                                 .defaultIfEmpty(new ResponseEntity<>(null, headerGenerator.getHeadersForError(),
-                                                HttpStatus.NOT_FOUND));
+                                                HttpStatus.NOT_FOUND))
+                                .map(r -> (Object)r);
         }
 
-        @ApiOperation(value = "Get user by ID", notes = "Retrieve user information based on the provided ID.")
-        @ApiResponses({
-                        @ApiResponse(code = 200, message = "User retrieved successfully", response = UserDto.class),
-                        @ApiResponse(code = 404, message = "User not found", response = ResponseEntity.class)
-        })
         @GetMapping("/user/{id}")
         @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER') and principal.id == #id")
-        public Mono<ResponseEntity<?>> getUserById(@PathVariable("id") Long id) {
+        public Mono<?> getUserById(@PathVariable("id") Long id) {
                 return userService.findById(id)
-                                .map(user -> modelMapper.map(user, UserDto.class))
-                                .map(userDto -> new ResponseEntity<>(userDto,
-                                                headerGenerator.getHeadersForSuccessGetMethod(), HttpStatus.OK))
+                                .map(user -> {
+                                        UserDto userDto = modelMapper.map(user, UserDto.class);
+                                        return new ResponseEntity<UserDto>(userDto,
+                                                headerGenerator.getHeadersForSuccessGetMethod(), HttpStatus.OK);
+                                })
                                 .defaultIfEmpty(new ResponseEntity<>(null, headerGenerator.getHeadersForError(),
-                                                HttpStatus.NOT_FOUND));
+                                                HttpStatus.NOT_FOUND))
+                                .map(r -> (Object)r);
         }
 
-        @ApiOperation(value = "Get a secure user resource", authorizations = { @Authorization(value = "JWT") })
         @GetMapping("/all")
         @PreAuthorize("hasAuthority('ADMIN')")
         public Mono<ResponseEntity<Page<UserDto>>> getAllUsers(@RequestParam(defaultValue = "0") int page,
@@ -117,13 +106,8 @@ public class UserManager {
                                                 headerGenerator.getHeadersForSuccessGetMethod(), HttpStatus.OK));
         }
 
-        @ApiOperation(value = "Get user information from token", notes = "Retrieve user information based on the provided JWT token.")
-        @ApiResponses({
-                        @ApiResponse(code = 200, message = "User information retrieved successfully", response = UserDto.class),
-                        @ApiResponse(code = 404, message = "User not found", response = ResponseEntity.class)
-        })
         @GetMapping("/info")
-        public Mono<ResponseEntity<?>> getUserInfo(@RequestHeader("Authorization") String token) {
+        public Mono<?> getUserInfo(@RequestHeader("Authorization") String token) {
                 String username = jwtProvider.getUserNameFromToken(token);
                 return userService.findByUsername(username)
                                 .map(user -> modelMapper.map(user, UserDto.class))

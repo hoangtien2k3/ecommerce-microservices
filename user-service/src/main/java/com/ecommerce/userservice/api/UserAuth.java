@@ -9,10 +9,6 @@ import com.ecommerce.userservice.model.dto.response.ResponseMessage;
 import com.ecommerce.userservice.security.validate.AuthorityTokenUtil;
 import com.ecommerce.userservice.service.UserService;
 import com.ecommerce.userservice.security.validate.TokenValidate;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +22,6 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/api/auth")
-@Api(value = "User Authentication API", description = "APIs for user registration, login, and authentication")
 @RequiredArgsConstructor
 public class UserAuth {
 
@@ -34,11 +29,6 @@ public class UserAuth {
     private final TokenValidate tokenValidate;
     private final AuthorityTokenUtil authorityTokenUtil;
 
-    @ApiOperation(value = "Register a new user", notes = "Registers a new user with the provided details.")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "User created successfully", response = ResponseMessage.class),
-            @ApiResponse(code = 500, message = "Internal Server Error", response = ResponseMessage.class)
-    })
     @PostMapping({ "/signup", "/register" })
     public Mono<ResponseMessage> register(@Valid @RequestBody SignUp signUp) {
         return userService.register(signUp)
@@ -46,11 +36,6 @@ public class UserAuth {
                 .onErrorResume(error -> Mono.just(new ResponseMessage("Error occurred while creating the account.")));
     }
 
-    @ApiOperation(value = "User login", notes = "Logs in a user with the provided credentials.")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Login successful", response = JwtResponseMessage.class),
-            @ApiResponse(code = 500, message = "Internal Server Error", response = ResponseEntity.class)
-    })
     @PostMapping({ "/signin", "/login" })
     public Mono<ResponseEntity<JwtResponseMessage>> login(@Valid @RequestBody Login signInForm) {
         return userService.login(signInForm)
@@ -64,11 +49,6 @@ public class UserAuth {
                 });
     }
 
-    @ApiOperation(value = "User logout", notes = "Logs out the authenticated user.")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Logged out successfully", response = String.class),
-            @ApiResponse(code = 400, message = "Bad Request", response = ResponseEntity.class)
-    })
     @PostMapping("/logout")
     @PreAuthorize("isAuthenticated() and hasAuthority('USER')")
     public Mono<ResponseEntity<String>> logout() {
@@ -81,11 +61,6 @@ public class UserAuth {
                 });
     }
 
-    @ApiOperation(value = "Validate JWT token", notes = "Validates the provided JWT token.")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Token is valid", response = Boolean.class),
-            @ApiResponse(code = 401, message = "Unauthorized", response = TokenValidationResponse.class)
-    })
     @GetMapping({ "/validateToken", "/validate-token" })
     public ResponseEntity<?> validateToken(@RequestHeader(name = "Authorization") String authorizationToken) {
         if (tokenValidate.validateToken(authorizationToken)) {
@@ -96,11 +71,6 @@ public class UserAuth {
         }
     }
 
-    @ApiOperation(value = "Check user authority", notes = "Checks if the user has the specified authority.")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Role access API", response = Boolean.class),
-            @ApiResponse(code = 401, message = "Unauthorized", response = TokenValidationResponse.class)
-    })
     @GetMapping({ "/hasAuthority", "/authorization" })
     public ResponseEntity<?> getAuthority(@RequestHeader(name = "Authorization") String authorizationToken,
             @RequestParam String requiredRole) {
