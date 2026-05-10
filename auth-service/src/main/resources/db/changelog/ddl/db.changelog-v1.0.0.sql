@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS users
     full_name        VARCHAR(100),
     user_name        VARCHAR(100) NOT NULL UNIQUE,
     email            VARCHAR(50)  NOT NULL UNIQUE,
-    password         VARCHAR(100),
     gender           VARCHAR(255) NOT NULL,
     phone_number     VARCHAR(11) UNIQUE,
     image_url        TEXT,

@@ -8,13 +8,11 @@ import com.ecommerce.authservice.service.RoleService;
 import com.ecommerce.authservice.service.UserService;
 import com.ecommerce.commonlib.exception.BusinessException;
 import com.ecommerce.commonlib.keycloak.KeycloakAuthClient;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.*;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
@@ -22,25 +20,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
     private final RoleService roleService;
     private final KeycloakAuthClient keycloakAuthClient;
-
-    @Autowired
-    public UserServiceImpl(UserRepository userRepository,
-            PasswordEncoder passwordEncoder,
-            ModelMapper modelMapper,
-            RoleService roleService,
-            KeycloakAuthClient keycloakAuthClient) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.modelMapper = modelMapper;
-        this.roleService = roleService;
-        this.keycloakAuthClient = keycloakAuthClient;
-    }
 
     @Override
     @Transactional
@@ -66,7 +52,6 @@ public class UserServiceImpl implements UserService {
 
         try {
             User user = modelMapper.map(signUp, User.class);
-            user.setPassword(passwordEncoder.encode(signUp.getPassword()));
             user.setKeycloakUserId(keycloakUserId);
             user.setRoles(requestedRoles
                 .stream()
@@ -97,7 +82,6 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> BusinessException.notFound("auth.user.not.found.for.update", id));
 
         modelMapper.map(updateDTO, existingUser);
-        existingUser.setPassword(passwordEncoder.encode(updateDTO.getPassword()));
 
         return userRepository.save(existingUser);
     }
@@ -105,34 +89,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public String changePassword(ChangePasswordRequest request) {
-        String username = getCurrentUsername();
-
-        User existingUser = userRepository.findByUsername(username)
-                .orElseThrow(() -> BusinessException.notFound("auth.user.not.found.with.username", username));
-
-        if (passwordEncoder.matches(request.getOldPassword(), existingUser.getPassword())) {
-            if (validateNewPassword(request.getNewPassword(), request.getConfirmPassword())) {
-                existingUser.setPassword(passwordEncoder.encode(request.getNewPassword()));
-                userRepository.save(existingUser);
-                return "Password changed successfully";
-            }
-
-            return "Password changed failed.";
-        } else {
-            throw BusinessException.badRequest("auth.incorrect.password");
-        }
-    }
-
-    private String getCurrentUsername() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated() || authentication.getName() == null) {
-            throw BusinessException.unauthorized("auth.user.not.authenticated");
-        }
-        return authentication.getName();
-    }
-
-    private boolean validateNewPassword(String newPassword, String confirmPassword) {
-        return Objects.equals(newPassword, confirmPassword);
+        throw BusinessException.badRequest("auth.password.managed.by.keycloak");
     }
 
     @Transactional

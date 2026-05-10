@@ -1,6 +1,5 @@
 package com.ecommerce.authservice.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.NaturalId;
 
@@ -43,12 +42,6 @@ public class User {
     @Email(message = "Input must be in Email format")
     @Column(name = "email")
     private String email;
-
-    @JsonIgnore
-    @NotNull(message = "Password must not be null")
-    @Size(min = 6, max = 100, message = "Password must be between 6 and 100 characters")
-    @Column(name = "password")
-    private String password;
 
     @NotBlank(message = "Gender must not be blank")
     @Column(name = "gender", nullable = false)
