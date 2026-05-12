@@ -15,7 +15,7 @@ import java.util.Set;
 public class SignUp {
     @NotBlank(message = "The fullName must not be left blank")
     @Size(min = 6, max = 50, message = "The fullName must be 6 characters or more")
-    private String fullname;
+    private String fullName;
 
     @NotBlank(message = "The username must not be left blank")
     @Size(min = 6, max = 50, message = "The username must be 6 characters or more")

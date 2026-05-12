@@ -29,7 +29,7 @@ public class User {
     @NotBlank(message = "Full name must not be blank")
     @Size(min = 3, max = 100, message = "Full name must be between 3 and 100 characters")
     @Column(name = "full_name")
-    private String fullname;
+    private String fullName;
 
     @NotBlank(message = "Username must not be blank")
     @Size(min = 3, max = 100, message = "Username must be between 3 and 100 characters")
