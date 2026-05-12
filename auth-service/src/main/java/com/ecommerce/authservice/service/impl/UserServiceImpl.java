@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
         String keycloakUserId = keycloakAuthClient.createUser(
             signUp.getUsername(),
             signUp.getEmail(),
-            signUp.getFullname(),
+            signUp.getFullName(),
             signUp.getPassword(),
             requestedRoles
         );
