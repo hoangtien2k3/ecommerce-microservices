@@ -19,6 +19,4 @@ public class KeycloakTokenResponse {
 
     @JsonProperty("refresh_expires_in")
     private Long refreshExpiresIn;
-
-    private String scope;
 }

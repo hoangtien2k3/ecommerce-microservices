@@ -10,7 +10,6 @@ import com.ecommerce.commonlib.exception.BusinessException;
 import com.ecommerce.commonlib.keycloak.KeycloakAuthClient;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
