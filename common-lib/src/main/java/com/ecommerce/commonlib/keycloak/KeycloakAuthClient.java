@@ -9,6 +9,7 @@ import java.util.Map;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -16,30 +17,34 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 
+import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.*;
+
 @Component
 @RequiredArgsConstructor
 public class KeycloakAuthClient {
+    private static final String BEARER_SCHEME = "Bearer";
+    
     private final RestClient.Builder restClientBuilder;
     private final KeycloakClientProperties properties;
 
     public KeycloakTokenResponse login(String username, String password) {
         MultiValueMap<String, String> form = baseClientForm();
-        form.add("grant_type", "password");
-        form.add("username", username);
-        form.add("password", password);
+        form.add(GRANT_TYPE, PASSWORD);
+        form.add(USERNAME, username);
+        form.add(PASSWORD, password);
         return postToken(form);
     }
 
     public KeycloakTokenResponse refreshToken(String refreshToken) {
         MultiValueMap<String, String> form = baseClientForm();
-        form.add("grant_type", "refresh_token");
-        form.add("refresh_token", refreshToken);
+        form.add(GRANT_TYPE, REFRESH_TOKEN);
+        form.add(REFRESH_TOKEN, refreshToken);
         return postToken(form);
     }
 
     public void logout(String refreshToken) {
         MultiValueMap<String, String> form = baseClientForm();
-        form.add("refresh_token", refreshToken);
+        form.add(REFRESH_TOKEN, refreshToken);
 
         execute(() -> restClientBuilder.build()
             .post()
@@ -84,7 +89,7 @@ public class KeycloakAuthClient {
         URI location = execute(() -> restClientBuilder.build()
             .post()
             .uri(properties.adminUsersEndpoint())
-            .header("Authorization", "Bearer " + adminToken)
+            .header(HttpHeaders.AUTHORIZATION, BEARER_SCHEME + " " + adminToken)
             .contentType(MediaType.APPLICATION_JSON)
             .body(payload)
             .retrieve()
@@ -106,7 +111,7 @@ public class KeycloakAuthClient {
         execute(() -> restClientBuilder.build()
             .delete()
             .uri(properties.adminUserByIdEndpoint(keycloakUserId))
-            .header("Authorization", "Bearer " + adminToken)
+            .header(HttpHeaders.AUTHORIZATION, BEARER_SCHEME + " " + adminToken)
             .retrieve()
             .toBodilessEntity());
     }
@@ -123,19 +128,19 @@ public class KeycloakAuthClient {
 
     private MultiValueMap<String, String> baseClientForm() {
         MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
-        form.add("client_id", properties.getClientId());
+        form.add(CLIENT_ID, properties.getClientId());
         if (properties.getClientSecret() != null && !properties.getClientSecret().isBlank()) {
-            form.add("client_secret", properties.getClientSecret());
+            form.add(CLIENT_SECRET, properties.getClientSecret());
         }
         return form;
     }
 
     private String fetchAdminAccessToken() {
         MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
-        form.add("client_id", properties.getAdminClientId());
-        form.add("username", properties.getAdminUsername());
-        form.add("password", properties.getAdminPassword());
-        form.add("grant_type", "password");
+        form.add(CLIENT_ID, properties.getAdminClientId());
+        form.add(USERNAME, properties.getAdminUsername());
+        form.add(PASSWORD, properties.getAdminPassword());
+        form.add(GRANT_TYPE, PASSWORD);
 
         KeycloakTokenResponse tokenResponse = execute(() -> restClientBuilder.build()
             .post()
@@ -161,9 +166,9 @@ public class KeycloakAuthClient {
             Map<String, Object> roleRepresentation = execute(() -> restClientBuilder.build()
                 .get()
                 .uri(properties.adminRoleByNameEndpoint(roleName))
-                .header("Authorization", "Bearer " + adminToken)
+                .header(HttpHeaders.AUTHORIZATION, BEARER_SCHEME + " " + adminToken)
                 .retrieve()
-                .body(new ParameterizedTypeReference<Map<String, Object>>() {
+                .body(new ParameterizedTypeReference<>() {
                 }));
             roleRepresentations.add(roleRepresentation);
         }
@@ -171,7 +176,7 @@ public class KeycloakAuthClient {
         execute(() -> restClientBuilder.build()
             .post()
             .uri(properties.adminUserRealmRoleMappingEndpoint(keycloakUserId))
-            .header("Authorization", "Bearer " + adminToken)
+            .header(HttpHeaders.AUTHORIZATION, BEARER_SCHEME + " " + adminToken)
             .contentType(MediaType.APPLICATION_JSON)
             .body(roleRepresentations)
             .retrieve()
