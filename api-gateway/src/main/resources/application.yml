@@ -9,86 +9,215 @@ spring:
     gateway:
       mvc:
         routes:
-          # FAVOURITE-SERVICE
-          - id: favourite-service
-            uri: lb://FAVOURITE-SERVICE
-            predicates:
-              - Path=/api/favourites/**
-
-          # INVENTORY-SERVICE
-          - id: inventory-service
-            uri: lb://INVENTORY-SERVICE
-            predicates:
-              - Path=/api/inventory/**
-
-          # NOTIFY-SERVICE
-          - id: notification-service-notifications
-            uri: lb://NOTIFICATION-SERVICE
-            predicates:
-              - Path=/api/email/**
-
-          - id: notification-service-payments
-            uri: lb://NOTIFICATION-SERVICE
-            predicates:
-              - Path=/api/payments/**
-
-          # ORDER-SERVICE
-          - id: order-service-carts
-            uri: lb://ORDER-SERVICE
-            predicates:
-              - Path=/api/carts/**
-
-          - id: order-service-orders
-            uri: lb://ORDER-SERVICE
-            predicates:
-              - Path=/api/orders/**
-
-          # PAYMENT-SERVICE
-          - id: payment-service
-            uri: lb://PAYMENT-SERVICE
-            predicates:
-              - Path=/api/payments/**
-
-          # PRODUCT-SERVICE
-          - id: product-categories
-            uri: lb://PRODUCT-SERVICE
-            predicates:
-              - Path=/api/categories/**
-
-          - id: product-products
-            uri: lb://PRODUCT-SERVICE
-            predicates:
-              - Path=/api/products/**
-
-          # SHIPPING-SERVICE
-          - id: shipping-service
-            uri: lb://SHIPPING-SERVICE
-            predicates:
-              - Path=/api/shippings/**
-
+          # =====================
           # AUTH-SERVICE
+          # =====================
           - id: auth-service-auth
             uri: lb://AUTH-SERVICE
             predicates:
               - Path=/api/auth/**
-
-          - id: auth-service-information
+          - id: auth-service-role
             uri: lb://AUTH-SERVICE
             predicates:
               - Path=/api/role/**
-
           - id: auth-service-manager
             uri: lb://AUTH-SERVICE
             predicates:
               - Path=/api/manager/**
 
+          # =====================
+          # PRODUCT-SERVICE
+          # =====================
+          - id: product-service-categories
+            uri: lb://PRODUCT-SERVICE
+            predicates:
+              - Path=/api/categories/**
+          - id: product-service-products
+            uri: lb://PRODUCT-SERVICE
+            predicates:
+              - Path=/api/products/**
+
+          # =====================
+          # ORDER-SERVICE
+          # =====================
+          - id: order-service-carts
+            uri: lb://ORDER-SERVICE
+            predicates:
+              - Path=/api/carts/**
+          - id: order-service-orders
+            uri: lb://ORDER-SERVICE
+            predicates:
+              - Path=/api/orders/**
+
+          # =====================
+          # PAYMENT-SERVICE
+          # =====================
+          - id: payment-service
+            uri: lb://PAYMENT-SERVICE
+            predicates:
+              - Path=/api/payments/**
+
+          # =====================
+          # INVENTORY-SERVICE
+          # =====================
+          - id: inventory-service
+            uri: lb://INVENTORY-SERVICE
+            predicates:
+              - Path=/api/inventory/**
+
+          # =====================
+          # SHIPPING-SERVICE
+          # =====================
+          - id: shipping-service
+            uri: lb://SHIPPING-SERVICE
+            predicates:
+              - Path=/api/shippings/**
+
+          # =====================
+          # FAVOURITE-SERVICE
+          # =====================
+          - id: favourite-service
+            uri: lb://FAVOURITE-SERVICE
+            predicates:
+              - Path=/api/favourites/**
+
+          # =====================
+          # NOTIFICATION-SERVICE
+          # =====================
+          - id: notification-service-email
+            uri: lb://NOTIFICATION-SERVICE
+            predicates:
+              - Path=/api/email/**
+          - id: notification-service-notifications
+            uri: lb://NOTIFICATION-SERVICE
+            predicates:
+              - Path=/api/notifications/**
+          - id: notification-service-payment-notifications
+            uri: lb://NOTIFICATION-SERVICE
+            predicates:
+              - Path=/api/payment-notifications/**
+
+          # =====================
+          # MEDIA-SERVICE
+          # =====================
+          - id: media-service
+            uri: lb://MEDIA-SERVICE
+            predicates:
+              - Path=/medias/**
+
+          # =====================
+          # RATING-SERVICE
+          # =====================
+          - id: rating-service-storefront
+            uri: lb://RATING-SERVICE
+            predicates:
+              - Path=/storefront/ratings/**
+          - id: rating-service-backoffice
+            uri: lb://RATING-SERVICE
+            predicates:
+              - Path=/backoffice/ratings/**
+
+          # =====================
+          # SEARCH-SERVICE
+          # =====================
+          - id: search-service
+            uri: lb://SEARCH-SERVICE
+            predicates:
+              - Path=/storefront/catalog-search,/storefront/search_suggest
+
+          # =====================
+          # PROMOTION-SERVICE
+          # =====================
+          - id: promotion-service
+            uri: lb://PROMOTION-SERVICE
+            predicates:
+              - Path=/backoffice/promotions/**
+
+          # =====================
+          # TAX-SERVICE
+          # =====================
+          - id: tax-service-classes
+            uri: lb://TAX-SERVICE
+            predicates:
+              - Path=/backoffice/tax-classes/**
+          - id: tax-service-rates
+            uri: lb://TAX-SERVICE
+            predicates:
+              - Path=/backoffice/tax-rates/**
+
+          # =====================
+          # SWAGGER / OPENAPI AGGREGATION
+          # =====================
+          - id: openapi-auth
+            uri: lb://AUTH-SERVICE
+            predicates:
+              - Path=/auth/v3/api-docs/**
+          - id: openapi-product
+            uri: lb://PRODUCT-SERVICE
+            predicates:
+              - Path=/product/v3/api-docs/**
+          - id: openapi-order
+            uri: lb://ORDER-SERVICE
+            predicates:
+              - Path=/order/v3/api-docs/**
+          - id: openapi-payment
+            uri: lb://PAYMENT-SERVICE
+            predicates:
+              - Path=/payment/v3/api-docs/**
+          - id: openapi-inventory
+            uri: lb://INVENTORY-SERVICE
+            predicates:
+              - Path=/inventory/v3/api-docs/**
+          - id: openapi-shipping
+            uri: lb://SHIPPING-SERVICE
+            predicates:
+              - Path=/shipping/v3/api-docs/**
+          - id: openapi-favourite
+            uri: lb://FAVOURITE-SERVICE
+            predicates:
+              - Path=/favourite/v3/api-docs/**
+          - id: openapi-notification
+            uri: lb://NOTIFICATION-SERVICE
+            predicates:
+              - Path=/notification/v3/api-docs/**
+          - id: openapi-media
+            uri: lb://MEDIA-SERVICE
+            predicates:
+              - Path=/media/v3/api-docs/**
+          - id: openapi-rating
+            uri: lb://RATING-SERVICE
+            predicates:
+              - Path=/rating/v3/api-docs/**
+          - id: openapi-search
+            uri: lb://SEARCH-SERVICE
+            predicates:
+              - Path=/search/v3/api-docs/**
+          - id: openapi-promotion
+            uri: lb://PROMOTION-SERVICE
+            predicates:
+              - Path=/promotion/v3/api-docs/**
+          - id: openapi-tax
+            uri: lb://TAX-SERVICE
+            predicates:
+              - Path=/tax/v3/api-docs/**
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/ezbuy-server}
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8080/realms/ezbuy-server/protocol/openid-connect/certs}
+
 eureka:
   client:
     serviceUrl:
       defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+  instance:
+    preferIpAddress: true
+    hostname: ${HOSTNAME:localhost}
 
 logging:
   level:
     root: INFO
-    "[org.springframework.cloud.gateway.route.RouteDefinitionLocator]": INFO
     "[org.springframework.cloud.gateway]": TRACE
+    "[org.springframework.security]": DEBUG
