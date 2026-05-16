@@ -1,18 +1,17 @@
-package com.ecommerce.authservice.model.dto.request;
-
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+package com.ecommerce.authservice.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Set;
 
-@Setter
 @Getter
-@RequiredArgsConstructor
-public class SignUp {
+@Setter
+public class RegisterRequest {
+
     @NotBlank(message = "The fullName must not be left blank")
     @Size(min = 6, max = 50, message = "The fullName must be 6 characters or more")
     private String fullName;
@@ -21,9 +20,10 @@ public class SignUp {
     @Size(min = 6, max = 50, message = "The username must be 6 characters or more")
     private String username;
 
+    @NotBlank(message = "The password must not be left blank")
     @Size(min = 8, max = 50, message = "Password must be between 8 and 50 characters")
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$",
-            message = "Password must contain all uppercase and lowercase letters and numbers")
+            message = "Password must contain uppercase, lowercase letters and numbers")
     private String password;
 
     @Size(max = 50)
@@ -41,5 +41,4 @@ public class SignUp {
     private String avatar;
 
     private Set<String> roles;
-
 }

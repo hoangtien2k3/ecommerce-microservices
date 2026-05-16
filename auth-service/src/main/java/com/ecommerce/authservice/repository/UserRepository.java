@@ -1,9 +1,7 @@
 package com.ecommerce.authservice.repository;
 
-import com.ecommerce.authservice.model.entity.User;
+import com.ecommerce.authservice.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -11,32 +9,13 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    @Query("SELECT u FROM User u WHERE u.username = :username") // JPQL
-    Optional<User> findByUsername(@Param("username") String username);
+    Optional<User> findByUsername(String username);
 
-    @Query("SELECT u FROM User u WHERE u.email = :email")
-    Optional<User> findByEmail(@Param("email") String name);
+    Optional<User> findByEmail(String email);
 
-    @Query("SELECT u FROM User u WHERE u.id = :id")
-    Optional<User> findById(@Param("id") Long id);
+    boolean existsByUsername(String username);
 
-    @Query("SELECT CASE WHEN COUNT(u) > 0 " +
-            "THEN true " +
-            "ELSE false " +
-            "END FROM User u " +
-            "WHERE u.username = :username")
-    boolean existsByUsername(@Param("username") String username);
+    boolean existsByEmail(String email);
 
-    @Query("SELECT CASE WHEN COUNT(u) > 0 " +
-            "THEN true " +
-            "ELSE false " +
-            "END FROM User u WHERE u.email = :email")
-    boolean existsByEmail(@Param("email") String email);
-
-    @Query("SELECT CASE WHEN COUNT(u) > 0 " +
-            "THEN true " +
-            "ELSE false " +
-            "END FROM User u WHERE u.phone = :phone")
-    boolean existsByPhoneNumber(@Param("phone") String phone);
-
+    boolean existsByPhone(String phone);
 }

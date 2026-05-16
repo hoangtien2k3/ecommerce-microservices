@@ -1,15 +1,16 @@
 package com.ecommerce.authservice.service;
 
-import com.ecommerce.authservice.model.dto.request.ChangePasswordRequest;
-import com.ecommerce.authservice.model.dto.request.SignUp;
-import com.ecommerce.authservice.model.dto.request.UserDto;
-import com.ecommerce.authservice.model.entity.User;
+import com.ecommerce.authservice.dto.request.ChangePasswordRequest;
+import com.ecommerce.authservice.dto.request.RegisterRequest;
+import com.ecommerce.authservice.dto.request.UpdateUserRequest;
+import com.ecommerce.authservice.dto.response.UserResponse;
+import com.ecommerce.authservice.entity.User;
 import org.springframework.data.domain.Page;
 
 public interface UserService {
-    User register(SignUp signUp);
+    User register(RegisterRequest request);
 
-    User update(Long userId, SignUp update);
+    UserResponse update(Long userId, UpdateUserRequest request);
 
     String changePassword(ChangePasswordRequest request);
 
@@ -19,5 +20,5 @@ public interface UserService {
 
     User findByUsername(String userName);
 
-    Page<UserDto> findAllUsers(int page, int size, String sortBy, String sortOrder);
+    Page<UserResponse> findAllUsers(int page, int size, String sortBy, String sortOrder);
 }

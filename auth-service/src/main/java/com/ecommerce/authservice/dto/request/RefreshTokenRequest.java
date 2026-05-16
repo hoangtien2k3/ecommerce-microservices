@@ -1,4 +1,4 @@
-package com.ecommerce.authservice.model.dto.request;
+package com.ecommerce.authservice.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

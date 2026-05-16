@@ -40,6 +40,4 @@ INSERT INTO roles (id, role_name)
 VALUES (3, 'ADMIN')
 ON CONFLICT (id) DO NOTHING;
 
-ALTER TABLE users
-    ADD COLUMN IF NOT EXISTS keycloak_user_id VARCHAR(64);
-CREATE UNIQUE INDEX IF NOT EXISTS uk_users_keycloak_user_id ON users (keycloak_user_id);
+

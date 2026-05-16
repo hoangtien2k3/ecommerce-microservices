@@ -2,7 +2,6 @@ package com.ecommerce.authservice.controller;
 
 import com.ecommerce.authservice.service.RoleService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,12 +12,11 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/api/role")
-public class UserRole {
+public class RoleController {
 
     private final RoleService roleService;
 
-    @Autowired
-    public UserRole(RoleService roleService) {
+    public RoleController(RoleService roleService) {
         this.roleService = roleService;
     }
 
@@ -47,5 +45,4 @@ public class UserRole {
         List<String> userRoles = roleService.getUserRoles(id);
         return ResponseEntity.ok(userRoles);
     }
-
 }

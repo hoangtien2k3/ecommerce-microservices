@@ -7,6 +7,6 @@ WORKDIR /home/app
 ENV SPRING_PROFILES_ACTIVE application
 COPY ./ .
 ADD target/auth-service-0.0.1-SNAPSHOT.jar auth-service-0.0.1-SNAPSHOT.jar
-EXPOSE 8888
+EXPOSE 8088
 ENTRYPOINT ["java", "-jar", "auth-service-0.0.1-SNAPSHOT.jar"]
 CMD ["mvn", "spring-boot:run"]

@@ -2,8 +2,8 @@ package com.ecommerce.commonlib.csv;
 
 import com.opencsv.CSVWriter;
 import com.opencsv.ICSVWriter;
-import com.ecommerce.commonlib.csv.anotation.CsvColumn;
-import com.ecommerce.commonlib.csv.anotation.CsvName;
+import com.ecommerce.commonlib.csv.annotation.CsvColumn;
+import com.ecommerce.commonlib.csv.annotation.CsvName;
 import com.ecommerce.commonlib.utils.DateTimeUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

@@ -1,18 +1,14 @@
-package com.ecommerce.authservice.model.entity;
-
-import lombok.*;
-import lombok.experimental.Accessors;
-import org.hibernate.annotations.NaturalId;
+package com.ecommerce.authservice.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.NaturalId;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString
-@With
-@Accessors(fluent = true)
 @Entity
 @Table(name = "roles")
 public class Role {
@@ -26,5 +22,4 @@ public class Role {
     @NaturalId
     @Column(name = "role_name", length = 60)
     private RoleName name;
-
 }

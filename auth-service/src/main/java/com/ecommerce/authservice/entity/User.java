@@ -1,17 +1,17 @@
-package com.ecommerce.authservice.model.entity;
-
-import lombok.*;
-import org.hibernate.annotations.NaturalId;
+package com.ecommerce.authservice.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import lombok.*;
+import org.hibernate.annotations.NaturalId;
+
 import java.util.HashSet;
 import java.util.Set;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Entity
 @Table(name = "users", uniqueConstraints = {
@@ -66,5 +66,4 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
-
 }

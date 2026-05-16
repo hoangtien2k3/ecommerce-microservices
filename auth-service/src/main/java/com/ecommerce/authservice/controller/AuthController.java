@@ -1,15 +1,15 @@
 package com.ecommerce.authservice.controller;
 
-import com.ecommerce.authservice.model.dto.request.Login;
-import com.ecommerce.authservice.model.dto.request.RefreshTokenRequest;
-import com.ecommerce.authservice.model.dto.request.SignUp;
-import com.ecommerce.authservice.model.dto.response.ResponseMessage;
+import com.ecommerce.authservice.dto.request.LoginRequest;
+import com.ecommerce.authservice.dto.request.RefreshTokenRequest;
+import com.ecommerce.authservice.dto.request.RegisterRequest;
+import com.ecommerce.authservice.dto.response.ResponseMessage;
 import com.ecommerce.authservice.service.UserService;
 import com.ecommerce.commonlib.keycloak.KeycloakAuthClient;
 import com.ecommerce.commonlib.keycloak.KeycloakTokenResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,15 +20,15 @@ public class AuthController {
     private final UserService userService;
     private final KeycloakAuthClient keycloakAuthClient;
 
-    @PostMapping({ "/signup", "/register" })
-    public ResponseMessage register(@Valid @RequestBody SignUp signUp) {
-        userService.register(signUp);
-        return new ResponseMessage("Create user: " + signUp.getUsername() + " successfully.");
+    @PostMapping({"/signup", "/register"})
+    public ResponseMessage register(@Valid @RequestBody RegisterRequest request) {
+        userService.register(request);
+        return new ResponseMessage("Create user: " + request.getUsername() + " successfully.");
     }
 
-    @PostMapping({ "/signin", "/login" })
-    public ResponseEntity<KeycloakTokenResponse> login(@Valid @RequestBody Login signInForm) {
-        KeycloakTokenResponse tokenResponse = keycloakAuthClient.login(signInForm.getUsername(), signInForm.getPassword());
+    @PostMapping({"/signin", "/login"})
+    public ResponseEntity<KeycloakTokenResponse> login(@Valid @RequestBody LoginRequest request) {
+        KeycloakTokenResponse tokenResponse = keycloakAuthClient.login(request.getUsername(), request.getPassword());
         return ResponseEntity.ok(tokenResponse);
     }
 
@@ -43,5 +43,4 @@ public class AuthController {
         keycloakAuthClient.logout(request.getRefreshToken());
         return ResponseEntity.ok(new ResponseMessage("Logout successfully."));
     }
-
 }

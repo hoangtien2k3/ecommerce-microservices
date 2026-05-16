@@ -1,8 +1,6 @@
 package com.ecommerce.commonlib.constants;
 
 public final class ApiConstant {
-    public static final String WAREHOUSE_URL = "/backoffice/warehouses";
-    public static final String STOCK_HISTORY_URL = "/backoffice/stocks/histories";
 
     public static final String CODE_200 = "200";
     public static final String OK = "Ok";
@@ -29,8 +27,6 @@ public final class ApiConstant {
     public static final String CODE_500 = "500";
     public static final String INTERNAL_SERVER_ERROR = "Internal server error";
 
-
     private ApiConstant() {
-        //Add constructor
     }
 }
