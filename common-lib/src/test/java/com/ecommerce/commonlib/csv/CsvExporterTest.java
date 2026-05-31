@@ -1,7 +1,7 @@
 package com.ecommerce.commonlib.csv;
 
-import com.ecommerce.commonlib.csv.anotation.CsvColumn;
-import com.ecommerce.commonlib.csv.anotation.CsvName;
+import com.ecommerce.commonlib.csv.annotation.CsvColumn;
+import com.ecommerce.commonlib.csv.annotation.CsvName;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;

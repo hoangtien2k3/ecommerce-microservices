@@ -1,7 +1,7 @@
 package com.ecommerce.promotion.service;
 
 import com.ecommerce.promotion.config.ServiceUrlConfig;
-import com.ecommerce.promotion.utils.AuthenticationUtils;
+import com.ecommerce.commonlib.utils.AuthenticationUtils;
 import com.ecommerce.promotion.viewmodel.BrandVm;
 import com.ecommerce.promotion.viewmodel.CategoryGetVm;
 import com.ecommerce.promotion.viewmodel.ProductVm;

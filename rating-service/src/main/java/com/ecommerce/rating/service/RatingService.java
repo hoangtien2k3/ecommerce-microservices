@@ -5,7 +5,7 @@ import com.ecommerce.rating.exception.NotFoundException;
 import com.ecommerce.rating.exception.ResourceExistedException;
 import com.ecommerce.rating.model.Rating;
 import com.ecommerce.rating.repository.RatingRepository;
-import com.ecommerce.rating.utils.AuthenticationUtils;
+import com.ecommerce.commonlib.utils.AuthenticationUtils;
 import com.ecommerce.rating.utils.Constants;
 import com.ecommerce.rating.viewmodel.CustomerVm;
 import com.ecommerce.rating.viewmodel.RatingListVm;

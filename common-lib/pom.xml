@@ -52,6 +52,20 @@
             <version>5.9</version>
         </dependency>
 
+        <!-- Observability + Resilience (inherited by every service depending on common-lib) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-spring-boot3</artifactId>
+        </dependency>
+
         <!-- Test Dependency -->
         <dependency>
             <groupId>org.testcontainers</groupId>

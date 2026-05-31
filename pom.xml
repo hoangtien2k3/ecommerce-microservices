@@ -57,6 +57,7 @@
         <testcontainers-keycloak.version>3.3.0</testcontainers-keycloak.version>
         <rest-assured.version>5.4.0</rest-assured.version>
         <instancio-junit.version>4.8.1</instancio-junit.version>
+        <resilience4j.version>2.2.0</resilience4j.version>
         <maven.compiler.compilerArgs>
             --add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED
             --add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED
@@ -128,6 +129,16 @@
                 <artifactId>instancio-junit</artifactId>
                 <version>${instancio-junit.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.github.resilience4j</groupId>
+                <artifactId>resilience4j-spring-boot3</artifactId>
+                <version>${resilience4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.resilience4j</groupId>
+                <artifactId>resilience4j-reactor</artifactId>
+                <version>${resilience4j.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

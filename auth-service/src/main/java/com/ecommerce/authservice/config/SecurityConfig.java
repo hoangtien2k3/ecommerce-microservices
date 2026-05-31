@@ -1,5 +1,6 @@
 package com.ecommerce.authservice.config;
 
+import com.ecommerce.commonlib.constants.ApiPaths;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -16,10 +17,10 @@ public class SecurityConfig {
     private static final String[] PUBLIC_ENDPOINTS = {
             "/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**",
             "/actuator/**",
-            "/api/auth/signup", "/api/auth/register",
-            "/api/auth/signin", "/api/auth/login",
-            "/api/auth/refresh", "/api/auth/refresh-token",
-            "/api/auth/logout"
+            ApiPaths.AUTH + "/signup",
+            ApiPaths.AUTH + "/signin",
+            ApiPaths.AUTH + "/refresh",
+            ApiPaths.AUTH + "/logout"
     };
 
     @Bean

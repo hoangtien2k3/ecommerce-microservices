@@ -3,22 +3,24 @@ package com.ecommerce.authservice.controller;
 import com.ecommerce.authservice.dto.request.LoginRequest;
 import com.ecommerce.authservice.dto.request.RefreshTokenRequest;
 import com.ecommerce.authservice.dto.request.RegisterRequest;
-import com.ecommerce.authservice.dto.response.ResponseMessage;
 import com.ecommerce.authservice.service.UserService;
 import com.ecommerce.commonlib.keycloak.KeycloakAuthClient;
 import com.ecommerce.commonlib.keycloak.KeycloakClientProperties;
-import com.ecommerce.commonlib.keycloak.KeycloakTokenResponse;
+import com.ecommerce.commonlib.viewmodel.ApiResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
@@ -50,10 +52,11 @@ class AuthControllerTest {
 
         when(userService.register(any(RegisterRequest.class))).thenReturn(null);
 
-        ResponseMessage response = authController.register(request);
+        ApiResponse<Void> response = authController.register(request);
 
         assertNotNull(response);
-        assertEquals("Create user: newuser successfully.", response.getMessage());
+        assertTrue(response.success());
+        assertEquals("User newuser registered successfully", response.message());
         verify(userService).register(request);
     }
 

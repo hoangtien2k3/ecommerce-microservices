@@ -1,18 +1,21 @@
 package com.ecommerce.authservice.controller;
 
 import com.ecommerce.authservice.service.RoleService;
+import com.ecommerce.commonlib.exception.BusinessException;
+import com.ecommerce.commonlib.viewmodel.ApiResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class RoleControllerTest {
@@ -31,20 +34,18 @@ class RoleControllerTest {
     void assignRolesShouldReturnSuccessMessage() {
         when(roleService.assignRole(1L, "ADMIN")).thenReturn(true);
 
-        ResponseEntity<?> response = roleController.assignRoles(1L, "ADMIN");
+        ApiResponse<Void> response = roleController.assignRoles(1L, "ADMIN");
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Roles have been assigned to users with IDs 1", response.getBody());
+        assertTrue(response.success());
+        assertEquals("Roles assigned to user 1", response.message());
         verify(roleService).assignRole(1L, "ADMIN");
     }
 
     @Test
-    void assignRolesWhenAlreadyAssignedShouldReturnBadRequest() {
+    void assignRolesWhenAlreadyAssignedShouldThrow() {
         when(roleService.assignRole(1L, "USER")).thenReturn(false);
 
-        ResponseEntity<?> response = roleController.assignRoles(1L, "USER");
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertThrows(BusinessException.class, () -> roleController.assignRoles(1L, "USER"));
         verify(roleService).assignRole(1L, "USER");
     }
 
@@ -52,20 +53,18 @@ class RoleControllerTest {
     void revokeRolesShouldReturnSuccessMessage() {
         when(roleService.revokeRole(1L, "USER")).thenReturn(true);
 
-        ResponseEntity<?> response = roleController.revokeRoles(1L, "USER");
+        ApiResponse<Void> response = roleController.revokeRoles(1L, "USER");
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Roles have been revoked from user ID 1", response.getBody());
+        assertTrue(response.success());
+        assertEquals("Roles revoked from user 1", response.message());
         verify(roleService).revokeRole(1L, "USER");
     }
 
     @Test
-    void revokeRolesWhenNotAssignedShouldReturnBadRequest() {
+    void revokeRolesWhenNotAssignedShouldThrow() {
         when(roleService.revokeRole(1L, "ADMIN")).thenReturn(false);
 
-        ResponseEntity<?> response = roleController.revokeRoles(1L, "ADMIN");
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertThrows(BusinessException.class, () -> roleController.revokeRoles(1L, "ADMIN"));
         verify(roleService).revokeRole(1L, "ADMIN");
     }
 
@@ -74,12 +73,12 @@ class RoleControllerTest {
         List<String> expectedRoles = List.of("USER", "ADMIN");
         when(roleService.getUserRoles(1L)).thenReturn(expectedRoles);
 
-        ResponseEntity<List<String>> response = roleController.getUserRoles(1L);
+        ApiResponse<List<String>> response = roleController.getUserRoles(1L);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(2, response.getBody().size());
-        assertTrue(response.getBody().contains("USER"));
-        assertTrue(response.getBody().contains("ADMIN"));
+        assertTrue(response.success());
+        assertEquals(2, response.data().size());
+        assertTrue(response.data().contains("USER"));
+        assertTrue(response.data().contains("ADMIN"));
         verify(roleService).getUserRoles(1L);
     }
 }

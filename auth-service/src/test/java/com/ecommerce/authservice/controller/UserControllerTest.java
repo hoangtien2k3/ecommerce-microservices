@@ -1,11 +1,11 @@
 package com.ecommerce.authservice.controller;
 
 import com.ecommerce.authservice.dto.request.UpdateUserRequest;
-import com.ecommerce.authservice.dto.response.ResponseMessage;
 import com.ecommerce.authservice.dto.response.UserResponse;
 import com.ecommerce.authservice.entity.User;
 import com.ecommerce.authservice.mapper.UserMapper;
 import com.ecommerce.authservice.service.UserService;
+import com.ecommerce.commonlib.viewmodel.ApiResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,14 +14,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
@@ -43,10 +45,10 @@ class UserControllerTest {
         when(userService.update(anyLong(), any(UpdateUserRequest.class)))
                 .thenReturn(UserResponse.builder().build());
 
-        ResponseEntity<ResponseMessage> response = userController.update(1L, new UpdateUserRequest());
+        ApiResponse<UserResponse> response = userController.update(1L, new UpdateUserRequest());
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Update user successfully.", response.getBody().getMessage());
+        assertTrue(response.success());
+        assertEquals("User updated successfully", response.message());
         verify(userService).update(eq(1L), any(UpdateUserRequest.class));
     }
 
@@ -57,10 +59,10 @@ class UserControllerTest {
 
         when(userService.findByUsername("testuser")).thenReturn(user);
 
-        ResponseEntity<UserResponse> response = userController.getUserByUsername("testuser");
+        ApiResponse<UserResponse> response = userController.getUserByUsername("testuser");
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("testuser", response.getBody().getUsername());
+        assertTrue(response.success());
+        assertEquals("testuser", response.data().getUsername());
     }
 
     @Test
@@ -71,10 +73,10 @@ class UserControllerTest {
 
         when(userService.findById(1L)).thenReturn(user);
 
-        ResponseEntity<UserResponse> response = userController.getUserById(1L);
+        ApiResponse<UserResponse> response = userController.getUserById(1L);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("testuser", response.getBody().getUsername());
+        assertTrue(response.success());
+        assertEquals("testuser", response.data().getUsername());
     }
 
     @Test
@@ -84,18 +86,19 @@ class UserControllerTest {
 
         when(userService.findAllUsers(0, 10, "id", "ASC")).thenReturn(page);
 
-        ResponseEntity<Page<UserResponse>> response = userController.getAllUsers(0, 10, "id", "ASC");
+        ApiResponse<Page<UserResponse>> response = userController.getAllUsers(0, 10, "id", "ASC");
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(1, response.getBody().getContent().size());
+        assertTrue(response.success());
+        assertEquals(1, response.data().getContent().size());
     }
 
     @Test
     void deleteShouldReturnSuccessMessage() {
         when(userService.delete(1L)).thenReturn("User with id 1 deleted successfully.");
 
-        String result = userController.delete(1L);
+        ApiResponse<Void> response = userController.delete(1L);
 
-        assertEquals("User with id 1 deleted successfully.", result);
+        assertTrue(response.success());
+        assertEquals("User 1 deleted successfully", response.message());
     }
 }

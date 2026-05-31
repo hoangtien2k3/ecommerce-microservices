@@ -1,22 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <property name="ENCODING" value="UTF-8"/>
-    <property name="LOG_LEVEL" value="DEBUG"/>
-    <include
-            resource="org/springframework/boot/logging/logback/base.xml"/>
-    <springProperty scope="context" name="appName"
-                    source="spring.application.name"/>
-    <!-- Reuse the log from Spring -->
-    <include
-            resource="org/springframework/boot/logging/logback/defaults.xml"/>
-    <include
-            resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <springProperty scope="context" name="appName" source="spring.application.name"/>
 
-    <appender name="CONSOLE"
-              class="ch.qos.logback.core.ConsoleAppender">
-        <Target>${user-system}.out</Target>
+    <property name="LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) [${appName:-app}] [%X{correlationId:-},%X{requestId:-}] [%thread] %cyan(%logger{36}) - %msg%n"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <pattern>${LOG_PATTERN}</pattern>
             <charset>${ENCODING}</charset>
         </encoder>
     </appender>

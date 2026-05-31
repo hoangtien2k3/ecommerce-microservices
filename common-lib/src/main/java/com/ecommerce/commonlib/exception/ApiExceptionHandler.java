@@ -1,173 +1,136 @@
 package com.ecommerce.commonlib.exception;
 
-import com.ecommerce.commonlib.viewmodel.error.ErrorVm;
+import com.ecommerce.commonlib.constants.ErrorCode;
+import com.ecommerce.commonlib.utils.MessagesUtils;
+import com.ecommerce.commonlib.viewmodel.ApiResponse;
 import jakarta.validation.ConstraintViolationException;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
-@ControllerAdvice
+import java.util.List;
+
+/**
+ * Global, cross-service exception translator. Every uncaught exception in any service
+ * is converted to the canonical {@link ApiResponse} envelope so clients see one shape.
+ */
+@RestControllerAdvice
+@Order(Ordered.LOWEST_PRECEDENCE)
 @Slf4j
 public class ApiExceptionHandler {
-    private static final String ERROR_LOG_FORMAT = "Error: URI: {}, ErrorCode: {}, Message: {}";
-    private static final String INVALID_REQUEST_INFORMATION_MESSAGE = "Request information is not valid";
+
+    private static final String ERROR_LOG_FORMAT = "ApiError uri={} status={} code={} message={}";
 
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ErrorVm> handleBusinessException(BusinessException ex, WebRequest request) {
-        return buildErrorResponse(ex.getStatus(), ex.getMessage(), null, ex, request, ex.getStatus().value());
+    public ResponseEntity<ApiResponse<Void>> handleBusinessException(BusinessException ex, WebRequest request) {
+        return build(ex.getStatus(), ex.getErrorCode(), ex.getMessage(), null, request, ex);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    protected ResponseEntity<ErrorVm> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-                                                                   WebRequest request) {
-
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-
-        List<String> errors = ex.getBindingResult()
-            .getFieldErrors()
-            .stream()
-            .map(error -> error.getField() + " " + error.getDefaultMessage())
-            .toList();
-
-        return buildErrorResponse(status, INVALID_REQUEST_INFORMATION_MESSAGE, errors, ex, request, 0);
+    public ResponseEntity<ApiResponse<Void>> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+                                                                          WebRequest request) {
+        List<String> errors = ex.getBindingResult().getFieldErrors().stream()
+                .map(e -> e.getField() + ": " + e.getDefaultMessage())
+                .toList();
+        return build(HttpStatus.BAD_REQUEST,
+                ErrorCode.VALIDATION_FAILED.getCode(),
+                MessagesUtils.getMessage(ErrorCode.VALIDATION_FAILED.getMessageKey()),
+                errors, request, ex);
     }
 
     @ExceptionHandler(HandlerMethodValidationException.class)
-    protected ResponseEntity<ErrorVm> handleHandlerMethodValidationException(HandlerMethodValidationException ex) {
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-
+    public ResponseEntity<ApiResponse<Void>> handleHandlerMethodValidation(HandlerMethodValidationException ex,
+                                                                           WebRequest request) {
         List<String> errors = ex.getAllErrors().stream()
-            .map(error -> {
-                if (error instanceof FieldError fieldError) {
-                    return fieldError.getField() + " " + fieldError.getDefaultMessage();
-                }
-                return error.getDefaultMessage();
-            }).toList();
-
-        return buildErrorResponse(status, INVALID_REQUEST_INFORMATION_MESSAGE, errors, ex, null, status.value());
+                .map(e -> e instanceof FieldError fe ? fe.getField() + ": " + fe.getDefaultMessage()
+                                                     : e.getDefaultMessage())
+                .toList();
+        return build(HttpStatus.BAD_REQUEST,
+                ErrorCode.VALIDATION_FAILED.getCode(),
+                MessagesUtils.getMessage(ErrorCode.VALIDATION_FAILED.getMessageKey()),
+                errors, request, ex);
     }
 
-    @ExceptionHandler({ConstraintViolationException.class})
-    public ResponseEntity<ErrorVm> handleConstraintViolation(ConstraintViolationException ex) {
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleConstraintViolation(ConstraintViolationException ex,
+                                                                       WebRequest request) {
         List<String> errors = ex.getConstraintViolations().stream()
-            .map(violation -> String.format("%s %s: %s",
-                violation.getRootBeanClass().getName(),
-                violation.getPropertyPath(),
-                violation.getMessage()))
-            .toList();
-
-        return buildErrorResponse(status, INVALID_REQUEST_INFORMATION_MESSAGE, errors, ex, null, 0);
-    }
-
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ErrorVm> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
-        return handleBadRequest(ex, null);
+                .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                .toList();
+        return build(HttpStatus.BAD_REQUEST,
+                ErrorCode.VALIDATION_FAILED.getCode(),
+                MessagesUtils.getMessage(ErrorCode.VALIDATION_FAILED.getMessageKey()),
+                errors, request, ex);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    protected ResponseEntity<ErrorVm> handleMissingParams(MissingServletRequestParameterException e) {
-        return handleBadRequest(e, null);
+    public ResponseEntity<ApiResponse<Void>> handleMissingParam(MissingServletRequestParameterException ex,
+                                                                WebRequest request) {
+        return build(HttpStatus.BAD_REQUEST, ErrorCode.BAD_REQUEST.getCode(), ex.getMessage(), null, request, ex);
     }
 
-    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
-    public ResponseEntity<ErrorVm> handleSecurityAccessDeniedException(
-        org.springframework.security.access.AccessDeniedException ex, WebRequest request) {
-        HttpStatus status = HttpStatus.FORBIDDEN;
-        String message = ex.getMessage();
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDataIntegrity(DataIntegrityViolationException ex,
+                                                                 WebRequest request) {
+        return build(HttpStatus.CONFLICT, ErrorCode.CONFLICT.getCode(),
+                ex.getMostSpecificCause().getMessage(), null, request, ex);
+    }
 
-        return buildErrorResponse(status, message, null, ex, request, 403);
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex,
+                                                                      WebRequest request) {
+        return build(HttpStatus.METHOD_NOT_ALLOWED, ErrorCode.METHOD_NOT_ALLOWED.getCode(),
+                ex.getMessage(), null, request, ex);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAccessDenied(AccessDeniedException ex, WebRequest request) {
+        return build(HttpStatus.FORBIDDEN, ErrorCode.FORBIDDEN.getCode(),
+                MessagesUtils.getMessage(ErrorCode.FORBIDDEN.getMessageKey()), null, request, ex);
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ErrorVm> handleAuthenticationException(AuthenticationException ex, WebRequest request) {
-        HttpStatus status = HttpStatus.UNAUTHORIZED;
-        String message = ex.getMessage();
-
-        return buildErrorResponse(status, message, null, ex, request, 401);
-    }
-
-    @ExceptionHandler(RuntimeException.class)
-    protected ResponseEntity<ErrorVm> handleRuntimeException(RuntimeException ex, WebRequest request) {
-        HttpStatus status = resolveStatusFromExceptionName(ex);
-        String message = ex.getMessage();
-
-        return buildErrorResponse(status, message, null, ex, request, status.value());
+    public ResponseEntity<ApiResponse<Void>> handleAuthentication(AuthenticationException ex, WebRequest request) {
+        return build(HttpStatus.UNAUTHORIZED, ErrorCode.UNAUTHORIZED.getCode(),
+                MessagesUtils.getMessage(ErrorCode.UNAUTHORIZED.getMessageKey()), null, request, ex);
     }
 
     @ExceptionHandler(Exception.class)
-    protected ResponseEntity<ErrorVm> handleOtherException(Exception ex, WebRequest request) {
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        String message = ex.getMessage();
-
-        return buildErrorResponse(status, message, null, ex, request, 500);
+    public ResponseEntity<ApiResponse<Void>> handleOther(Exception ex, WebRequest request) {
+        return build(HttpStatus.INTERNAL_SERVER_ERROR,
+                ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
+                MessagesUtils.getMessage(ErrorCode.INTERNAL_SERVER_ERROR.getMessageKey()),
+                null, request, ex);
     }
 
-    private String getServletPath(WebRequest webRequest) {
-        ServletWebRequest servletRequest = (ServletWebRequest) webRequest;
-        return servletRequest.getRequest().getServletPath();
+    private ResponseEntity<ApiResponse<Void>> build(HttpStatus status, String code, String message,
+                                                    List<String> errors, WebRequest request, Exception ex) {
+        String path = resolvePath(request);
+        log.error(ERROR_LOG_FORMAT, path, status.value(), code, message, ex);
+        ApiResponse<Void> body = errors == null
+                ? ApiResponse.error(code, message, path)
+                : ApiResponse.error(code, message, errors, path);
+        return ResponseEntity.status(status).body(body);
     }
 
-    private ResponseEntity<ErrorVm> handleBadRequest(Exception ex, WebRequest request) {
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-        String message = ex.getMessage();
-
-        return buildErrorResponse(status, message, null, ex, request, 400);
-    }
-
-    private ResponseEntity<ErrorVm> buildErrorResponse(HttpStatus status, String message, List<String> errors,
-                                                       Exception ex, WebRequest request, int statusCode) {
-        ErrorVm errorVm =
-            new ErrorVm(status.toString(), status.getReasonPhrase(), message, errors);
-
-        if (request != null) {
-            log.error(ERROR_LOG_FORMAT, this.getServletPath(request), statusCode, message);
+    private String resolvePath(WebRequest request) {
+        if (request instanceof ServletWebRequest swr) {
+            return swr.getRequest().getRequestURI();
         }
-        log.error(message, ex);
-        return ResponseEntity.status(status).body(errorVm);
-    }
-
-    private HttpStatus resolveStatusFromExceptionName(RuntimeException ex) {
-        String exceptionName = ex.getClass().getSimpleName().toLowerCase();
-
-        if (exceptionName.contains("notfound")) {
-            return HttpStatus.NOT_FOUND;
-        }
-        if (exceptionName.contains("forbidden") || exceptionName.contains("accessdenied")) {
-            return HttpStatus.FORBIDDEN;
-        }
-        if (exceptionName.contains("unauthorized")
-            || exceptionName.contains("authentication")
-            || exceptionName.contains("notauthenticated")
-            || exceptionName.contains("signinrequired")) {
-            return HttpStatus.UNAUTHORIZED;
-        }
-        if (exceptionName.contains("duplicated")
-            || exceptionName.contains("alreadyexists")
-            || exceptionName.contains("existed")
-            || exceptionName.contains("conflict")) {
-            return HttpStatus.CONFLICT;
-        }
-        if (exceptionName.contains("badrequest")
-            || exceptionName.contains("invalid")
-            || exceptionName.contains("unsupportedmedia")
-            || exceptionName.contains("wrongemail")
-            || exceptionName.contains("stockexisting")
-            || exceptionName.contains("multipart")) {
-            return HttpStatus.BAD_REQUEST;
-        }
-        return HttpStatus.INTERNAL_SERVER_ERROR;
+        return null;
     }
 }

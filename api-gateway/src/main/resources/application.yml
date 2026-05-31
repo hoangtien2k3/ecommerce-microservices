@@ -10,20 +10,20 @@ spring:
       mvc:
         routes:
           # =====================
-          # AUTH-SERVICE
+          # AUTH-SERVICE (v1)
           # =====================
           - id: auth-service-auth
             uri: lb://AUTH-SERVICE
             predicates:
-              - Path=/api/auth/**
-          - id: auth-service-role
+              - Path=/api/v1/auth/**
+          - id: auth-service-roles
             uri: lb://AUTH-SERVICE
             predicates:
-              - Path=/api/role/**
-          - id: auth-service-manager
+              - Path=/api/v1/roles/**
+          - id: auth-service-users
             uri: lb://AUTH-SERVICE
             predicates:
-              - Path=/api/manager/**
+              - Path=/api/v1/users/**
 
           # =====================
           # PRODUCT-SERVICE
