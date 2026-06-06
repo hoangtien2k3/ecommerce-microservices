@@ -10,7 +10,7 @@ RUN ./mvnw package -DskipTests -B
 FROM eclipse-temurin:21-jre-alpine
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 WORKDIR /app
-COPY --from=build /app/target/auth-service-*.jar app.jar
-EXPOSE 8088
+COPY --from=build /app/target/notification-service-*.jar app.jar
+EXPOSE 8090
 USER appuser
 ENTRYPOINT ["java", "-jar", "app.jar"]

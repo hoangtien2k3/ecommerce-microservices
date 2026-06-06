@@ -1,4 +1,9 @@
 services:
+
+  # ============================================================
+  # INFRASTRUCTURE
+  # ============================================================
+
   postgres:
     image: postgres:16
     container_name: postgres
@@ -12,10 +17,112 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d ecommerce" ]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ecommerce"]
       interval: 5s
       timeout: 5s
       retries: 20
+    networks:
+      - ecommerce-network
+
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: "tienha@!@#"
+      MONGO_INITDB_DATABASE: notificationservice
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - ecommerce-network
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: redis
+    command: redis-server --requirepass "tienha@!@#" --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - ecommerce-network
+
+  kafka:
+    image: apache/kafka:3.9.0
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+    networks:
+      - ecommerce-network
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 20
+    networks:
+      - ecommerce-network
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: "tienha@!@#"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     networks:
       - ecommerce-network
 
@@ -40,38 +147,435 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:8080/realms/master/.well-known/openid-configuration || exit 1" ]
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/realms/master/.well-known/openid-configuration || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 30
     networks:
       - ecommerce-network
 
-  kafka:
-    image: apache/kafka:3.9.0
-    container_name: kafka
+  zipkin:
+    image: openzipkin/zipkin:3
+    container_name: zipkin
     ports:
-      - "9092:9092"
+      - "9411:9411"
+    networks:
+      - ecommerce-network
+
+  # ============================================================
+  # BACKEND — Spring Boot Microservices
+  # ============================================================
+
+  discovery-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: discovery-service
+    image: ecommerce/discovery-service:latest
+    container_name: discovery-service
+    ports:
+      - "8761:8761"
     environment:
-      KAFKA_NODE_ID: 1
-      KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
-      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-    volumes:
-      - kafka_data:/var/lib/kafka/data
+      EUREKA_URI: http://discovery-service:8761/eureka
     healthcheck:
-      test: [ "CMD-SHELL", "kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1" ]
+      test: ["CMD-SHELL", "curl -f http://localhost:8761/actuator/health || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 20
+      retries: 15
+    networks:
+      - ecommerce-network
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: api-gateway
+    image: ecommerce/api-gateway:latest
+    container_name: api-gateway
+    ports:
+      - "8888:8888"
+    environment:
+      EUREKA_URI: http://discovery-service:8761/eureka
+      KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/ecommerce
+      KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/ecommerce/protocol/openid-connect/certs
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8888/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+    networks:
+      - ecommerce-network
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: auth-service
+    image: ecommerce/auth-service:latest
+    container_name: auth-service
+    ports:
+      - "8088:8088"
+    environment:
+      EUREKA_URI: http://discovery-service:8761/eureka
+      JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/authservice
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      ZIPKIN_URL: http://zipkin:9411
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  product-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: product-service
+    image: ecommerce/product-service:latest
+    container_name: product-service
+    ports:
+      - "8086:8086"
+    environment:
+      EUREKA_URI: http://discovery-service:8761/eureka
+      JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/productservice
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      ZIPKIN_URL: http://zipkin:9411
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  order-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: order-service
+    image: ecommerce/order-service:latest
+    container_name: order-service
+    ports:
+      - "8084:8084"
+    environment:
+      EUREKA_URI: http://discovery-service:8761/eureka
+      JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/orderservice
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      KAFKA_SERVERS: kafka:9092
+      ZIPKIN_URL: http://zipkin:9411
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: payment-service
+    image: ecommerce/payment-service:latest
+    container_name: payment-service
+    ports:
+      - "8085:8085"
+    environment:
+      EUREKA_URI: http://discovery-service:8761/eureka
+      JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/paymentservice
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      KAFKA_SERVERS: kafka:9092
+      ZIPKIN_URL: http://zipkin:9411
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  shipping-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: shipping-service
+    image: ecommerce/shipping-service:latest
+    container_name: shipping-service
+    ports:
+      - "8087:8087"
+    environment:
+      EUREKA_URI: http://discovery-service:8761/eureka
+      JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/shippingservice
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      ZIPKIN_URL: http://zipkin:9411
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  inventory-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: inventory-service
+    image: ecommerce/inventory-service:latest
+    container_name: inventory-service
+    ports:
+      - "8082:8082"
+    environment:
+      EUREKA_URI: http://discovery-service:8761/eureka
+      JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/inventoryservice
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      ZIPKIN_URL: http://zipkin:9411
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  favourite-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: favourite-service
+    image: ecommerce/favourite-service:latest
+    container_name: favourite-service
+    ports:
+      - "8081:8081"
+    environment:
+      EUREKA_URI: http://discovery-service:8761/eureka
+      JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/favouriteservice
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      ZIPKIN_URL: http://zipkin:9411
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  rating-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: rating-service
+    image: ecommerce/rating-service:latest
+    container_name: rating-service
+    ports:
+      - "8089:8089"
+    environment:
+      EUREKA_URI: http://discovery-service:8761/eureka
+      JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ratingservice
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      ZIPKIN_URL: http://zipkin:9411
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  media-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: media-service
+    image: ecommerce/media-service:latest
+    container_name: media-service
+    ports:
+      - "8083:8083"
+    environment:
+      EUREKA_URI: http://discovery-service:8761/eureka
+      JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/media
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: admin
+      MINIO_SECRET_KEY: "tienha@!@#"
+      ZIPKIN_URL: http://zipkin:9411
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  tax-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: tax-service
+    image: ecommerce/tax-service:latest
+    container_name: tax-service
+    ports:
+      - "8091:8091"
+    environment:
+      EUREKA_URI: http://discovery-service:8761/eureka
+      JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/taxservice
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      ZIPKIN_URL: http://zipkin:9411
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  promotion-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: promotion-service
+    image: ecommerce/promotion-service:latest
+    container_name: promotion-service
+    ports:
+      - "8093:8092"
+    environment:
+      EUREKA_URI: http://discovery-service:8761/eureka
+      JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/promotionservice
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      ZIPKIN_URL: http://zipkin:9411
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  search-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: search-service
+    image: ecommerce/search-service:latest
+    container_name: search-service
+    ports:
+      - "8094:8092"
+    environment:
+      EUREKA_URI: http://discovery-service:8761/eureka
+      JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      ELASTICSEARCH_USERNAME: ""
+      ELASTICSEARCH_PASSWORD: ""
+      KAFKA_SERVERS: kafka:9092
+      ZIPKIN_URL: http://zipkin:9411
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: notification-service
+    image: ecommerce/notification-service:latest
+    container_name: notification-service
+    ports:
+      - "8090:8090"
+    environment:
+      EUREKA_URI: http://discovery-service:8761/eureka
+      JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
+      MONGO_HOST: mongodb
+      MONGO_PORT: 27017
+      KAFKA_SERVERS: kafka:9092
+      MAIL_USERNAME: hoangtien2k3qx1@gmail.com
+      MAIL_PASSWORD: uvbskgpuchmgtlbp
+      ZIPKIN_URL: http://zipkin:9411
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  # ============================================================
+  # FRONTEND — Next.js
+  # ============================================================
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: ecommerce/frontend:latest
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: http://localhost:8888
+    depends_on:
+      api-gateway:
+        condition: service_healthy
     networks:
       - ecommerce-network
 
@@ -81,4 +585,8 @@ networks:
 
 volumes:
   postgres_data:
+  mongodb_data:
+  redis_data:
   kafka_data:
+  elasticsearch_data:
+  minio_data:

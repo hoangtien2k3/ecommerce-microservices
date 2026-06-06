@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: search-service
+  namespace: ecommerce
+  labels:
+    app: search-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: search-service
+  template:
+    metadata:
+      labels:
+        app: search-service
+    spec:
+      initContainers:
+        - name: wait-for-discovery
+          image: busybox
+          command: ["sh", "-c", "until nc -z discovery-service 8761; do sleep 3; done"]
+        - name: wait-for-elasticsearch
+          image: busybox
+          command: ["sh", "-c", "until nc -z elasticsearch 9200; do sleep 5; done"]
+        - name: wait-for-kafka
+          image: busybox
+          command: ["sh", "-c", "until nc -z kafka 9092; do sleep 5; done"]
+      containers:
+        - name: search-service
+          image: ecommerce/search-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8092
+          envFrom:
+            - configMapRef:
+                name: ecommerce-config
+          env:
+            - name: ELASTICSEARCH_USERNAME
+              value: ""
+            - name: ELASTICSEARCH_PASSWORD
+              value: ""
+          readinessProbe:
+            httpGet:
+              path: /search/actuator/health
+              port: 8092
+            initialDelaySeconds: 40
+            periodSeconds: 10
+            failureThreshold: 15
+          livenessProbe:
+            httpGet:
+              path: /search/actuator/health
+              port: 8092
+            initialDelaySeconds: 120
+            periodSeconds: 15
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "1000m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: search-service
+  namespace: ecommerce
+spec:
+  selector:
+    app: search-service
+  ports:
+    - port: 8092
+      targetPort: 8092

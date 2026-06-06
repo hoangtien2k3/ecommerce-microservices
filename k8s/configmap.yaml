@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ecommerce-config
+  namespace: ecommerce
+data:
+  # PostgreSQL
+  POSTGRES_HOST: postgres
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: ecommerce
+
+  # Keycloak
+  KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/ecommerce
+  KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/ecommerce/protocol/openid-connect/certs
+  JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
+
+  # Eureka
+  EUREKA_URI: http://discovery-service:8761/eureka
+
+  # Kafka
+  KAFKA_SERVERS: kafka:9092
+
+  # MongoDB
+  MONGO_HOST: mongodb
+  MONGO_PORT: "27017"
+
+  # Redis
+  REDIS_HOST: redis
+  REDIS_PORT: "6379"
+
+  # Elasticsearch
+  ELASTICSEARCH_URL: http://elasticsearch:9200
+
+  # MinIO
+  MINIO_ENDPOINT: http://minio:9000
+
+  # Zipkin
+  ZIPKIN_URL: http://zipkin:9411
