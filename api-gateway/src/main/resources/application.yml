@@ -205,8 +205,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/ezbuy-server}
-          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8080/realms/ezbuy-server/protocol/openid-connect/certs}
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/ecommerce}
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8080/realms/ecommerce/protocol/openid-connect/certs}
 
 eureka:
   client:

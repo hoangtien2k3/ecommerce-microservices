@@ -19,13 +19,24 @@ import java.util.List;
 public class SecurityConfig {
 
     private static final String[] PUBLIC_AUTH_PATHS = {
+            "/api/v1/auth/signup",
+            "/api/v1/auth/register",
+            "/api/v1/auth/signin",
+            "/api/v1/auth/login",
+            "/api/v1/auth/refresh",
+            "/api/v1/auth/refresh-token",
+            "/api/v1/auth/logout",
             "/api/auth/signup",
             "/api/auth/register",
             "/api/auth/signin",
-            "/api/auth/login",
             "/api/auth/refresh",
-            "/api/auth/refresh-token",
             "/api/auth/logout"
+    };
+
+    private static final String[] PUBLIC_STOREFRONT_PATHS = {
+            "/api/products/**",
+            "/api/categories/**",
+            "/storefront/**"
     };
 
     private static final String[] PUBLIC_SWAGGER_PATHS = {
@@ -44,6 +55,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_AUTH_PATHS).permitAll()
+                        .requestMatchers(PUBLIC_STOREFRONT_PATHS).permitAll()
                         .requestMatchers(PUBLIC_SWAGGER_PATHS).permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated())
