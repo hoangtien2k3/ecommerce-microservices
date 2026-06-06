@@ -12,7 +12,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    # Frontend — truy cập tại http://ecommerce.local
+    # Frontend — http://ecommerce.local
     - host: ecommerce.local
       http:
         paths:
@@ -24,7 +24,7 @@ spec:
                 port:
                   number: 3000
 
-    # API Gateway — truy cập tại http://api.ecommerce.local
+    # API Gateway — http://api.ecommerce.local
     - host: api.ecommerce.local
       http:
         paths:
@@ -36,7 +36,7 @@ spec:
                 port:
                   number: 8888
 
-    # Keycloak — truy cập tại http://auth.ecommerce.local
+    # Keycloak — http://auth.ecommerce.local
     - host: auth.ecommerce.local
       http:
         paths:
@@ -48,7 +48,7 @@ spec:
                 port:
                   number: 8080
 
-    # Eureka Dashboard — truy cập tại http://discovery.ecommerce.local
+    # Eureka Dashboard — http://discovery.ecommerce.local
     - host: discovery.ecommerce.local
       http:
         paths:
@@ -60,7 +60,7 @@ spec:
                 port:
                   number: 8761
 
-    # Zipkin — truy cập tại http://zipkin.ecommerce.local
+    # Zipkin — http://zipkin.ecommerce.local
     - host: zipkin.ecommerce.local
       http:
         paths:
@@ -72,7 +72,7 @@ spec:
                 port:
                   number: 9411
 
-    # MinIO Console — truy cập tại http://minio.ecommerce.local
+    # MinIO Console — http://minio.ecommerce.local
     - host: minio.ecommerce.local
       http:
         paths:

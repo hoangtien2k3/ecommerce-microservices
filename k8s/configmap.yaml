@@ -4,38 +4,38 @@ metadata:
   name: ecommerce-config
   namespace: ecommerce
 data:
-  # PostgreSQL
-  POSTGRES_HOST: postgres
+  # PostgresSQL
+  POSTGRES_HOST: "postgres"
   POSTGRES_PORT: "5432"
-  POSTGRES_DB: ecommerce
+  POSTGRES_DB: "ecommerce"
 
   # Keycloak
-  KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/ecommerce
-  KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/ecommerce/protocol/openid-connect/certs
-  JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
+  KEYCLOAK_ISSUER_URI: "http://keycloak:8080/realms/ecommerce"
+  KEYCLOAK_JWK_SET_URI: "http://keycloak:8080/realms/ecommerce/protocol/openid-connect/certs"
+  JWT_ISSUER_URI: "http://keycloak:8080/realms/ecommerce"
 
   # Eureka
-  EUREKA_URI: http://discovery-service:8761/eureka
+  EUREKA_URI: "http://discovery-service:8761/eureka"
 
   # Kafka
-  KAFKA_SERVERS: kafka:9092
+  KAFKA_SERVERS: "kafka:9092"
 
   # MongoDB
-  MONGO_HOST: mongodb
+  MONGO_HOST: "mongodb"
   MONGO_PORT: "27017"
 
   # Redis
-  REDIS_HOST: redis
+  REDIS_HOST: "redis"
   REDIS_PORT: "6379"
 
   # Elasticsearch
-  ELASTICSEARCH_URL: http://elasticsearch:9200
+  ELASTICSEARCH_URL: "http://elasticsearch:9200"
 
   # MinIO
-  MINIO_ENDPOINT: http://minio:9000
+  MINIO_ENDPOINT: "http://minio:9000"
 
   # Zipkin
-  ZIPKIN_URL: http://zipkin:9411
+  ZIPKIN_URL: "http://zipkin:9411"
 
-  # Hibernate — tự tạo/update bảng khi deploy lần đầu
-  SPRING_JPA_HIBERNATE_DDL_AUTO: update
+  # Hibernate — create/update first deploy
+  SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
