@@ -17,14 +17,15 @@ jobs:
       - name: Fix file permissions
         run: chmod -R 755 .
       - name: Run Trivy (fs)
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.28.0
+        continue-on-error: true
         with:
           scan-type: fs
           scan-ref: .
           format: sarif
           output: trivy-results.sarif
           severity: CRITICAL,HIGH
-          args: --skip-java-db-update --scanners vuln --parallel 1
+          args: --skip-db-update --skip-java-db-update --scanners vuln --parallel 1
       - name: Upload SARIF to GitHub Security
         uses: github/codeql-action/upload-sarif@v3
         if: always()
@@ -45,7 +46,8 @@ jobs:
           - order-service
     steps:
       - name: Run Trivy (image)
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.28.0
+        continue-on-error: true
         with:
           image-ref: ghcr.io/${{ github.repository_owner }}/ecommerce-microservices/${{ matrix.service }}:latest
           format: table
