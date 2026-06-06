@@ -94,8 +94,9 @@ jobs:
   deploy-argocd:
     name: Deploy via ArgoCD
     needs: update-manifests
-    # Self-hosted runner chạy trong cluster → access ArgoCD qua internal DNS
-    runs-on: self-hosted
+    # ARC runner chạy trong cluster → access ArgoCD qua internal DNS
+    # Label phải khớp với tên helm release: arc-runner-set
+    runs-on: arc-runner-set
     environment:
       name: ${{ env.ENVIRONMENT }}
     # ── Requires GitHub secret: ARGOCD_SERVER, ARGOCD_TOKEN ──

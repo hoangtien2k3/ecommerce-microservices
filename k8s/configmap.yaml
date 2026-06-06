@@ -36,3 +36,6 @@ data:
 
   # Zipkin
   ZIPKIN_URL: http://zipkin:9411
+
+  # Hibernate — tự tạo/update bảng khi deploy lần đầu
+  SPRING_JPA_HIBERNATE_DDL_AUTO: update
