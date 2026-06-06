@@ -15,7 +15,7 @@ env:
   IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}/ecommerce-microservices
 
 jobs:
-  # ── Detect which services changed ─────────────────────────
+  # ─ Detect which services changed ─
   detect-changes:
     name: Detect changed services
     runs-on: ubuntu-latest
@@ -90,7 +90,7 @@ jobs:
             frontend:
               - 'frontend/**'
 
-  # ── Run tests (always, all services) ──────────────────────
+  # ─ Run tests (always, all services) ─
   test:
     name: Unit Tests
     runs-on: ubuntu-latest
@@ -105,7 +105,7 @@ jobs:
         run: mvn test -B --fail-at-end 2>/dev/null || true
         # Services that have no tests won't fail the pipeline
 
-  # ── Build & Push each changed service (parallel) ──────────
+  # ─ Build & Push each changed service (parallel) ─
   build-discovery-service:
     needs: [detect-changes, test]
     if: needs.detect-changes.outputs.discovery-service == 'true' || github.event_name == 'workflow_dispatch'
@@ -270,7 +270,7 @@ jobs:
           cache-from: type=gha,scope=frontend
           cache-to: type=gha,mode=max,scope=frontend
 
-  # ── Summary gate ──────────────────────────────────────────
+  # ─ Summary gate ─
   ci-success:
     name: CI Passed
     if: always()

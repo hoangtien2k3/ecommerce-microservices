@@ -24,7 +24,7 @@ env:
   ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
 
 jobs:
-  # ── Guard: only deploy if CI succeeded ────────────────────
+  # ─ Guard: only deploy if CI succeeded ─
   check-ci:
     name: Guard — CI must pass
     runs-on: ubuntu-latest
@@ -34,7 +34,7 @@ jobs:
     steps:
       - run: echo "CI passed, proceeding with deploy to ${{ env.ENVIRONMENT }}"
 
-  # ── Update image tags in k8s manifests (GitOps) ───────────
+  # ─ Update image tags in k8s manifests (GitOps) ─
   update-manifests:
     name: Update image tags
     needs: check-ci
@@ -90,18 +90,17 @@ jobs:
             || git commit -m "ci: update images to ${{ steps.sha.outputs.short }} [skip ci]"
           git push
 
-  # ── Deploy: ArgoCD sync (recommended) ─────────────────────
+  # ─ Deploy: ArgoCD sync (recommended) ─
   deploy-argocd:
     name: Deploy via ArgoCD
     needs: update-manifests
-    # ARC runner chạy trong cluster → access ArgoCD qua internal DNS
-    # Label phải khớp với tên helm release: arc-runner-set
+    # Label helm release: arc-runner-set
     runs-on: arc-runner-set
     environment:
       name: ${{ env.ENVIRONMENT }}
-    # ── Requires GitHub secret: ARGOCD_SERVER, ARGOCD_TOKEN ──
+    # ─ Requires GitHub secret: ARGOCD_SERVER, ARGOCD_TOKEN ─
     # ARGOCD_SERVER = argocd-server.argocd.svc.cluster.local (internal DNS)
-    # ARGOCD_TOKEN  = token tạo bằng: argocd account generate-token --account admin
+    # ARGOCD_TOKEN  = create token: argocd account generate-token --account admin
     if: vars.DEPLOY_METHOD == 'argocd'
     steps:
       - name: Install argocd CLI
@@ -124,7 +123,7 @@ jobs:
     runs-on: ubuntu-latest  # Change to self-hosted if using local cluster
     environment:
       name: ${{ env.ENVIRONMENT }}
-    # ── Requires GitHub secret: KUBECONFIG_B64 ──────────────
+    # ─ Requires GitHub secret: KUBECONFIG_B64 ─
     if: vars.DEPLOY_METHOD == 'kubectl'
     steps:
       - uses: actions/checkout@v4
@@ -165,7 +164,7 @@ jobs:
       - name: Show pod status
         run: kubectl get pods -n ecommerce
 
-  # ── Notify ────────────────────────────────────────────────
+  # ─ Notify ─
   notify:
     name: Notify
     needs: [deploy-argocd, deploy-kubectl]
