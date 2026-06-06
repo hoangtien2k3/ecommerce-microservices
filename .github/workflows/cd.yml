@@ -94,11 +94,13 @@ jobs:
   deploy-argocd:
     name: Deploy via ArgoCD
     needs: update-manifests
-    runs-on: ubuntu-latest
+    # Self-hosted runner chạy trong cluster → access ArgoCD qua internal DNS
+    runs-on: self-hosted
     environment:
       name: ${{ env.ENVIRONMENT }}
-      url: https://argocd.your-domain.com/applications/ecommerce-${{ env.ENVIRONMENT }}
     # ── Requires GitHub secret: ARGOCD_SERVER, ARGOCD_TOKEN ──
+    # ARGOCD_SERVER = argocd-server.argocd.svc.cluster.local (internal DNS)
+    # ARGOCD_TOKEN  = token tạo bằng: argocd account generate-token --account admin
     if: vars.DEPLOY_METHOD == 'argocd'
     steps:
       - name: Install argocd CLI
@@ -110,7 +112,7 @@ jobs:
         run: |
           argocd login ${{ secrets.ARGOCD_SERVER }} \
             --auth-token ${{ secrets.ARGOCD_TOKEN }} \
-            --insecure --grpc-web
+            --insecure --grpc-web --plaintext
           argocd app sync ecommerce-${{ env.ENVIRONMENT }} --force
           argocd app wait ecommerce-${{ env.ENVIRONMENT }} --health --timeout 300
 

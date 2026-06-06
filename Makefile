@@ -176,6 +176,58 @@ argocd-ui:
 argocd-apply:
 	kubectl apply -f k8s/argocd/application.yaml
 
+## Generate ArgoCD API token (requires argocd CLI + port-forward active)
+argocd-token:
+	@echo "Generating ArgoCD token for GitHub Actions..."
+	argocd login argocd-server.argocd.svc.cluster.local:80 \
+		--auth-token $$(kubectl -n argocd get secret argocd-initial-admin-secret \
+		  -o jsonpath='{.data.password}' | base64 -d) \
+		--insecure --plaintext 2>/dev/null || \
+	argocd login localhost:8080 \
+		--username admin \
+		--password $$(kubectl -n argocd get secret argocd-initial-admin-secret \
+		  -o jsonpath='{.data.password}' | base64 -d) \
+		--insecure
+	@echo ""
+	@echo "==> ARGOCD_TOKEN:"
+	argocd account generate-token --account admin
+	@echo ""
+	@echo "==> ARGOCD_SERVER (for self-hosted runner):"
+	@echo "    argocd-server.argocd.svc.cluster.local:80"
+
+# ============================================================
+# GITHUB ACTIONS SELF-HOSTED RUNNER (ARC)
+# ============================================================
+
+.PHONY: arc-install arc-runner arc-status
+
+## Install Actions Runner Controller (ARC) — requires helm
+arc-install:
+	kubectl apply -f https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.yaml
+	kubectl wait pod -n cert-manager -l app=cert-manager --for=condition=Ready --timeout=120s
+	helm install arc \
+		--namespace arc-systems --create-namespace \
+		oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller
+	@echo "ARC controller installed. Now run: make arc-runner GITHUB_PAT=<your_pat>"
+
+## Deploy runner scale set — usage: make arc-runner GITHUB_PAT=ghp_xxx
+arc-runner:
+	@[ -n "$(GITHUB_PAT)" ] || (echo "Usage: make arc-runner GITHUB_PAT=ghp_xxx" && exit 1)
+	helm install arc-runner-set \
+		--namespace arc-runners --create-namespace \
+		--set githubConfigUrl="https://github.com/hoangtien2k3/ecommerce-microservices" \
+		--set githubConfigSecret.github_token="$(GITHUB_PAT)" \
+		oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set
+	@echo "Runner deployed! Check: kubectl get pods -n arc-runners"
+
+## Check runner status
+arc-status:
+	@echo "=== ARC Controller ==="
+	kubectl get pods -n arc-systems
+	@echo ""
+	@echo "=== Runners ==="
+	kubectl get pods -n arc-runners
+
 ## Watch pod status
 k8s-status:
 	kubectl get pods -n $(NAMESPACE) -w
