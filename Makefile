@@ -1,6 +1,7 @@
-REGISTRY  ?= ecommerce
+REGISTRY  ?= ghcr.io/hoangtien2k3/ecommerce-microservices
 TAG       ?= latest
 NAMESPACE ?= ecommerce
+SHA       := $(shell git rev-parse --short HEAD 2>/dev/null || echo "local")
 
 SERVICES = discovery-service api-gateway auth-service \
            product-service order-service payment-service \
@@ -91,8 +92,8 @@ k8s-infra: k8s-config
 ## Deploy backend microservices
 k8s-backend:
 	kubectl apply -f k8s/backend/discovery-service.yaml
-	@echo "Waiting 30s for Eureka…"
-	sleep 30
+	@echo "Waiting for discovery-service to be Ready…"
+	kubectl wait pod -n $(NAMESPACE) -l app=discovery-service --for=condition=Ready --timeout=240s
 	kubectl apply -f k8s/backend/api-gateway.yaml
 	kubectl apply -f k8s/backend/auth-service.yaml
 	kubectl apply -f k8s/backend/product-service.yaml
@@ -136,6 +137,44 @@ k8s-delete:
 ## Delete namespace and EVERYTHING (destructive!)
 k8s-nuke:
 	kubectl delete namespace $(NAMESPACE) --ignore-not-found
+
+## Login to GHCR (requires GITHUB_TOKEN env var or gh auth token)
+ghcr-login:
+	echo "$(GITHUB_TOKEN)" | docker login ghcr.io -u hoangtien2k3 --password-stdin
+
+## Push images with git SHA tag (used by CI/CD)
+k8s-push-sha:
+	@for svc in $(SERVICES); do \
+		docker tag $(REGISTRY)/$$svc:latest $(REGISTRY)/$$svc:$(SHA); \
+		docker push $(REGISTRY)/$$svc:$(SHA); \
+		docker push $(REGISTRY)/$$svc:latest; \
+	done
+
+# ============================================================
+# ARGOCD
+# ============================================================
+
+.PHONY: argocd-install argocd-apply argocd-ui argocd-password
+
+## Install ArgoCD into cluster
+argocd-install:
+	kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
+	kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+	kubectl wait pod -n argocd -l app.kubernetes.io/name=argocd-server --for=condition=Ready --timeout=300s
+	@echo "ArgoCD installed. Run: make argocd-password && make argocd-ui"
+
+## Get ArgoCD admin password
+argocd-password:
+	@kubectl -n argocd get secret argocd-initial-admin-secret \
+		-o jsonpath='{.data.password}' | base64 -d && echo
+
+## Open ArgoCD UI (port-forward)
+argocd-ui:
+	kubectl port-forward svc/argocd-server -n argocd 8080:443
+
+## Apply ArgoCD Application manifests
+argocd-apply:
+	kubectl apply -f k8s/argocd/application.yaml
 
 ## Watch pod status
 k8s-status:

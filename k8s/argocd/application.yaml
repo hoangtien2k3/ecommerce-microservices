@@ -1,0 +1,59 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ecommerce-dev
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/hoangtien2k3/ecommerce-microservices.git
+    targetRevision: main
+    path: k8s                        # watch the entire k8s/ directory
+    directory:
+      recurse: true
+      exclude: "argocd/**"          # don't self-manage ArgoCD manifests
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ecommerce
+
+  syncPolicy:
+    automated:
+      prune: true       # delete resources removed from git
+      selfHeal: true    # auto-fix drift (manual kubectl changes get reverted)
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+    retry:
+      limit: 3
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m
+
+---
+# Production Application (separate cluster or namespace)
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ecommerce-prod
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/hoangtien2k3/ecommerce-microservices.git
+    targetRevision: main
+    path: k8s
+    directory:
+      recurse: true
+      exclude: "argocd/**"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ecommerce-prod
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    # No automated sync for prod — require manual approval

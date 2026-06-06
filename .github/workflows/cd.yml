@@ -1,0 +1,177 @@
+name: CD — Deploy to Kubernetes
+
+on:
+  workflow_run:
+    workflows: ["CI — Build & Push"]
+    branches: [main]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        default: "dev"
+        type: choice
+        options: [dev, staging, prod]
+
+concurrency:
+  group: cd-${{ github.ref }}
+  cancel-in-progress: false   # never cancel a deploy mid-flight
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}/ecommerce-microservices
+  ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
+
+jobs:
+  # ── Guard: only deploy if CI succeeded ────────────────────
+  check-ci:
+    name: Guard — CI must pass
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+    steps:
+      - run: echo "CI passed, proceeding with deploy to ${{ env.ENVIRONMENT }}"
+
+  # ── Update image tags in k8s manifests (GitOps) ───────────
+  update-manifests:
+    name: Update image tags
+    needs: check-ci
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # needed to commit manifest changes
+    outputs:
+      sha-short: ${{ steps.sha.outputs.short }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Get short SHA
+        id: sha
+        run: echo "short=sha-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Install kustomize
+        run: |
+          curl -sL "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          sudo mv kustomize /usr/local/bin/
+
+      - name: Update image tags in k8s manifests
+        run: |
+          SHA="${{ steps.sha.outputs.short }}"
+          IMAGE_PREFIX="${{ env.IMAGE_PREFIX }}"
+
+          SERVICES=(
+            discovery-service api-gateway auth-service product-service
+            order-service payment-service shipping-service inventory-service
+            favourite-service rating-service notification-service media-service
+            search-service promotion-service tax-service frontend
+          )
+
+          for svc in "${SERVICES[@]}"; do
+            # Update image tag in deployment yamls using sed
+            find k8s/ -name "*.yaml" -exec \
+              sed -i "s|${IMAGE_PREFIX}/${svc}:[^ ]*|${IMAGE_PREFIX}/${svc}:${SHA}|g" {} \;
+          done
+
+          echo "Updated all image tags to: $SHA"
+          git diff k8s/ || true
+
+      - name: Commit manifest changes
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add k8s/
+          git diff --staged --quiet \
+            || git commit -m "ci: update images to ${{ steps.sha.outputs.short }} [skip ci]"
+          git push
+
+  # ── Deploy: ArgoCD sync (recommended) ─────────────────────
+  deploy-argocd:
+    name: Deploy via ArgoCD
+    needs: update-manifests
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ env.ENVIRONMENT }}
+      url: https://argocd.your-domain.com/applications/ecommerce-${{ env.ENVIRONMENT }}
+    # ── Requires GitHub secret: ARGOCD_SERVER, ARGOCD_TOKEN ──
+    if: vars.DEPLOY_METHOD == 'argocd'
+    steps:
+      - name: Install argocd CLI
+        run: |
+          curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+          chmod +x argocd && sudo mv argocd /usr/local/bin/
+
+      - name: ArgoCD sync
+        run: |
+          argocd login ${{ secrets.ARGOCD_SERVER }} \
+            --auth-token ${{ secrets.ARGOCD_TOKEN }} \
+            --insecure --grpc-web
+          argocd app sync ecommerce-${{ env.ENVIRONMENT }} --force
+          argocd app wait ecommerce-${{ env.ENVIRONMENT }} --health --timeout 300
+
+  # ── Deploy: kubectl direct (self-hosted runner / cloud k8s) ─
+  deploy-kubectl:
+    name: Deploy via kubectl
+    needs: update-manifests
+    runs-on: ubuntu-latest  # Change to self-hosted if using local cluster
+    environment:
+      name: ${{ env.ENVIRONMENT }}
+    # ── Requires GitHub secret: KUBECONFIG_B64 ──────────────
+    if: vars.DEPLOY_METHOD == 'kubectl'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main   # pull latest commit (with updated image tags)
+
+      - name: Set up kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG_B64 }}" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Deploy namespace & config
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/secrets.yaml
+          kubectl apply -f k8s/configmap.yaml
+
+      - name: Deploy infra
+        run: kubectl apply -f k8s/infra/
+
+      - name: Deploy backend services
+        run: kubectl apply -f k8s/backend/
+
+      - name: Deploy frontend
+        run: kubectl apply -f k8s/frontend/
+
+      - name: Apply ingress
+        run: kubectl apply -f k8s/ingress/ 2>/dev/null || true
+
+      - name: Wait for rollout
+        run: |
+          for svc in discovery-service api-gateway auth-service product-service \
+                     order-service payment-service; do
+            kubectl rollout status deployment/$svc -n ecommerce --timeout=300s || true
+          done
+
+      - name: Show pod status
+        run: kubectl get pods -n ecommerce
+
+  # ── Notify ────────────────────────────────────────────────
+  notify:
+    name: Notify
+    needs: [deploy-argocd, deploy-kubectl]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deployment summary
+        run: |
+          echo "## Deployment to ${{ env.ENVIRONMENT }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **SHA**: ${{ needs.update-manifests.outputs.sha-short }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Time**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY

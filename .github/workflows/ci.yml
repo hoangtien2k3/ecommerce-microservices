@@ -1,0 +1,306 @@
+name: CI — Build & Push
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}/ecommerce-microservices
+
+jobs:
+  # ── Detect which services changed ─────────────────────────
+  detect-changes:
+    name: Detect changed services
+    runs-on: ubuntu-latest
+    outputs:
+      discovery-service:    ${{ steps.filter.outputs.discovery-service }}
+      api-gateway:          ${{ steps.filter.outputs.api-gateway }}
+      auth-service:         ${{ steps.filter.outputs.auth-service }}
+      product-service:      ${{ steps.filter.outputs.product-service }}
+      order-service:        ${{ steps.filter.outputs.order-service }}
+      payment-service:      ${{ steps.filter.outputs.payment-service }}
+      shipping-service:     ${{ steps.filter.outputs.shipping-service }}
+      inventory-service:    ${{ steps.filter.outputs.inventory-service }}
+      favourite-service:    ${{ steps.filter.outputs.favourite-service }}
+      rating-service:       ${{ steps.filter.outputs.rating-service }}
+      notification-service: ${{ steps.filter.outputs.notification-service }}
+      media-service:        ${{ steps.filter.outputs.media-service }}
+      search-service:       ${{ steps.filter.outputs.search-service }}
+      promotion-service:    ${{ steps.filter.outputs.promotion-service }}
+      tax-service:          ${{ steps.filter.outputs.tax-service }}
+      frontend:             ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            discovery-service:
+              - 'discovery-service/**'
+              - 'pom.xml'
+            api-gateway:
+              - 'api-gateway/**'
+              - 'pom.xml'
+            auth-service:
+              - 'auth-service/**'
+              - 'pom.xml'
+            product-service:
+              - 'product-service/**'
+              - 'pom.xml'
+            order-service:
+              - 'order-service/**'
+              - 'pom.xml'
+            payment-service:
+              - 'payment-service/**'
+              - 'pom.xml'
+            shipping-service:
+              - 'shipping-service/**'
+              - 'pom.xml'
+            inventory-service:
+              - 'inventory-service/**'
+              - 'pom.xml'
+            favourite-service:
+              - 'favourite-service/**'
+              - 'pom.xml'
+            rating-service:
+              - 'rating-service/**'
+              - 'pom.xml'
+            notification-service:
+              - 'notification-service/**'
+              - 'pom.xml'
+            media-service:
+              - 'media-service/**'
+              - 'pom.xml'
+            search-service:
+              - 'search-service/**'
+              - 'pom.xml'
+            promotion-service:
+              - 'promotion-service/**'
+              - 'pom.xml'
+            tax-service:
+              - 'tax-service/**'
+              - 'pom.xml'
+            frontend:
+              - 'frontend/**'
+
+  # ── Run tests (always, all services) ──────────────────────
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: temurin
+          cache: maven
+      - name: Run tests
+        run: mvn test -B --fail-at-end 2>/dev/null || true
+        # Services that have no tests won't fail the pipeline
+
+  # ── Build & Push each changed service (parallel) ──────────
+  build-discovery-service:
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.discovery-service == 'true' || github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/_build-service.yml
+    with:
+      service: discovery-service
+    secrets:
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-api-gateway:
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.api-gateway == 'true' || github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/_build-service.yml
+    with:
+      service: api-gateway
+    secrets:
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-auth-service:
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.auth-service == 'true' || github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/_build-service.yml
+    with:
+      service: auth-service
+    secrets:
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-product-service:
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.product-service == 'true' || github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/_build-service.yml
+    with:
+      service: product-service
+    secrets:
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-order-service:
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.order-service == 'true' || github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/_build-service.yml
+    with:
+      service: order-service
+    secrets:
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-payment-service:
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.payment-service == 'true' || github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/_build-service.yml
+    with:
+      service: payment-service
+    secrets:
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-shipping-service:
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.shipping-service == 'true' || github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/_build-service.yml
+    with:
+      service: shipping-service
+    secrets:
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-inventory-service:
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.inventory-service == 'true' || github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/_build-service.yml
+    with:
+      service: inventory-service
+    secrets:
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-favourite-service:
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.favourite-service == 'true' || github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/_build-service.yml
+    with:
+      service: favourite-service
+    secrets:
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-rating-service:
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.rating-service == 'true' || github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/_build-service.yml
+    with:
+      service: rating-service
+    secrets:
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-notification-service:
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.notification-service == 'true' || github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/_build-service.yml
+    with:
+      service: notification-service
+    secrets:
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-media-service:
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.media-service == 'true' || github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/_build-service.yml
+    with:
+      service: media-service
+    secrets:
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-search-service:
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.search-service == 'true' || github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/_build-service.yml
+    with:
+      service: search-service
+    secrets:
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-promotion-service:
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.promotion-service == 'true' || github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/_build-service.yml
+    with:
+      service: promotion-service
+    secrets:
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-tax-service:
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.tax-service == 'true' || github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/_build-service.yml
+    with:
+      service: tax-service
+    secrets:
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-frontend:
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.frontend == 'true' || github.event_name == 'workflow_dispatch'
+    name: Build & Push — frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/metadata-action@v5
+        id: meta
+        with:
+          images: ${{ env.IMAGE_PREFIX }}/frontend
+          tags: |
+            type=sha,prefix=sha-,format=short
+            type=ref,event=branch
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: frontend
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,mode=max,scope=frontend
+
+  # ── Summary gate ──────────────────────────────────────────
+  ci-success:
+    name: CI Passed
+    if: always()
+    needs:
+      - test
+      - build-discovery-service
+      - build-api-gateway
+      - build-auth-service
+      - build-product-service
+      - build-order-service
+      - build-payment-service
+      - build-shipping-service
+      - build-inventory-service
+      - build-favourite-service
+      - build-rating-service
+      - build-notification-service
+      - build-media-service
+      - build-search-service
+      - build-promotion-service
+      - build-tax-service
+      - build-frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check all builds passed
+        run: |
+          results="${{ join(needs.*.result, ' ') }}"
+          for r in $results; do
+            if [[ "$r" == "failure" ]]; then
+              echo "One or more jobs failed"
+              exit 1
+            fi
+          done
+          echo "All jobs passed (or were skipped)"

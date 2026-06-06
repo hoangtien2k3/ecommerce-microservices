@@ -27,7 +27,7 @@ spec:
           command: ["sh", "-c", "until nc -z kafka 9092; do sleep 5; done"]
       containers:
         - name: payment-service
-          image: ecommerce/payment-service:latest
+          image: ghcr.io/hoangtien2k3/ecommerce-microservices/payment-service:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8085

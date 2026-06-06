@@ -27,7 +27,7 @@ spec:
           command: ["sh", "-c", "until nc -z kafka 9092; do sleep 5; done"]
       containers:
         - name: notification-service
-          image: ecommerce/notification-service:latest
+          image: ghcr.io/hoangtien2k3/ecommerce-microservices/notification-service:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8090
