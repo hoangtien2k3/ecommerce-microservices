@@ -29,7 +29,7 @@ services:
     container_name: mongodb
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: "tienha@!@#"
+      MONGO_INITDB_ROOT_PASSWORD: "ecommerce@!@#"
       MONGO_INITDB_DATABASE: notificationservice
     ports:
       - "27017:27017"
@@ -46,7 +46,7 @@ services:
   redis:
     image: redis:7.4-alpine
     container_name: redis
-    command: redis-server --requirepass "tienha@!@#" --appendonly yes
+    command: redis-server --requirepass "ecommerce@!@#" --appendonly yes
     ports:
       - "6379:6379"
     volumes:
@@ -112,7 +112,7 @@ services:
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: admin
-      MINIO_ROOT_PASSWORD: "tienha@!@#"
+      MINIO_ROOT_PASSWORD: "ecommerce@!@#"
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -439,7 +439,7 @@ services:
       POSTGRES_PASSWORD: admin
       MINIO_ENDPOINT: http://minio:9000
       MINIO_ACCESS_KEY: admin
-      MINIO_SECRET_KEY: "tienha@!@#"
+      MINIO_SECRET_KEY: "ecommerce@!@#"
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
       discovery-service:
