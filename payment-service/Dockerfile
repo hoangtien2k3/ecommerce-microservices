@@ -1,12 +1,22 @@
-## start with a base image
-FROM maven:latest
-VOLUME /tmp
-ARG PROJECT_VERSION=0.0.1
-RUN mkdir -p /home/app
-WORKDIR /home/app
-ENV SPRING_PROFILES_ACTIVE application
-COPY ./ .
-ADD target/payment-service-0.0.1-SNAPSHOT.jar payment-service-0.0.1-SNAPSHOT.jar
-EXPOSE 8888
-ENTRYPOINT ["java", "-jar", "payment-service-0.0.1-SNAPSHOT.jar"]
-CMD ["mvn", "spring-boot:run"]
+# Stage 1: Build
+FROM eclipse-temurin:21-jdk-alpine AS build
+WORKDIR /app
+
+COPY mvnw .
+COPY .mvn .mvn
+COPY pom.xml .
+RUN chmod +x mvnw && ./mvnw dependency:go-offline -B
+
+COPY src src
+RUN ./mvnw package -DskipTests -B
+
+# Stage 2: Runtime
+FROM eclipse-temurin:21-jre-alpine
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+WORKDIR /app
+
+COPY --from=build /app/target/payment-service-*.jar app.jar
+
+USER appuser
+EXPOSE 8085
+ENTRYPOINT ["java", "-jar", "app.jar"]
