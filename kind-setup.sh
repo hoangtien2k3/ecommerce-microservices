@@ -30,14 +30,6 @@ if ! kubectl get ns ingress-nginx &>/dev/null; then
   kubectl rollout status deployment/ingress-nginx-controller -n ingress-nginx --timeout=120s
 fi
 
-# --- Load images into cluster ---
-for svc in $SERVICES; do
-  docker tag "ecommerce/${svc}:latest" "${REGISTRY}/${svc}:latest" 2>/dev/null || true
-  kind load docker-image "${REGISTRY}/${svc}:latest" --name "$CLUSTER_NAME"
-done
-docker tag ecommerce/frontend:latest "${REGISTRY}/frontend:latest" 2>/dev/null || true
-kind load docker-image "${REGISTRY}/frontend:latest" --name "$CLUSTER_NAME"
-
 # --- Namespace ---
 kubectl apply -f k8s/namespace.yaml
 

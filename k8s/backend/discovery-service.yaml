@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: discovery-service
-          image: ghcr.io/hoangtien2k3/ecommerce-microservices/discovery-service:latest
+          image: ghcr.io/hoangtien2k3/discovery-service:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8761

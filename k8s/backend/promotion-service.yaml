@@ -26,7 +26,7 @@ spec:
           command: ["sh", "-c", "until nc -z postgres 5432; do sleep 3; done"]
       containers:
         - name: promotion-service
-          image: ghcr.io/hoangtien2k3/ecommerce-microservices/promotion-service:latest
+          image: ghcr.io/hoangtien2k3/promotion-service:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8092

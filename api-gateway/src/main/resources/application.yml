@@ -10,7 +10,7 @@ spring:
       mvc:
         routes:
           # =====================
-          # AUTH-SERVICE (v1)
+          # AUTH-SERVICE
           # =====================
           - id: auth-service-auth
             uri: lb://AUTH-SERVICE
@@ -146,7 +146,7 @@ spring:
               - Path=/backoffice/tax-rates/**
 
           # =====================
-          # SWAGGER / OPENAPI AGGREGATION
+          # SWAGGER-UI
           # =====================
           - id: openapi-auth
             uri: lb://AUTH-SERVICE
