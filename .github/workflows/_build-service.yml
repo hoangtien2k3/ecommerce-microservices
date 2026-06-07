@@ -26,6 +26,9 @@ jobs:
   build:
     name: Build & Push — ${{ inputs.service }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     outputs:
       image: ${{ steps.meta.outputs.tags }}
 
@@ -41,7 +44,7 @@ jobs:
           cache: maven
 
       - name: Build JAR (skip tests in CI — tests run separately)
-        run: ./mvnw -pl common-lib,${{ inputs.service }} -am package -DskipTests -B -q
+        run: mvn -pl common-lib,${{ inputs.service }} -am package -DskipTests -B -q
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
