@@ -20,10 +20,6 @@ data:
   # Kafka
   KAFKA_SERVERS: "kafka:9092"
 
-  # MongoDB
-  MONGO_HOST: "mongodb"
-  MONGO_PORT: "27017"
-
   # Redis
   REDIS_HOST: "redis"
   REDIS_PORT: "6379"

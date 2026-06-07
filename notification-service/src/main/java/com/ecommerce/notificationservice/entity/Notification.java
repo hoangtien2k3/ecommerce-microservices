@@ -1,27 +1,28 @@
 package com.ecommerce.notificationservice.entity;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
 
 @Setter
 @Getter
 @AllArgsConstructor
-@Document(collection = "notifications")
+@Entity
+@Table(name = "notifications")
 public class Notification {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String content;
     private String recipientId;
     private boolean read;
-    @Field(name = "timestamp")
+
+    @Column(name = "timestamp")
     private LocalDateTime timestamp;
     private String notificationType;
     private String link;

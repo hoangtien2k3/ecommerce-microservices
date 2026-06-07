@@ -21,9 +21,6 @@ spec:
         - name: wait-for-discovery
           image: busybox
           command: ["sh", "-c", "until nc -z discovery-service 8761; do sleep 3; done"]
-        - name: wait-for-mongodb
-          image: busybox
-          command: ["sh", "-c", "until nc -z mongodb 27017; do sleep 3; done"]
         - name: wait-for-kafka
           image: busybox
           command: ["sh", "-c", "until nc -z kafka 9092; do sleep 5; done"]
@@ -47,16 +44,6 @@ spec:
                 secretKeyRef:
                   name: mail-secret
                   key: MAIL_PASSWORD
-            - name: MONGO_INITDB_ROOT_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: mongodb-secret
-                  key: MONGO_INITDB_ROOT_USERNAME
-            - name: MONGO_INITDB_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mongodb-secret
-                  key: MONGO_INITDB_ROOT_PASSWORD
           readinessProbe:
             httpGet:
               path: /actuator/health

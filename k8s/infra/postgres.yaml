@@ -92,24 +92,3 @@ spec:
       targetPort: 5432
   clusterIP: None
 
----
-# Init scripts to create all databases
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: postgres-init-scripts
-  namespace: ecommerce
-data:
-  01-init-databases.sql: |
-    CREATE DATABASE keycloak;
-    CREATE DATABASE authservice;
-    CREATE DATABASE productservice;
-    CREATE DATABASE orderservice;
-    CREATE DATABASE paymentservice;
-    CREATE DATABASE shippingservice;
-    CREATE DATABASE inventoryservice;
-    CREATE DATABASE favouriteservice;
-    CREATE DATABASE ratingservice;
-    CREATE DATABASE media;
-    CREATE DATABASE taxservice;
-    CREATE DATABASE promotionservice;

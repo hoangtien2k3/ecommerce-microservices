@@ -1,26 +1,28 @@
 package com.ecommerce.notificationservice.entity;
 
+import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Document(collection = "payments")
+@Entity
+@Table(name = "payments")
 public class Payment {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private Integer paymentId;
     private Boolean isPayed;
+
+    @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
 
     private Integer orderId;
     private Long userId;
 
 }
-

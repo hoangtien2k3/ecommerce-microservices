@@ -82,9 +82,8 @@ spec:
               cpu: "1000m"
       volumes:
         - name: keycloak-import
-          hostPath:
-            path: /docker/keycloak/import
-            type: DirectoryOrCreate
+          configMap:
+            name: keycloak-realm
 
 ---
 apiVersion: v1

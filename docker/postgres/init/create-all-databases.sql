@@ -1,0 +1,12 @@
+CREATE DATABASE keycloak;
+CREATE DATABASE authservice;
+CREATE DATABASE productservice;
+CREATE DATABASE orderservice;
+CREATE DATABASE paymentservice;
+CREATE DATABASE shippingservice;
+CREATE DATABASE inventoryservice;
+CREATE DATABASE favouriteservice;
+CREATE DATABASE ratingservice;
+CREATE DATABASE mediaservice;
+CREATE DATABASE taxservice;
+CREATE DATABASE promotionservice;

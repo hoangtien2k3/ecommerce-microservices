@@ -38,7 +38,7 @@ spec:
                 name: ecommerce-config
           env:
             - name: SPRING_DATASOURCE_URL
-              value: jdbc:postgresql://postgres:5432/media
+              value: jdbc:postgresql://postgres:5432/mediaservice
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:

@@ -29,11 +29,17 @@ spring:
       batch-size: 16384
       buffer-memory: 33554432
 
-  data:
-    mongodb:
-      host: ${MONGO_HOST:localhost}
-      port: ${MONGO_PORT:27017}
-      database: notificationservice
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:ecommerce}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   security:
     oauth2:
       resourceserver:
@@ -68,7 +74,4 @@ logging:
   level:
     org:
       springframework:
-        data:
-          mongodb:
-            core:
-              MongoTemplate: DEBUG
+        data: INFO

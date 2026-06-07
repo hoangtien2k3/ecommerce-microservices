@@ -49,7 +49,7 @@ spec:
               mountPath: /data
           readinessProbe:
             exec:
-              command: ["redis-cli", "-a", "$(REDIS_PASSWORD)", "ping"]
+              command: ["sh", "-c", "redis-cli -a $REDIS_PASSWORD ping"]
             initialDelaySeconds: 10
             periodSeconds: 5
           resources:

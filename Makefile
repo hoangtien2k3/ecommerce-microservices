@@ -48,6 +48,42 @@ restart:
 	docker compose restart $(SVC)
 
 # ============================================================
+# KIND (local Kubernetes)
+# ============================================================
+
+.PHONY: kind-setup kind-delete kind-load kind-status kind-logs
+
+## Tạo kind cluster + deploy toàn bộ (one-shot)
+kind-setup:
+	./kind-setup.sh
+
+## Xóa kind cluster
+kind-delete:
+	kind delete cluster --name ecommerce
+
+## Load lại images vào kind sau khi build mới
+kind-load:
+	@for svc in $(SERVICES); do \
+		docker tag ecommerce/$$svc:latest $(REGISTRY)/$$svc:latest 2>/dev/null || true; \
+		echo "==> Loading $$svc"; \
+		kind load docker-image $(REGISTRY)/$$svc:latest --name ecommerce; \
+	done
+	docker tag ecommerce/frontend:latest $(REGISTRY)/frontend:latest 2>/dev/null || true
+	kind load docker-image $(REGISTRY)/frontend:latest --name ecommerce
+
+## Xem trạng thái pods trong kind cluster
+kind-status:
+	kubectl get pods -n $(NAMESPACE) -o wide
+
+## Xem logs của một service: make kind-logs SVC=auth-service
+kind-logs:
+	kubectl logs -n $(NAMESPACE) -l app=$(SVC) --tail=100 -f
+
+## Restart một service: make kind-restart SVC=auth-service
+kind-restart:
+	kubectl rollout restart deployment/$(SVC) -n $(NAMESPACE)
+
+# ============================================================
 # KUBERNETES
 # ============================================================
 
