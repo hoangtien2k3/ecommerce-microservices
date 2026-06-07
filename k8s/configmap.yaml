@@ -35,3 +35,6 @@ data:
 
   # Hibernate — create/update first deploy
   SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+
+  # JVM heap limit — prevents OOMKilled in kind (limited RAM)
+  JAVA_TOOL_OPTIONS: "-Xmx200m -Xms100m -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"

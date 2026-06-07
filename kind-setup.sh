@@ -24,11 +24,39 @@ fi
 
 kubectl config use-context "kind-${CLUSTER_NAME}"
 
+# --- Pre-load infra images into kind node ---
+echo "Pre-loading infra images..."
+INFRA_IMAGES=(
+  "postgres:16"
+  "redis:7.4-alpine"
+  "apache/kafka:3.9.0"
+  "docker.elastic.co/elasticsearch/elasticsearch:8.15.0"
+  "minio/minio:latest"
+  "quay.io/keycloak/keycloak:26.0"
+  "openzipkin/zipkin:3"
+)
+for img in "${INFRA_IMAGES[@]}"; do
+  docker pull "$img" 2>/dev/null || true
+  kind load docker-image "$img" --name "$CLUSTER_NAME" 2>/dev/null || true
+done
+
+# --- Pre-load service images into kind node ---
+echo "Pre-loading service images..."
+for svc in $SERVICES frontend; do
+  img="${REGISTRY}/${svc}:latest"
+  # Pull if not present locally
+  docker image inspect "$img" &>/dev/null || docker pull "$img" 2>/dev/null || true
+  kind load docker-image "$img" --name "$CLUSTER_NAME" 2>/dev/null || true
+done
+
 # --- Ingress NGINX ---
 if ! kubectl get ns ingress-nginx &>/dev/null; then
   kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
-  kubectl rollout status deployment/ingress-nginx-controller -n ingress-nginx --timeout=120s
 fi
+kubectl wait --namespace ingress-nginx \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=300s
 
 # --- Namespace ---
 kubectl apply -f k8s/namespace.yaml
@@ -76,11 +104,16 @@ kubectl apply -f k8s/infra/minio.yaml
 kubectl apply -f k8s/infra/keycloak.yaml
 kubectl apply -f k8s/infra/zipkin.yaml
 
-kubectl wait pod -n "$NAMESPACE" -l app=postgres --for=condition=Ready --timeout=180s
+echo "Waiting for infrastructure to be ready..."
+kubectl wait pod -n "$NAMESPACE" -l app=postgres  --for=condition=Ready --timeout=600s
+kubectl wait pod -n "$NAMESPACE" -l app=redis     --for=condition=Ready --timeout=300s
+kubectl wait pod -n "$NAMESPACE" -l app=kafka     --for=condition=Ready --timeout=300s
+kubectl wait pod -n "$NAMESPACE" -l app=keycloak  --for=condition=Ready --timeout=600s
 
 # --- Backend services ---
+echo "Deploying backend services..."
 kubectl apply -f k8s/backend/discovery-service.yaml
-kubectl wait pod -n "$NAMESPACE" -l app=discovery-service --for=condition=Ready --timeout=240s
+kubectl wait pod -n "$NAMESPACE" -l app=discovery-service --for=condition=Ready --timeout=600s
 
 for yaml in k8s/backend/*.yaml; do
   [[ "$yaml" == *"discovery-service"* ]] && continue
