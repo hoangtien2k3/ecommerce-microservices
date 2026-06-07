@@ -23,7 +23,7 @@ public class NotificationController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Notification> getNotificationById(@PathVariable String id) {
+    public ResponseEntity<Notification> getNotificationById(@PathVariable Long id) {
         Optional<Notification> notification = notificationService.getNotificationById(id);
         return notification.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -36,7 +36,7 @@ public class NotificationController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> deleteNotification(@PathVariable String id) {
+    public ResponseEntity<Boolean> deleteNotification(@PathVariable Long id) {
         notificationService.deleteNotificationById(id);
         return new ResponseEntity<>(true, HttpStatus.OK);
     }

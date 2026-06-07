@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface NotificationService {
     List<Notification> getAllNotifications();
-    Optional<Notification> getNotificationById(String id);
+    Optional<Notification> getNotificationById(Long id);
     Notification saveNotification(Notification notification);
-    void deleteNotificationById(String id);
+    void deleteNotificationById(Long id);
 }

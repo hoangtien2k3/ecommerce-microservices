@@ -33,7 +33,7 @@ public class PaymentServerImpl implements PaymentService {
     }
 
     @Override
-    public Mono<Payment> getPayment(Integer paymentId) {
+    public Mono<Payment> getPayment(Long paymentId) {
         return Mono.fromSupplier(() -> paymentRepository.findById(paymentId)
                         .orElse(null));
     }
@@ -48,7 +48,7 @@ public class PaymentServerImpl implements PaymentService {
     }
 
     @Override
-    public Mono<Void> deletePayment(Integer paymentId) {
+    public Mono<Void> deletePayment(Long paymentId) {
         log.info("Void, service; delete payment by id");
         return Mono.fromRunnable(() -> paymentRepository.deleteById(paymentId));
     }

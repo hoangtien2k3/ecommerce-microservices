@@ -22,7 +22,7 @@ public class PaymentController {
     }
 
     @GetMapping("/{paymentId}")
-    public Mono<Payment> getPayment(@PathVariable Integer paymentId) {
+    public Mono<Payment> getPayment(@PathVariable Long paymentId) {
         return paymentService.getPayment(paymentId);
     }
 
@@ -32,7 +32,7 @@ public class PaymentController {
     }
 
     @DeleteMapping("/{paymentId}")
-    public Mono<Void> deletePayment(@PathVariable Integer paymentId) {
+    public Mono<Void> deletePayment(@PathVariable Long paymentId) {
         return paymentService.deletePayment(paymentId);
     }
 

@@ -25,7 +25,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public Optional<Notification> getNotificationById(String id) {
+    public Optional<Notification> getNotificationById(Long id) {
         return notificationRepository.findById(id);
     }
 
@@ -35,7 +35,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public void deleteNotificationById(String id) {
+    public void deleteNotificationById(Long id) {
         notificationRepository.deleteById(id);
     }
 
