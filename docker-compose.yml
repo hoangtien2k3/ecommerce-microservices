@@ -9,8 +9,8 @@ services:
     container_name: postgres
     environment:
       POSTGRES_DB: ecommerce
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -28,8 +28,8 @@ services:
     image: mongo:7
     container_name: mongodb
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: "ecommerce@!@#"
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
       MONGO_INITDB_DATABASE: notificationservice
     ports:
       - "27017:27017"
@@ -46,7 +46,7 @@ services:
   redis:
     image: redis:7.4-alpine
     container_name: redis
-    command: redis-server --requirepass "ecommerce@!@#" --appendonly yes
+    command: redis-server --requirepass "${REDIS_PASSWORD}" --appendonly yes
     ports:
       - "6379:6379"
     volumes:
@@ -111,8 +111,8 @@ services:
     container_name: minio
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: admin
-      MINIO_ROOT_PASSWORD: "ecommerce@!@#"
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -131,14 +131,14 @@ services:
     container_name: keycloak
     command: start-dev --http-port=8080 --import-realm
     environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
       KC_DB: postgres
       KC_DB_URL_HOST: postgres
       KC_DB_URL_PORT: 5432
       KC_DB_URL_DATABASE: keycloak
-      KC_DB_USERNAME: postgres
-      KC_DB_PASSWORD: postgres
+      KC_DB_USERNAME: ${POSTGRES_USER}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ./docker/keycloak/import:/opt/keycloak/data/import:ro
     ports:
@@ -435,11 +435,11 @@ services:
       EUREKA_URI: http://discovery-service:8761/eureka
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/media
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       MINIO_ENDPOINT: http://minio:9000
-      MINIO_ACCESS_KEY: admin
-      MINIO_SECRET_KEY: "ecommerce@!@#"
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
       discovery-service:
@@ -545,8 +545,8 @@ services:
       MONGO_HOST: mongodb
       MONGO_PORT: 27017
       KAFKA_SERVERS: kafka:9092
-      MAIL_USERNAME: hoangtien2k3qx1@gmail.com
-      MAIL_PASSWORD: uvbskgpuchmgtlbp
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
       discovery-service:

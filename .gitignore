@@ -62,3 +62,7 @@ build/
 
 .claude
 .codegraph
+
+# Secrets — không commit lên git
+.env
+k8s/secrets.yaml
