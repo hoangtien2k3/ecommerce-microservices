@@ -12,7 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 @Configuration
 @EnableJpaRepositories("com.ecommerce.promotion.repository")
-@EntityScan("com.hoangtien2k3.promotion.model")
+@EntityScan("com.ecommerce.promotion.model")
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
 public class DatabaseAutoConfig {
     @Bean
