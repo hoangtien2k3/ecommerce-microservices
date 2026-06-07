@@ -13,6 +13,7 @@ data:
   KEYCLOAK_ISSUER_URI: "http://keycloak:8080/realms/ecommerce"
   KEYCLOAK_JWK_SET_URI: "http://keycloak:8080/realms/ecommerce/protocol/openid-connect/certs"
   JWT_ISSUER_URI: "http://keycloak:8080/realms/ecommerce"
+  KEYCLOAK_SERVER_URL: "http://keycloak:8080"
 
   # Eureka
   EUREKA_URI: "http://discovery-service:8761/eureka"
