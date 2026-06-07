@@ -44,48 +44,63 @@ jobs:
           filters: |
             discovery-service:
               - 'discovery-service/**'
+              - 'common-lib/**'
               - 'pom.xml'
             api-gateway:
               - 'api-gateway/**'
+              - 'common-lib/**'
               - 'pom.xml'
             auth-service:
               - 'auth-service/**'
+              - 'common-lib/**'
               - 'pom.xml'
             product-service:
               - 'product-service/**'
+              - 'common-lib/**'
               - 'pom.xml'
             order-service:
               - 'order-service/**'
+              - 'common-lib/**'
               - 'pom.xml'
             payment-service:
               - 'payment-service/**'
+              - 'common-lib/**'
               - 'pom.xml'
             shipping-service:
               - 'shipping-service/**'
+              - 'common-lib/**'
               - 'pom.xml'
             inventory-service:
               - 'inventory-service/**'
+              - 'common-lib/**'
               - 'pom.xml'
             favourite-service:
               - 'favourite-service/**'
+              - 'common-lib/**'
               - 'pom.xml'
             rating-service:
               - 'rating-service/**'
+              - 'common-lib/**'
               - 'pom.xml'
             notification-service:
               - 'notification-service/**'
+              - 'common-lib/**'
               - 'pom.xml'
             media-service:
               - 'media-service/**'
+              - 'common-lib/**'
               - 'pom.xml'
             search-service:
               - 'search-service/**'
+              - 'common-lib/**'
               - 'pom.xml'
             promotion-service:
               - 'promotion-service/**'
+              - 'common-lib/**'
               - 'pom.xml'
             tax-service:
               - 'tax-service/**'
+              - 'common-lib/**'
               - 'pom.xml'
             frontend:
               - 'frontend/**'
@@ -102,8 +117,8 @@ jobs:
           distribution: temurin
           cache: maven
       - name: Run tests
-        run: mvn test -B --fail-at-end 2>/dev/null || true
-        # Services that have no tests won't fail the pipeline
+        run: mvn test -B --fail-at-end -Dspring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration,org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration,org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
+        # Excludes DB autoconfiguration so contextLoads tests pass without a real database
 
   # ─ Build & Push each changed service (parallel) ─
   build-discovery-service:
