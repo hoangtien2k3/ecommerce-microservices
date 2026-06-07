@@ -38,7 +38,7 @@ services:
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 10s
-      timeout: 5s
+      timeout: 15s
       retries: 10
     networks:
       - ecommerce-network
@@ -80,7 +80,7 @@ services:
     volumes:
       - kafka_data:/var/lib/kafka/data
     healthcheck:
-      test: ["CMD-SHELL", "kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1"]
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1"]
       interval: 10s
       timeout: 10s
       retries: 20
@@ -147,10 +147,11 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/realms/master/.well-known/openid-configuration || exit 1"]
+      test: ["CMD", "bash", "-c", "echo > /dev/tcp/localhost/8080"]
       interval: 10s
       timeout: 5s
       retries: 30
+      start_period: 90s
     networks:
       - ecommerce-network
 

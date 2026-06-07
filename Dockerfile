@@ -52,7 +52,8 @@ RUN ./mvnw -pl common-lib,${SERVICE_NAME} -am package -DskipTests -B -q
 FROM eclipse-temurin:21-jre-alpine
 ARG SERVICE_NAME
 
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN apk add --no-cache curl && \
+    addgroup -S appgroup && adduser -S appuser -G appgroup
 WORKDIR /app
 COPY --from=build /workspace/${SERVICE_NAME}/target/*.jar app.jar
 

@@ -12,8 +12,8 @@ RUN ./mvnw package -DskipTests -B
 
 # Stage 2: Runtime
 FROM eclipse-temurin:21-jre-alpine
-RUN apk add --no-cache bash
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN apk add --no-cache bash curl && \
+    addgroup -S appgroup && adduser -S appuser -G appgroup
 WORKDIR /app
 
 COPY --from=build /app/target/search-service-*.jar app.jar
