@@ -208,6 +208,32 @@ spring:
           issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/ecommerce}
           jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8080/realms/ecommerce/protocol/openid-connect/certs}
 
+security:
+  public-paths:
+    auth:
+      - /api/v1/auth/signup
+      - /api/v1/auth/register
+      - /api/v1/auth/signin
+      - /api/v1/auth/login
+      - /api/v1/auth/refresh
+      - /api/v1/auth/refresh-token
+      - /api/v1/auth/logout
+      - /api/auth/signup
+      - /api/auth/register
+      - /api/auth/signin
+      - /api/auth/refresh
+      - /api/auth/logout
+    storefront:
+      - /api/products/**
+      - /api/categories/**
+      - /storefront/**
+    swagger:
+      - /v3/api-docs/**
+      - /swagger-ui/**
+      - /swagger-resources/**
+      - /actuator/**
+      - /error
+
 eureka:
   client:
     serviceUrl:

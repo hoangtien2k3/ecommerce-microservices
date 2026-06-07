@@ -1,5 +1,6 @@
 package com.ecommerce.apigateway.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -16,47 +17,22 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    private static final String[] PUBLIC_AUTH_PATHS = {
-            "/api/v1/auth/signup",
-            "/api/v1/auth/register",
-            "/api/v1/auth/signin",
-            "/api/v1/auth/login",
-            "/api/v1/auth/refresh",
-            "/api/v1/auth/refresh-token",
-            "/api/v1/auth/logout",
-            "/api/auth/signup",
-            "/api/auth/register",
-            "/api/auth/signin",
-            "/api/auth/refresh",
-            "/api/auth/logout"
-    };
-
-    private static final String[] PUBLIC_STOREFRONT_PATHS = {
-            "/api/products/**",
-            "/api/categories/**",
-            "/storefront/**"
-    };
-
-    private static final String[] PUBLIC_SWAGGER_PATHS = {
-            "/v3/api-docs/**",
-            "/swagger-ui/**",
-            "/swagger-resources/**",
-            "/actuator/**",
-            "/error"
-    };
+    private final SecurityProperties securityProperties;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        SecurityProperties.PublicPaths paths = securityProperties.getPublicPaths();
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(PUBLIC_AUTH_PATHS).permitAll()
-                        .requestMatchers(PUBLIC_STOREFRONT_PATHS).permitAll()
-                        .requestMatchers(PUBLIC_SWAGGER_PATHS).permitAll()
+                        .requestMatchers(paths.getAuth()).permitAll()
+                        .requestMatchers(paths.getStorefront()).permitAll()
+                        .requestMatchers(paths.getSwagger()).permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {}));
