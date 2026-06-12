@@ -125,6 +125,7 @@ jobs:
     uses: ./.github/workflows/_build-service.yml
     with:
       service: discovery-service
+      port: 8761
     secrets:
       GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -134,6 +135,7 @@ jobs:
     uses: ./.github/workflows/_build-service.yml
     with:
       service: api-gateway
+      port: 8888
     secrets:
       GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -143,6 +145,7 @@ jobs:
     uses: ./.github/workflows/_build-service.yml
     with:
       service: auth-service
+      port: 8088
     secrets:
       GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -152,6 +155,7 @@ jobs:
     uses: ./.github/workflows/_build-service.yml
     with:
       service: product-service
+      port: 8086
     secrets:
       GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -161,6 +165,7 @@ jobs:
     uses: ./.github/workflows/_build-service.yml
     with:
       service: order-service
+      port: 8084
     secrets:
       GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -170,6 +175,7 @@ jobs:
     uses: ./.github/workflows/_build-service.yml
     with:
       service: payment-service
+      port: 8085
     secrets:
       GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -179,6 +185,7 @@ jobs:
     uses: ./.github/workflows/_build-service.yml
     with:
       service: shipping-service
+      port: 8087
     secrets:
       GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -188,6 +195,7 @@ jobs:
     uses: ./.github/workflows/_build-service.yml
     with:
       service: inventory-service
+      port: 8082
     secrets:
       GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -197,6 +205,7 @@ jobs:
     uses: ./.github/workflows/_build-service.yml
     with:
       service: favourite-service
+      port: 8081
     secrets:
       GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -206,6 +215,7 @@ jobs:
     uses: ./.github/workflows/_build-service.yml
     with:
       service: rating-service
+      port: 8089
     secrets:
       GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -215,6 +225,7 @@ jobs:
     uses: ./.github/workflows/_build-service.yml
     with:
       service: notification-service
+      port: 8090
     secrets:
       GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -224,6 +235,7 @@ jobs:
     uses: ./.github/workflows/_build-service.yml
     with:
       service: media-service
+      port: 8083
     secrets:
       GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -233,6 +245,7 @@ jobs:
     uses: ./.github/workflows/_build-service.yml
     with:
       service: search-service
+      port: 8094
     secrets:
       GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -242,6 +255,7 @@ jobs:
     uses: ./.github/workflows/_build-service.yml
     with:
       service: promotion-service
+      port: 8093
     secrets:
       GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -251,6 +265,7 @@ jobs:
     uses: ./.github/workflows/_build-service.yml
     with:
       service: tax-service
+      port: 8091
     secrets:
       GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

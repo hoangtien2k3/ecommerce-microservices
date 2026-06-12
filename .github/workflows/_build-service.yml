@@ -6,21 +6,19 @@ on:
       service:
         required: true
         type: string
+      port:
+        required: true
+        type: string
       java-version:
         required: false
         type: string
         default: "21"
-    outputs:
-      image:
-        description: "Full image reference pushed"
-        value: ${{ jobs.build.outputs.image }}
     secrets:
       GHCR_TOKEN:
         required: true
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}
 
 jobs:
   build:
@@ -29,8 +27,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-    outputs:
-      image: ${{ steps.meta.outputs.tags }}
 
     steps:
       - name: Checkout
@@ -43,11 +39,21 @@ jobs:
           distribution: temurin
           cache: maven
 
-      - name: Build JAR (skip tests in CI — tests run separately)
-        run: mvn -pl common-lib,${{ inputs.service }} -am package -DskipTests -B -q
+      - name: Generate image metadata
+        id: meta
+        run: |
+          SHA="sha-$(git rev-parse --short HEAD)"
+          IMAGE="ghcr.io/${{ github.repository_owner }}/${{ inputs.service }}"
+          echo "image=${IMAGE}" >> $GITHUB_OUTPUT
+          echo "sha=${SHA}" >> $GITHUB_OUTPUT
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+          TAGS="${SHA}"
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            TAGS="${TAGS},latest"
+          elif [[ "${{ github.ref_type }}" == "branch" ]]; then
+            TAGS="${TAGS},${{ github.ref_name }}"
+          fi
+          echo "tags=${TAGS}" >> $GITHUB_OUTPUT
 
       - name: Log in to GHCR
         uses: docker/login-action@v3
@@ -56,26 +62,24 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
 
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.IMAGE_PREFIX }}/${{ inputs.service }}
-          tags: |
-            type=sha,prefix=sha-,format=short
-            type=ref,event=branch
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+      - name: Build & push image with Jib
+        if: github.event_name != 'pull_request'
+        run: |
+          mvn -pl ${{ inputs.service }} -am \
+            jib:build \
+            -DskipTests -B \
+            -Djib.to.image=${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.sha }} \
+            -Djib.to.tags=${{ steps.meta.outputs.tags }} \
+            -Djib.container.ports=${{ inputs.port }}
 
-      - name: Build and push image
-        uses: docker/build-push-action@v6
-        with:
-          context: ${{ inputs.service }}
-          file: ${{ inputs.service }}/Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=${{ inputs.service }}
-          cache-to: type=gha,mode=max,scope=${{ inputs.service }}
+      - name: Build image tar only (PR — no push)
+        if: github.event_name == 'pull_request'
+        run: |
+          mvn -pl ${{ inputs.service }} -am \
+            jib:buildTar \
+            -DskipTests -B \
+            -Djib.to.image=${{ steps.meta.outputs.image }}:pr-check \
+            -Djib.container.ports=${{ inputs.port }}
 
       - name: Image digest
-        run: echo "Pushed ${{ steps.meta.outputs.tags }}"
+        run: echo "Pushed ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.sha }}"
