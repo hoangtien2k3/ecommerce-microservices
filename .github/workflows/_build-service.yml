@@ -62,15 +62,25 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
 
+      - name: Stagger start to reduce GHCR rate-limit contention
+        if: github.event_name != 'pull_request'
+        run: sleep $(( RANDOM % 10 ))
+
       - name: Build & push image with Jib
         if: github.event_name != 'pull_request'
         run: |
-          mvn -pl ${{ inputs.service }} -am \
-            compile jib:build \
-            -DskipTests -B \
-            -Djib.to.image=${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.sha }} \
-            -Djib.to.tags=${{ steps.meta.outputs.tags }} \
-            -Djib.container.ports=${{ inputs.port }}
+          for i in 1 2 3; do
+            mvn -pl ${{ inputs.service }} -am \
+              compile jib:build \
+              -DskipTests -B \
+              -Djib.to.image=${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.sha }} \
+              -Djib.to.tags=${{ steps.meta.outputs.tags }} \
+              -Djib.container.ports=${{ inputs.port }} && break
+            jitter=$(( RANDOM % 10 + 1 ))
+            delay=$(( i * 8 + jitter ))
+            echo "Push attempt $i failed. Retrying in ${delay}s..."
+            sleep $delay
+          done
 
       - name: Build image tar only (PR — no push)
         if: github.event_name == 'pull_request'

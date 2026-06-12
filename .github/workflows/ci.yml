@@ -116,7 +116,7 @@ jobs:
           distribution: temurin
           cache: maven
       - name: Run tests
-        run: mvn test -B --fail-at-end -pl common-lib,auth-service -am
+        run: mvn test -B --fail-at-end
 
   # Build & Push
   build-discovery-service:
