@@ -21,6 +21,10 @@
           - common-lib     : Spring Boot Starter (auto-configuration for web, security, JPA, Kafka, etc.)
     </description>
 
+    <properties>
+        <jib.skip>true</jib.skip>
+    </properties>
+
     <modules>
         <module>common-core</module>
         <module>common-spring</module>

@@ -52,6 +52,9 @@
         <!-- CI-friendly version (https://maven.apache.org/maven-ci-friendly.html) -->
         <revision>1.0-SNAPSHOT</revision>
 
+        <!-- Jib: skip containerization for library modules (no main class) -->
+        <jib.skip>false</jib.skip>
+
         <!-- Annotation processors -->
         <lombok.version>1.18.34</lombok.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
@@ -344,23 +347,24 @@
                 </plugin>
 
                 <!-- Jib: build & push container images without Docker daemon -->
-                <plugin>
-                    <groupId>com.google.cloud.tools</groupId>
-                    <artifactId>jib-maven-plugin</artifactId>
-                    <version>3.5.1</version>
-                    <configuration>
-                        <from>
-                            <image>gcr.io/distroless/java21-debian12</image>
-                        </from>
-                        <container>
-                            <format>OCI</format>
-                            <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
-                            <jvmFlags>
-                                <jvmFlag>-Djava.security.egd=file:/dev/./urandom</jvmFlag>
-                            </jvmFlags>
-                        </container>
-                    </configuration>
-                </plugin>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <skip>${jib.skip}</skip>
+                    <from>
+                        <image>gcr.io/distroless/java21-debian12</image>
+                    </from>
+                    <container>
+                        <format>OCI</format>
+                        <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+                        <jvmFlags>
+                            <jvmFlag>-Djava.security.egd=file:/dev/./urandom</jvmFlag>
+                        </jvmFlags>
+                    </container>
+                </configuration>
+            </plugin>
             </plugins>
         </pluginManagement>
 
