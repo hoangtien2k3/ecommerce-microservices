@@ -94,7 +94,7 @@ jobs:
     needs: update-manifests
     runs-on: arc-runner-set
     environment:
-      name: ${{ env.ENVIRONMENT }}
+      name: ${{ github.event.inputs.environment || 'dev' }}
     if: vars.DEPLOY_METHOD == 'argocd'
     steps:
       - name: Install argocd CLI
@@ -116,7 +116,7 @@ jobs:
     needs: update-manifests
     runs-on: ubuntu-latest  # Change to self-hosted if using local cluster
     environment:
-      name: ${{ env.ENVIRONMENT }}
+      name: ${{ github.event.inputs.environment || 'dev' }}
     if: vars.DEPLOY_METHOD == 'kubectl'
     steps:
       - uses: actions/checkout@v4
