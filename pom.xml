@@ -1,18 +1,26 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.3.5</version>
         <relativePath/>
     </parent>
-    <groupId>com.hoangtien2k3</groupId>
+
+    <groupId>com.ecommerce</groupId>
     <artifactId>ecommerce-microservices</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
     <name>ecommerce-microservices</name>
+    <description>
+        Aggregator + parent POM for the ecommerce microservices platform.
+        Pins versions for every third-party dependency, centralizes plugin
+        configuration, and exposes a single CI-friendly version property
+        (${revision}) inherited by all modules.
+    </description>
 
     <modules>
         <module>common-lib</module>
@@ -34,44 +42,59 @@
     </modules>
 
     <properties>
+        <!-- Build -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>21</java.version>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
-        <ecommerce.version>1.0-SNAPSHOT</ecommerce.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+
+        <!-- CI-friendly version (https://maven.apache.org/maven-ci-friendly.html) -->
         <revision>1.0-SNAPSHOT</revision>
 
-        <sonar.organization>nashtech-garage</sonar.organization>
-        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <springdoc-openapi-starter-webmvc-ui.version>2.6.0</springdoc-openapi-starter-webmvc-ui.version>
-        <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
-        <org.lombok.version>1.18.42</org.lombok.version>
+        <!-- Annotation processors -->
+        <lombok.version>1.18.34</lombok.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
-        <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
-        <opentelemetry-logback.vesion>1.30.0-alpha</opentelemetry-logback.vesion>
+
+        <!-- Spring Cloud (compatible with Spring Boot 3.3.x) -->
         <spring-cloud.version>2023.0.3</spring-cloud.version>
 
-        <commons-validator.version>1.7</commons-validator.version>
-        <org.elasticsearch.version>8.14.0</org.elasticsearch.version>
-        <paypal-checkout-sdk.version>2.0.0</paypal-checkout-sdk.version>
-        <testcontainers-keycloak.version>3.3.0</testcontainers-keycloak.version>
-        <rest-assured.version>5.4.0</rest-assured.version>
-        <instancio-junit.version>4.8.1</instancio-junit.version>
+        <!-- Third-party libraries -->
+        <springdoc-openapi.version>2.6.0</springdoc-openapi.version>
         <resilience4j.version>2.2.0</resilience4j.version>
-        <maven.compiler.compilerArgs>
-            --add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED
-            --add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED
-            --add-opens=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
-            --add-opens=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED
-            --add-opens=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED
-            --add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED
-            --add-opens=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED
-            --add-opens=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED
-            --add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED
-        </maven.compiler.compilerArgs>
+        <modelmapper.version>3.2.0</modelmapper.version>
+        <opencsv.version>5.9</opencsv.version>
+        <gson.version>2.11.0</gson.version>
+        <org-json.version>20240303</org-json.version>
+        <commons-validator.version>1.9.0</commons-validator.version>
+        <paypal-checkout-sdk.version>2.0.0</paypal-checkout-sdk.version>
+        <spring-cloud-cb-reactor-resilience4j.version>3.1.3</spring-cloud-cb-reactor-resilience4j.version>
+
+        <!-- Test -->
+        <instancio-junit.version>4.8.1</instancio-junit.version>
+        <rest-assured.version>5.5.0</rest-assured.version>
+        <testcontainers-keycloak.version>3.3.0</testcontainers-keycloak.version>
+
+        <!-- Maven plugins -->
+        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
+        <maven-checkstyle-plugin.version>3.4.0</maven-checkstyle-plugin.version>
+        <maven-failsafe-plugin.version>3.4.0</maven-failsafe-plugin.version>
+        <maven-surefire-plugin.version>3.4.0</maven-surefire-plugin.version>
+        <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
+        <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
+        <dependency-check-maven.version>10.0.4</dependency-check-maven.version>
+
+        <!-- Tooling -->
+        <sonar.organization>hoangtien2k3</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
+
     <dependencyManagement>
         <dependencies>
+            <!-- Spring Cloud BOM (also covers Eureka, OpenFeign, Gateway, Sleuth bridges...) -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
@@ -79,57 +102,52 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
+            <!-- Platform-internal libraries -->
             <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-web</artifactId>
-                <version>6.1.14</version>
+                <groupId>com.ecommerce</groupId>
+                <artifactId>common-core</artifactId>
+                <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-webmvc</artifactId>
-                <version>6.1.14</version>
+                <groupId>com.ecommerce</groupId>
+                <artifactId>common-lib</artifactId>
+                <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-webflux</artifactId>
-                <version>6.1.14</version>
+                <groupId>com.ecommerce</groupId>
+                <artifactId>common-lib</artifactId>
+                <version>${revision}</version>
+                <classifier>tests</classifier>
+                <type>test-jar</type>
+                <scope>test</scope>
             </dependency>
+
+            <!-- Annotation processors -->
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
-                <version>${org.lombok.version}</version>
+                <version>${lombok.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mapstruct</groupId>
                 <artifactId>mapstruct</artifactId>
-                <version>${org.mapstruct.version}</version>
+                <version>${mapstruct.version}</version>
             </dependency>
+
+            <!-- OpenAPI / Swagger -->
             <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-                <version>${springdoc-openapi-starter-webmvc-ui.version}</version>
+                <version>${springdoc-openapi.version}</version>
             </dependency>
             <dependency>
-                <groupId>commons-validator</groupId>
-                <artifactId>commons-validator</artifactId>
-                <version>${commons-validator.version}</version>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+                <version>${springdoc-openapi.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.elasticsearch</groupId>
-                <artifactId>elasticsearch</artifactId>
-                <version>${org.elasticsearch.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.paypal.sdk</groupId>
-                <artifactId>checkout-sdk</artifactId>
-                <version>${paypal-checkout-sdk.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.instancio</groupId>
-                <artifactId>instancio-junit</artifactId>
-                <version>${instancio-junit.version}</version>
-                <scope>test</scope>
-            </dependency>
+
+            <!-- Resilience4j (servlet + reactor stacks) -->
             <dependency>
                 <groupId>io.github.resilience4j</groupId>
                 <artifactId>resilience4j-spring-boot3</artifactId>
@@ -140,60 +158,64 @@
                 <artifactId>resilience4j-reactor</artifactId>
                 <version>${resilience4j.version}</version>
             </dependency>
+            <!-- Spring Cloud's reactive circuit breaker uses its own version line -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
+                <version>${spring-cloud-cb-reactor-resilience4j.version}</version>
+            </dependency>
+
+            <!-- DTO mapping (legacy services — new code should prefer MapStruct) -->
+            <dependency>
+                <groupId>org.modelmapper</groupId>
+                <artifactId>modelmapper</artifactId>
+                <version>${modelmapper.version}</version>
+            </dependency>
+
+            <!-- CSV export -->
+            <dependency>
+                <groupId>com.opencsv</groupId>
+                <artifactId>opencsv</artifactId>
+                <version>${opencsv.version}</version>
+            </dependency>
+
+            <!-- Miscellaneous third-party -->
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>${gson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.json</groupId>
+                <artifactId>json</artifactId>
+                <version>${org-json.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-validator</groupId>
+                <artifactId>commons-validator</artifactId>
+                <version>${commons-validator.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.paypal.sdk</groupId>
+                <artifactId>checkout-sdk</artifactId>
+                <version>${paypal-checkout-sdk.version}</version>
+            </dependency>
+
+            <!-- Test -->
+            <dependency>
+                <groupId>org.instancio</groupId>
+                <artifactId>instancio-junit</artifactId>
+                <version>${instancio-junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.rest-assured</groupId>
+                <artifactId>rest-assured</artifactId>
+                <version>${rest-assured.version}</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>io.github.resilience4j</groupId>-->
-<!--            <artifactId>resilience4j-spring-boot3</artifactId>-->
-<!--            <version>2.1.0</version>-->
-<!--        </dependency>-->
-        <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-            <version>6.1.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aspects</artifactId>
-        </dependency>
-    </dependencies>
 
     <build>
         <pluginManagement>
@@ -201,36 +223,33 @@
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
+                    <configuration>
+                        <excludes>
+                            <exclude>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                            </exclude>
+                        </excludes>
+                    </configuration>
                 </plugin>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.13.0</version>
+                    <version>${maven-compiler-plugin.version}</version>
                     <configuration>
-                        <source>${java.version}</source>
-                        <target>${java.version}</target>
-                        <fork>true</fork>
-                        <compilerArgs>
-                            <arg>--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
-                            <arg>--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
-                            <arg>--add-opens=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
-                            <arg>--add-opens=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
-                            <arg>--add-opens=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>
-                            <arg>--add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
-                            <arg>--add-opens=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
-                            <arg>--add-opens=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
-                            <arg>--add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
-                        </compilerArgs>
+                        <release>${java.version}</release>
+                        <parameters>true</parameters>
                         <annotationProcessorPaths>
-                            <path>
-                                <groupId>org.mapstruct</groupId>
-                                <artifactId>mapstruct-processor</artifactId>
-                                <version>${org.mapstruct.version}</version>
-                            </path>
                             <path>
                                 <groupId>org.projectlombok</groupId>
                                 <artifactId>lombok</artifactId>
-                                <version>${org.lombok.version}</version>
+                                <version>${lombok.version}</version>
+                            </path>
+                            <path>
+                                <groupId>org.mapstruct</groupId>
+                                <artifactId>mapstruct-processor</artifactId>
+                                <version>${mapstruct.version}</version>
                             </path>
                             <path>
                                 <groupId>org.projectlombok</groupId>
@@ -240,59 +259,70 @@
                         </annotationProcessorPaths>
                     </configuration>
                 </plugin>
+
                 <plugin>
-                    <groupId>org.owasp</groupId>
-                    <artifactId>dependency-check-maven</artifactId>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven-surefire-plugin.version}</version>
                 </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${maven-failsafe-plugin.version}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${build-helper-maven-plugin.version}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>flatten-maven-plugin</artifactId>
+                    <version>${flatten-maven-plugin.version}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>${maven-enforcer-plugin.version}</version>
+                </plugin>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>3.4.0</version>
-                    <executions>
-                        <execution>
-                            <id>checkstyle</id>
-                            <phase>validate</phase>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
+                    <version>${maven-checkstyle-plugin.version}</version>
                     <configuration>
-                        <configLocation>/checkstyle/checkstyle.xml</configLocation>
-                        <suppressionsLocation>/checkstyle/suppressions.xml</suppressionsLocation>
                         <consoleOutput>true</consoleOutput>
                         <failsOnError>false</failsOnError>
                         <failOnViolation>false</failOnViolation>
                     </configuration>
                 </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>3.6.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.4.0</version>
-                </plugin>
+
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.11</version>
+                    <version>${jacoco-maven-plugin.version}</version>
+                    <configuration>
+                        <excludes>
+                            <exclude>com/ecommerce/**/*Application.class</exclude>
+                            <exclude>com/ecommerce/**/config/**</exclude>
+                            <exclude>com/ecommerce/**/configuration/**</exclude>
+                            <exclude>com/ecommerce/**/constants/**</exclude>
+                            <exclude>com/ecommerce/**/exception/**</exclude>
+                            <exclude>com/ecommerce/**/viewmodel/**</exclude>
+                            <exclude>com/ecommerce/**/dto/**</exclude>
+                        </excludes>
+                    </configuration>
                     <executions>
                         <execution>
+                            <id>prepare-agent</id>
                             <goals>
                                 <goal>prepare-agent</goal>
                             </goals>
                         </execution>
-                        <!-- attached to Maven test phase -->
                         <execution>
                             <id>report</id>
                             <phase>verify</phase>
@@ -301,69 +331,114 @@
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.owasp</groupId>
+                    <artifactId>dependency-check-maven</artifactId>
+                    <version>${dependency-check-maven.version}</version>
                     <configuration>
-                        <excludes>
-                            <exclude>com/hoangtien2k3/**/*Application.class</exclude>
-                            <exclude>com/hoangtien2k3/**/config/**</exclude>
-                            <exclude>com/hoangtien2k3/**/exception/**</exclude>
-                            <exclude>com/hoangtien2k3/**/constants/**</exclude>
-                        </excludes>
+                        <failBuildOnCVSS>8</failBuildOnCVSS>
+                        <skipTestScope>true</skipTestScope>
                     </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
 
         <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-test-source</id>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>add-test-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>src/it/java</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>add-integration-test-resources</id>
-                        <phase>generate-test-resources</phase>
-                        <goals>
-                            <goal>add-test-resource</goal>
-                        </goals>
-                        <configuration>
-                            <resources>
-                                <resource>
-                                    <filtering>true</filtering>
-                                    <directory>src/it/resources</directory>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+            <!-- Fails fast if a contributor is on an unsupported JDK / Maven version. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
+                <artifactId>maven-enforcer-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>enforce-build-environment</id>
                         <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
+                            <goal>enforce</goal>
                         </goals>
                         <configuration>
-                            <includes>
-                                <include>**/**IT.java</include>
-                            </includes>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>[${java.version},)</version>
+                                </requireJavaVersion>
+                                <requireMavenVersion>
+                                    <version>[3.9.0,)</version>
+                                </requireMavenVersion>
+                            </rules>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!--
+            Integration tests live under src/it/**. Only wired in for modules that
+            actually have the directory — keeps the build clean for the others.
+        -->
+        <profile>
+            <id>it</id>
+            <activation>
+                <file>
+                    <exists>src/it/java</exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-it-sources</id>
+                                <phase>generate-test-sources</phase>
+                                <goals>
+                                    <goal>add-test-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>src/it/java</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>add-it-resources</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>add-test-resource</goal>
+                                </goals>
+                                <configuration>
+                                    <resources>
+                                        <resource>
+                                            <filtering>true</filtering>
+                                            <directory>src/it/resources</directory>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>integration-test</id>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                                <configuration>
+                                    <includes>
+                                        <include>**/*IT.java</include>
+                                    </includes>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

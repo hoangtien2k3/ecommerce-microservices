@@ -1,7 +1,7 @@
 package com.ecommerce.promotion.service;
 
 import com.ecommerce.promotion.config.ServiceUrlConfig;
-import com.ecommerce.commonlib.utils.AuthenticationUtils;
+import com.ecommerce.commonlib.security.AuthenticationUtils;
 import com.ecommerce.promotion.viewmodel.BrandVm;
 import com.ecommerce.promotion.viewmodel.CategoryGetVm;
 import com.ecommerce.promotion.viewmodel.ProductVm;
@@ -29,7 +29,7 @@ public class ProductService extends AbstractCircuitBreakFallbackHandler {
     @Retry(name = "restApi")
     @CircuitBreaker(name = "restCircuitBreaker", fallbackMethod = "handleFallback")
     public List<ProductVm> getProductByIds(List<Long> ids) {
-        String jwt = AuthenticationUtils.extractJwt();
+        String jwt = AuthenticationUtils.requireJwt();
         final URI url = UriComponentsBuilder
             .fromHttpUrl(serviceUrlConfig.product())
             .path("/backoffice/products/by-ids")
@@ -49,7 +49,7 @@ public class ProductService extends AbstractCircuitBreakFallbackHandler {
     @Retry(name = "restApi")
     @CircuitBreaker(name = "restCircuitBreaker", fallbackMethod = "handleFallback")
     public List<CategoryGetVm> getCategoryByIds(List<Long> ids) {
-        String jwt = AuthenticationUtils.extractJwt();
+        String jwt = AuthenticationUtils.requireJwt();
         final URI url = UriComponentsBuilder
             .fromHttpUrl(serviceUrlConfig.product())
             .path("/backoffice/categories/by-ids")
@@ -68,7 +68,7 @@ public class ProductService extends AbstractCircuitBreakFallbackHandler {
     @Retry(name = "restApi")
     @CircuitBreaker(name = "restCircuitBreaker", fallbackMethod = "handleFallback")
     public List<BrandVm> getBrandByIds(List<Long> ids) {
-        String jwt = AuthenticationUtils.extractJwt();
+        String jwt = AuthenticationUtils.requireJwt();
         final URI url = UriComponentsBuilder
             .fromHttpUrl(serviceUrlConfig.product())
             .path("/backoffice/brands/by-ids")

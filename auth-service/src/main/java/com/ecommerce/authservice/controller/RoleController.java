@@ -2,8 +2,8 @@ package com.ecommerce.authservice.controller;
 
 import com.ecommerce.authservice.service.RoleService;
 import com.ecommerce.commonlib.constants.ApiPaths;
-import com.ecommerce.commonlib.constants.ErrorCode;
 import com.ecommerce.commonlib.exception.BusinessException;
+import com.ecommerce.commonlib.exception.ErrorCode;
 import com.ecommerce.commonlib.viewmodel.ApiResponse;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;

@@ -1,0 +1,66 @@
+{
+  "groups": [
+    {
+      "name": "ecommerce.cors",
+      "description": "Cross-origin resource sharing for the platform."
+    },
+    {
+      "name": "ecommerce.security",
+      "description": "Resource-server security knobs (JWT + public path allow-list)."
+    },
+    {
+      "name": "ecommerce.i18n",
+      "description": "i18n message-source configuration."
+    },
+    {
+      "name": "ecommerce.openapi",
+      "description": "OpenAPI metadata (title, version, description)."
+    },
+    {
+      "name": "ecommerce.web.correlation",
+      "description": "X-Correlation-Id / X-Request-Id filter."
+    },
+    {
+      "name": "ecommerce.web.exception-handler",
+      "description": "Global RestControllerAdvice that maps exceptions to ApiResponse."
+    }
+  ],
+  "properties": [
+    {
+      "name": "ecommerce.cors.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable platform CORS filter.",
+      "defaultValue": true
+    },
+    {
+      "name": "ecommerce.security.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable platform JWT resource-server config.",
+      "defaultValue": true
+    },
+    {
+      "name": "ecommerce.security.csrf-disabled",
+      "type": "java.lang.Boolean",
+      "description": "Disable CSRF (stateless JWT auth).",
+      "defaultValue": true
+    },
+    {
+      "name": "ecommerce.security.stateless-session",
+      "type": "java.lang.Boolean",
+      "description": "Force SessionCreationPolicy.STATELESS.",
+      "defaultValue": true
+    },
+    {
+      "name": "ecommerce.web.correlation.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable correlation-id filter.",
+      "defaultValue": true
+    },
+    {
+      "name": "ecommerce.web.exception-handler.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable the platform RestControllerAdvice.",
+      "defaultValue": true
+    }
+  ]
+}

@@ -5,7 +5,7 @@ import com.ecommerce.rating.exception.NotFoundException;
 import com.ecommerce.rating.exception.ResourceExistedException;
 import com.ecommerce.rating.model.Rating;
 import com.ecommerce.rating.repository.RatingRepository;
-import com.ecommerce.commonlib.utils.AuthenticationUtils;
+import com.ecommerce.commonlib.security.AuthenticationUtils;
 import com.ecommerce.rating.utils.Constants;
 import com.ecommerce.rating.viewmodel.CustomerVm;
 import com.ecommerce.rating.viewmodel.RatingListVm;
@@ -73,7 +73,7 @@ public class RatingService {
     }
 
     public RatingVm createRating(RatingPostVm ratingPostVm) {
-        String userId = AuthenticationUtils.extractUserId();
+        String userId = AuthenticationUtils.requireUserId();
 
         if (!orderService.checkOrderExistsByProductAndUserWithStatus(
                 ratingPostVm.productId()

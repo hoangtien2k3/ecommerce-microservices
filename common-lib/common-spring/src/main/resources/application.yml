@@ -1,0 +1,31 @@
+# Default values applied to every service that pulls common-lib in.
+# Override per service via its own application.yml or environment variables.
+spring:
+  application:
+    name: ${SERVICE_NAME:common-lib-default}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI:http://identity/realms/ecommerce}
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+
+springdoc:
+  oauthflow:
+    authorization-url: ${JWT_AUTH_URL:http://identity/realms/ecommerce/protocol/openid-connect/auth}
+    token-url: ${JWT_TOKEN_URL:http://identity/realms/ecommerce/protocol/openid-connect/token}
+
+ecommerce:
+  cors:
+    enabled: true
+    allowed-origin-patterns:
+      - "*"
+  security:
+    enabled: true
+    csrf-disabled: true
+    stateless-session: true
+  i18n:
+    default-locale: vi
