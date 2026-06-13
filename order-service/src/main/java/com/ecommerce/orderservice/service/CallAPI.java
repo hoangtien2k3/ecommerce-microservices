@@ -2,36 +2,31 @@ package com.ecommerce.orderservice.service;
 
 import com.ecommerce.orderservice.dto.product.ProductDto;
 import com.ecommerce.orderservice.dto.user.UserDto;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+import org.springframework.web.client.RestClient;
 
 @Component
+@RequiredArgsConstructor
 public class CallAPI {
-    private final WebClient.Builder webClientBuilder;
 
-    @Autowired
-    public CallAPI(WebClient.Builder webClientBuilder) {
-        this.webClientBuilder = webClientBuilder;
-    }
+    private final RestClient.Builder restClientBuilder;
 
-    public Mono<UserDto> receiverUserDto(Long userId, String token) {
-        return webClientBuilder.baseUrl("http://AUTH-SERVICE").build()
+    public UserDto receiverUserDto(Long userId, String token) {
+        return restClientBuilder.baseUrl("http://AUTH-SERVICE").build()
                 .get()
-                .uri("/api/manager/user/" + userId)
+                .uri("/api/manager/user/{id}", userId)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .retrieve()
-                .bodyToMono(UserDto.class);
+                .body(UserDto.class);
     }
 
-    public Mono<ProductDto> receiverProductDto(Integer productId) {
-        return webClientBuilder.baseUrl("http://PRODUCT-SERVICE").build()
+    public ProductDto receiverProductDto(Integer productId) {
+        return restClientBuilder.baseUrl("http://PRODUCT-SERVICE").build()
                 .get()
-                .uri("/api/products/" + productId)
+                .uri("/api/products/{id}", productId)
                 .retrieve()
-                .bodyToMono(ProductDto.class);
+                .body(ProductDto.class);
     }
-
 }
