@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: discovery-service
-          image: ghcr.io/hoangtien2k3/discovery-service:sha-69f2322
+          image: ghcr.io/hoangtien2k3/discovery-service:sha-374ea13
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8761
