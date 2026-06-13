@@ -2,24 +2,23 @@ package com.ecommerce.orderservice.service;
 
 import com.ecommerce.orderservice.dto.order.OrderDto;
 import org.springframework.data.domain.Page;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 public interface OrderService {
-    Mono<List<OrderDto>> findAll();
+    List<OrderDto> findAll();
 
-    Mono<Page<OrderDto>> findAll(int page, int size, String sortBy, String sortOrder);
+    Page<OrderDto> findAll(int page, int size, String sortBy, String sortOrder);
 
-    Mono<OrderDto> findById(Integer orderId);
+    OrderDto findById(Integer orderId);
 
-    Mono<OrderDto> save(final OrderDto orderDto);
+    OrderDto save(OrderDto orderDto);
 
-    Mono<OrderDto> update(final OrderDto orderDto);
+    OrderDto update(OrderDto orderDto);
 
-    Mono<OrderDto> update(final Integer orderId, final OrderDto orderDto);
+    OrderDto update(Integer orderId, OrderDto orderDto);
 
-    Mono<Void> deleteById(final Integer orderId);
+    void deleteById(Integer orderId);
 
     Boolean existsByOrderId(Integer orderId);
 }
