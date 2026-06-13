@@ -51,7 +51,7 @@
         <spring-cloud.version>2023.0.3</spring-cloud.version>
         <springdoc-openapi.version>2.6.0</springdoc-openapi.version>
         <resilience4j.version>2.2.0</resilience4j.version>
-        <modelmapper.version>3.2.0</modelmapper.version>
+        <modelmapper.version>3.2.6</modelmapper.version>
         <opencsv.version>5.9</opencsv.version>
         <gson.version>2.11.0</gson.version>
         <org-json.version>20240303</org-json.version>
