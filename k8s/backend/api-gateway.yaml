@@ -26,7 +26,7 @@ spec:
             - until nc -z discovery-service 8761; do echo "Waiting for Eureka..."; sleep 5; done
       containers:
         - name: api-gateway
-          image: ghcr.io/hoangtien2k3/api-gateway:latest
+          image: ghcr.io/hoangtien2k3/api-gateway:sha-69f2322
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8888
