@@ -66,3 +66,52 @@ springdoc:
   oauthflow:
     authorization-url: ${KEYCLOAK_SERVER_URL:http://localhost:8080}/realms/${KEYCLOAK_REALM:ecommerce}/protocol/openid-connect/auth
     token-url: ${KEYCLOAK_SERVER_URL:http://localhost:8080}/realms/${KEYCLOAK_REALM:ecommerce}/protocol/openid-connect/token
+---
+ecommerce:
+  security:
+    enabled: ${ECOMMERCE_SECURITY_ENABLED:true}
+    csrf-disabled: ${ECOMMERCE_SECURITY_CSRF_DISABLED:true}
+    stateless-session: ${ECOMMERCE_SECURITY_STATELESS_SESSION:true}
+    public-paths: []
+  cors:
+    enabled: ${ECOMMERCE_CORS_ENABLED:true}
+    allowed-origin-patterns: ${CORS_ALLOWED_ORIGIN_PATTERNS:*}
+    allowed-methods:
+      - GET
+      - POST
+      - PUT
+      - PATCH
+      - DELETE
+      - OPTIONS
+    allowed-headers:
+      - "*"
+    exposed-headers:
+      - X-Correlation-Id
+      - X-Request-Id
+    allow-credentials: ${CORS_ALLOW_CREDENTIALS:false}
+    max-age-seconds: ${CORS_MAX_AGE_SECONDS:3600}
+  rest-client:
+    connect-timeout: ${REST_CLIENT_CONNECT_TIMEOUT:5s}
+    read-timeout: ${REST_CLIENT_READ_TIMEOUT:30s}
+    pool:
+      max-total: ${REST_CLIENT_POOL_MAX_TOTAL:200}
+      max-per-route: ${REST_CLIENT_POOL_MAX_PER_ROUTE:50}
+      keep-alive: ${REST_CLIENT_POOL_KEEP_ALIVE:60s}
+      evict-idle-after: ${REST_CLIENT_POOL_EVICT_IDLE_AFTER:30s}
+  i18n:
+    basenames:
+      - classpath:messages/messages
+    default-locale: ${I18N_DEFAULT_LOCALE:vi}
+    encoding: UTF-8
+    cache-duration: ${I18N_CACHE_DURATION:1h}
+    fallback-to-system-locale: false
+    use-code-as-default-message: false
+  web:
+    correlation:
+      enabled: ${WEB_CORRELATION_ENABLED:true}
+    exception-handler:
+      enabled: ${WEB_EXCEPTION_HANDLER_ENABLED:true}
+  openapi:
+    title: Favourite Service API
+    version: ${APP_VERSION:v1}
+    description: Favourite and wishlist management
