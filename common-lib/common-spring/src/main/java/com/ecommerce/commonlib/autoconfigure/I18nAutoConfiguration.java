@@ -25,12 +25,12 @@ import java.util.List;
  */
 @AutoConfiguration
 @EnableConfigurationProperties(I18nProperties.class)
-public class CommonI18nAutoConfiguration {
+public class I18nAutoConfiguration {
 
     private final I18nProperties props;
     private MessageSource messageSource;
 
-    public CommonI18nAutoConfiguration(I18nProperties props) {
+    public I18nAutoConfiguration(I18nProperties props) {
         this.props = props;
     }
 

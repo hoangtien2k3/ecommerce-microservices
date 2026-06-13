@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnClass(OpenAPI.class)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @EnableConfigurationProperties(OpenApiProperties.class)
-public class CommonOpenApiAutoConfiguration {
+public class OpenApiAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(OpenAPI.class)

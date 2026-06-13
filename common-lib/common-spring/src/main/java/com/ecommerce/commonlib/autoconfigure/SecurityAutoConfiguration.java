@@ -27,7 +27,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 @EnableConfigurationProperties(SecurityProperties.class)
 @EnableMethodSecurity
 @Import(BaseSecurityConfig.class)
-public class CommonSecurityAutoConfiguration {
+public class SecurityAutoConfiguration {
 
     @Bean
     public BaseSecurityConfig baseSecurityConfig(SecurityProperties properties) {

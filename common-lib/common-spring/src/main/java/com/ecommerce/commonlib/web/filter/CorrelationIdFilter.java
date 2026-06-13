@@ -20,7 +20,7 @@ import java.util.UUID;
  * <p>Ordered first so every downstream log line — including ones from the Spring
  * Security filter chain — carries the ids.</p>
  *
- * <p>Wired via {@code CommonWebAutoConfiguration}, not via {@code @Component},
+ * <p>Wired via {@code WebAutoConfiguration}, not via {@code @Component},
  * so it can be disabled with {@code ecommerce.web.correlation.enabled=false}.</p>
  */
 public final class CorrelationIdFilter extends OncePerRequestFilter implements Ordered {

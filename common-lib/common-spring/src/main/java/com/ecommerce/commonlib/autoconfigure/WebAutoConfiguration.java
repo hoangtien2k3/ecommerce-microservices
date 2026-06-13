@@ -21,11 +21,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * <p>Skipped automatically for reactive runtimes (api-gateway) because of
  * {@code @ConditionalOnWebApplication(type = SERVLET)}.</p>
  */
-@AutoConfiguration(after = CommonI18nAutoConfiguration.class)
+@AutoConfiguration(after = I18nAutoConfiguration.class)
 @ConditionalOnClass({Servlet.class, WebMvcConfigurer.class})
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @EnableConfigurationProperties(CorsProperties.class)
-public class CommonWebAutoConfiguration {
+public class WebAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean

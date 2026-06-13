@@ -1,7 +1,7 @@
-com.ecommerce.commonlib.autoconfigure.CommonI18nAutoConfiguration
-com.ecommerce.commonlib.autoconfigure.CommonWebAutoConfiguration
-com.ecommerce.commonlib.autoconfigure.CommonSecurityAutoConfiguration
-com.ecommerce.commonlib.autoconfigure.CommonJpaAutoConfiguration
-com.ecommerce.commonlib.autoconfigure.CommonKeycloakAdminAutoConfiguration
-com.ecommerce.commonlib.autoconfigure.CommonOpenApiAutoConfiguration
-com.ecommerce.commonlib.autoconfigure.CommonModelMapperAutoConfiguration
+com.ecommerce.commonlib.autoconfigure.I18nAutoConfiguration
+com.ecommerce.commonlib.autoconfigure.WebAutoConfiguration
+com.ecommerce.commonlib.autoconfigure.SecurityAutoConfiguration
+com.ecommerce.commonlib.autoconfigure.JpaAutoConfiguration
+com.ecommerce.commonlib.autoconfigure.KeycloakAdminAutoConfiguration
+com.ecommerce.commonlib.autoconfigure.OpenApiAutoConfiguration
+com.ecommerce.commonlib.autoconfigure.ModelMapperAutoConfiguration

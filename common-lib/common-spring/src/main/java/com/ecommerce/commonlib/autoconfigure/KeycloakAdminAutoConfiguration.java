@@ -19,7 +19,7 @@ import org.springframework.web.client.RestClient;
 @ConditionalOnClass(RestClient.class)
 @ConditionalOnProperty(prefix = "keycloak.client", name = "admin-username")
 @EnableConfigurationProperties(KeycloakClientProperties.class)
-public class CommonKeycloakAdminAutoConfiguration {
+public class KeycloakAdminAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(KeycloakAuthClient.class)

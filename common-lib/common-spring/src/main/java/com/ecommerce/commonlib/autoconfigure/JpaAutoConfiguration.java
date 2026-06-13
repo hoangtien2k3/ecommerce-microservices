@@ -22,7 +22,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @ConditionalOnClass(EntityManagerFactory.class)
 @ConditionalOnBean(EntityManagerFactory.class)
 @EnableJpaAuditing(auditorAwareRef = "platformAuditorAware")
-public class CommonJpaAutoConfiguration {
+public class JpaAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(name = "platformAuditorAware")
