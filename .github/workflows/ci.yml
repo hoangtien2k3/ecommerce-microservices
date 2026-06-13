@@ -13,12 +13,14 @@ concurrency:
 env:
   REGISTRY: ghcr.io
   IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   detect-changes:
     name: Detect changed services
     runs-on: ubuntu-latest
     outputs:
+      backend:              ${{ steps.filter.outputs.backend }}
       discovery-service:    ${{ steps.filter.outputs.discovery-service }}
       api-gateway:          ${{ steps.filter.outputs.api-gateway }}
       auth-service:         ${{ steps.filter.outputs.auth-service }}
@@ -41,6 +43,11 @@ jobs:
         id: filter
         with:
           filters: |
+            backend:
+              - 'pom.xml'
+              - 'common-lib/**'
+              - '*-service/**'
+              - 'api-gateway/**'
             discovery-service:
               - 'discovery-service/**'
               - 'common-lib/**'
@@ -104,10 +111,13 @@ jobs:
             frontend:
               - 'frontend/**'
 
-  # Run tests
+  # Run tests — only when backend code changed
   test:
     name: Unit Tests
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.backend == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -121,7 +131,9 @@ jobs:
   # Build & Push
   build-discovery-service:
     needs: [detect-changes, test]
-    if: needs.detect-changes.outputs.discovery-service == 'true' || github.event_name == 'workflow_dispatch'
+    if: |
+      (needs.detect-changes.outputs.discovery-service == 'true' || github.event_name == 'workflow_dispatch') &&
+      (needs.test.result == 'success' || needs.test.result == 'skipped')
     uses: ./.github/workflows/_build-service.yml
     with:
       service: discovery-service
@@ -131,7 +143,9 @@ jobs:
 
   build-api-gateway:
     needs: [detect-changes, test]
-    if: needs.detect-changes.outputs.api-gateway == 'true' || github.event_name == 'workflow_dispatch'
+    if: |
+      (needs.detect-changes.outputs.api-gateway == 'true' || github.event_name == 'workflow_dispatch') &&
+      (needs.test.result == 'success' || needs.test.result == 'skipped')
     uses: ./.github/workflows/_build-service.yml
     with:
       service: api-gateway
@@ -141,7 +155,9 @@ jobs:
 
   build-auth-service:
     needs: [detect-changes, test]
-    if: needs.detect-changes.outputs.auth-service == 'true' || github.event_name == 'workflow_dispatch'
+    if: |
+      (needs.detect-changes.outputs.auth-service == 'true' || github.event_name == 'workflow_dispatch') &&
+      (needs.test.result == 'success' || needs.test.result == 'skipped')
     uses: ./.github/workflows/_build-service.yml
     with:
       service: auth-service
@@ -151,7 +167,9 @@ jobs:
 
   build-product-service:
     needs: [detect-changes, test]
-    if: needs.detect-changes.outputs.product-service == 'true' || github.event_name == 'workflow_dispatch'
+    if: |
+      (needs.detect-changes.outputs.product-service == 'true' || github.event_name == 'workflow_dispatch') &&
+      (needs.test.result == 'success' || needs.test.result == 'skipped')
     uses: ./.github/workflows/_build-service.yml
     with:
       service: product-service
@@ -161,7 +179,9 @@ jobs:
 
   build-order-service:
     needs: [detect-changes, test]
-    if: needs.detect-changes.outputs.order-service == 'true' || github.event_name == 'workflow_dispatch'
+    if: |
+      (needs.detect-changes.outputs.order-service == 'true' || github.event_name == 'workflow_dispatch') &&
+      (needs.test.result == 'success' || needs.test.result == 'skipped')
     uses: ./.github/workflows/_build-service.yml
     with:
       service: order-service
@@ -171,7 +191,9 @@ jobs:
 
   build-payment-service:
     needs: [detect-changes, test]
-    if: needs.detect-changes.outputs.payment-service == 'true' || github.event_name == 'workflow_dispatch'
+    if: |
+      (needs.detect-changes.outputs.payment-service == 'true' || github.event_name == 'workflow_dispatch') &&
+      (needs.test.result == 'success' || needs.test.result == 'skipped')
     uses: ./.github/workflows/_build-service.yml
     with:
       service: payment-service
@@ -181,7 +203,9 @@ jobs:
 
   build-shipping-service:
     needs: [detect-changes, test]
-    if: needs.detect-changes.outputs.shipping-service == 'true' || github.event_name == 'workflow_dispatch'
+    if: |
+      (needs.detect-changes.outputs.shipping-service == 'true' || github.event_name == 'workflow_dispatch') &&
+      (needs.test.result == 'success' || needs.test.result == 'skipped')
     uses: ./.github/workflows/_build-service.yml
     with:
       service: shipping-service
@@ -191,7 +215,9 @@ jobs:
 
   build-inventory-service:
     needs: [detect-changes, test]
-    if: needs.detect-changes.outputs.inventory-service == 'true' || github.event_name == 'workflow_dispatch'
+    if: |
+      (needs.detect-changes.outputs.inventory-service == 'true' || github.event_name == 'workflow_dispatch') &&
+      (needs.test.result == 'success' || needs.test.result == 'skipped')
     uses: ./.github/workflows/_build-service.yml
     with:
       service: inventory-service
@@ -201,7 +227,9 @@ jobs:
 
   build-favourite-service:
     needs: [detect-changes, test]
-    if: needs.detect-changes.outputs.favourite-service == 'true' || github.event_name == 'workflow_dispatch'
+    if: |
+      (needs.detect-changes.outputs.favourite-service == 'true' || github.event_name == 'workflow_dispatch') &&
+      (needs.test.result == 'success' || needs.test.result == 'skipped')
     uses: ./.github/workflows/_build-service.yml
     with:
       service: favourite-service
@@ -211,7 +239,9 @@ jobs:
 
   build-rating-service:
     needs: [detect-changes, test]
-    if: needs.detect-changes.outputs.rating-service == 'true' || github.event_name == 'workflow_dispatch'
+    if: |
+      (needs.detect-changes.outputs.rating-service == 'true' || github.event_name == 'workflow_dispatch') &&
+      (needs.test.result == 'success' || needs.test.result == 'skipped')
     uses: ./.github/workflows/_build-service.yml
     with:
       service: rating-service
@@ -221,7 +251,9 @@ jobs:
 
   build-notification-service:
     needs: [detect-changes, test]
-    if: needs.detect-changes.outputs.notification-service == 'true' || github.event_name == 'workflow_dispatch'
+    if: |
+      (needs.detect-changes.outputs.notification-service == 'true' || github.event_name == 'workflow_dispatch') &&
+      (needs.test.result == 'success' || needs.test.result == 'skipped')
     uses: ./.github/workflows/_build-service.yml
     with:
       service: notification-service
@@ -231,7 +263,9 @@ jobs:
 
   build-media-service:
     needs: [detect-changes, test]
-    if: needs.detect-changes.outputs.media-service == 'true' || github.event_name == 'workflow_dispatch'
+    if: |
+      (needs.detect-changes.outputs.media-service == 'true' || github.event_name == 'workflow_dispatch') &&
+      (needs.test.result == 'success' || needs.test.result == 'skipped')
     uses: ./.github/workflows/_build-service.yml
     with:
       service: media-service
@@ -241,7 +275,9 @@ jobs:
 
   build-search-service:
     needs: [detect-changes, test]
-    if: needs.detect-changes.outputs.search-service == 'true' || github.event_name == 'workflow_dispatch'
+    if: |
+      (needs.detect-changes.outputs.search-service == 'true' || github.event_name == 'workflow_dispatch') &&
+      (needs.test.result == 'success' || needs.test.result == 'skipped')
     uses: ./.github/workflows/_build-service.yml
     with:
       service: search-service
@@ -251,7 +287,9 @@ jobs:
 
   build-promotion-service:
     needs: [detect-changes, test]
-    if: needs.detect-changes.outputs.promotion-service == 'true' || github.event_name == 'workflow_dispatch'
+    if: |
+      (needs.detect-changes.outputs.promotion-service == 'true' || github.event_name == 'workflow_dispatch') &&
+      (needs.test.result == 'success' || needs.test.result == 'skipped')
     uses: ./.github/workflows/_build-service.yml
     with:
       service: promotion-service
@@ -261,7 +299,9 @@ jobs:
 
   build-tax-service:
     needs: [detect-changes, test]
-    if: needs.detect-changes.outputs.tax-service == 'true' || github.event_name == 'workflow_dispatch'
+    if: |
+      (needs.detect-changes.outputs.tax-service == 'true' || github.event_name == 'workflow_dispatch') &&
+      (needs.test.result == 'success' || needs.test.result == 'skipped')
     uses: ./.github/workflows/_build-service.yml
     with:
       service: tax-service
@@ -274,6 +314,7 @@ jobs:
     if: needs.detect-changes.outputs.frontend == 'true' || github.event_name == 'workflow_dispatch'
     name: Build & Push — frontend
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
@@ -326,8 +367,8 @@ jobs:
         run: |
           results="${{ join(needs.*.result, ' ') }}"
           for r in $results; do
-            if [[ "$r" == "failure" ]]; then
-              echo "One or more jobs failed"
+            if [[ "$r" == "failure" || "$r" == "cancelled" ]]; then
+              echo "One or more jobs failed or were cancelled"
               exit 1
             fi
           done

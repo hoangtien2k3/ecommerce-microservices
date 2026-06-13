@@ -22,6 +22,7 @@ env:
   REGISTRY: ghcr.io
   IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}
   ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   check-ci:
@@ -37,8 +38,9 @@ jobs:
     name: Update image tags
     needs: check-ci
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
-      contents: write   # needed to commit manifest changes
+      contents: write
     outputs:
       sha-short: ${{ steps.sha.outputs.short }}
 
@@ -47,16 +49,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Get short SHA
         id: sha
         run: echo "short=sha-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-
-      - name: Install kustomize
-        run: |
-          curl -sL "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
-          sudo mv kustomize /usr/local/bin/
 
       - name: Update image tags in k8s manifests
         run: |
@@ -71,7 +68,6 @@ jobs:
           )
 
           for svc in "${SERVICES[@]}"; do
-            # Update image tag in deployment yamls using sed
             find k8s/ -name "*.yaml" -exec \
               sed -i "s|${IMAGE_PREFIX}/${svc}:[^ ]*|${IMAGE_PREFIX}/${svc}:${SHA}|g" {} \;
           done
@@ -93,6 +89,7 @@ jobs:
     name: Deploy via ArgoCD
     needs: update-manifests
     runs-on: arc-runner-set
+    timeout-minutes: 15
     environment:
       name: ${{ github.event.inputs.environment || 'dev' }}
     if: vars.DEPLOY_METHOD == 'argocd'
@@ -114,14 +111,15 @@ jobs:
   deploy-kubectl:
     name: Deploy via kubectl
     needs: update-manifests
-    runs-on: ubuntu-latest  # Change to self-hosted if using local cluster
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     environment:
       name: ${{ github.event.inputs.environment || 'dev' }}
     if: vars.DEPLOY_METHOD == 'kubectl'
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main   # pull latest commit (with updated image tags)
+          ref: main
 
       - name: Set up kubeconfig
         run: |
@@ -145,7 +143,7 @@ jobs:
         run: kubectl apply -f k8s/frontend/
 
       - name: Apply ingress
-        run: kubectl apply -f k8s/ingress/ 2>/dev/null || true
+        run: kubectl apply -f k8s/ingress/ || true
 
       - name: Wait for rollout
         run: |

@@ -19,11 +19,13 @@ on:
 
 env:
   REGISTRY: ghcr.io
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build:
     name: Build & Push — ${{ inputs.service }}
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
       packages: write
@@ -69,18 +71,21 @@ jobs:
       - name: Build & push image with Jib
         if: github.event_name != 'pull_request'
         run: |
+          SUCCESS=false
           for i in 1 2 3; do
             mvn -pl ${{ inputs.service }} -am \
               compile jib:build \
               -DskipTests -B \
               -Djib.to.image=${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.sha }} \
               -Djib.to.tags=${{ steps.meta.outputs.tags }} \
-              -Djib.container.ports=${{ inputs.port }} && break
+              -Djib.container.ports=${{ inputs.port }} \
+            && { SUCCESS=true; break; }
             jitter=$(( RANDOM % 10 + 1 ))
             delay=$(( i * 8 + jitter ))
             echo "Push attempt $i failed. Retrying in ${delay}s..."
             sleep $delay
           done
+          $SUCCESS || { echo "All 3 push attempts failed"; exit 1; }
 
       - name: Build image tar only (PR — no push)
         if: github.event_name == 'pull_request'
