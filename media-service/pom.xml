@@ -14,14 +14,11 @@
     <dependencies>
         <dependency>
             <groupId>com.ecommerce.microservices</groupId>
-            <artifactId>common-lib</artifactId>
+            <artifactId>common-spring</artifactId>
         </dependency>
         <dependency>
             <groupId>com.ecommerce.microservices</groupId>
-            <artifactId>common-lib</artifactId>
-            <classifier>tests</classifier>
-            <type>test-jar</type>
-            <scope>test</scope>
+            <artifactId>common-spring</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -76,6 +76,16 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>com.ecommerce.microservices</groupId>
+                <artifactId>common-core</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ecommerce.microservices</groupId>
+                <artifactId>common-spring</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
                 <version>${spring-cloud.version}</version>
@@ -86,24 +96,6 @@
                 <groupId>me.paulschwarz</groupId>
                 <artifactId>spring-dotenv</artifactId>
                 <version>${spring-dotenv.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.ecommerce.microservices</groupId>
-                <artifactId>common-core</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.ecommerce.microservices</groupId>
-                <artifactId>common-lib</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.ecommerce.microservices</groupId>
-                <artifactId>common-lib</artifactId>
-                <version>${revision}</version>
-                <classifier>tests</classifier>
-                <type>test-jar</type>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.projectlombok</groupId>

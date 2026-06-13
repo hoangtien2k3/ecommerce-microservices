@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>com.ecommerce.microservices</groupId>
-            <artifactId>common-lib</artifactId>
+            <artifactId>common-spring</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>

@@ -10,12 +10,7 @@
     </parent>
     <artifactId>common-core</artifactId>
     <name>Common Library Core</name>
-    <description>
-        Pure-Java contract shared by every service: constants, view models, exception types,
-        i18n keys, and a small set of side-effect-free utilities.
-        MUST NOT depend on Spring Web / Data JPA / Kafka so it can be reused by gateways,
-        discovery, and any non-servlet runtime.
-    </description>
+    <description>Pure-Java contract shared by every service</description>
     <dependencies>
         <dependency>
             <groupId>org.springframework</groupId>
