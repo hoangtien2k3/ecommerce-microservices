@@ -8,15 +8,10 @@
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <artifactId>common-lib-parent</artifactId>
+    <artifactId>common-lib</artifactId>
     <packaging>pom</packaging>
-    <name>Common Library :: Parent</name>
-    <description>
-        Aggregator for shared libraries consumed by every microservice.
-        Splits the public API into two artifacts:
-          - common-core    : pure Java contract (constants, view models, exceptions, i18n)
-          - common-lib     : Spring Boot Starter (auto-configuration for web, security, JPA, Kafka, etc.)
-    </description>
+    <name>Common Library Parent</name>
+    <description>Aggregator for shared libraries consumed by every microservice</description>
     <properties>
         <jib.skip>true</jib.skip>
     </properties>

@@ -1,16 +1,16 @@
-# Compiled class file
+### Compiled class file ###
 *.class
 
-# Log file
+### Log file ###
 *.log
 
-# BlueJ files
+### BlueJ files ###
 *.ctxt
 
-# Mobile Tools for Java (J2ME)
+### Mobile Tools for Java (J2ME) ###
 .mtj.tmp/
 
-# Package Files #
+### Package Files ###
 *.jar
 *.war
 *.nar
@@ -19,7 +19,7 @@
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+#### Virtual machine crash logs ###
 hs_err_pid*
 replay_pid*
 
@@ -60,6 +60,10 @@ build/
 ### MacOs ###
 .DS_Store
 
+### Agents ###
 .claude
 .codegraph
 
+### Flatten-maven-plugin ###
+**/.flattened-pom.xml
+.flattened-pom.xml

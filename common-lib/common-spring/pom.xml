@@ -4,18 +4,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.ecommerce.microservices</groupId>
-        <artifactId>common-lib-parent</artifactId>
+        <artifactId>common-lib</artifactId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <artifactId>common-lib</artifactId>
-    <name>Common Library :: Spring Boot Starter</name>
-    <description>
-        Drop-in Spring Boot Starter that wires up every cross-cutting concern:
-        unified exception handling, correlation id, i18n, Keycloak resource-server,
-        JPA auditing, Kafka CDC consumers, CSV export, OpenAPI, MapStruct base mappers.
-        Every feature is gated behind @ConditionalOn... so it stays inert until needed.
-    </description>
+    <artifactId>common-spring</artifactId>
+    <name>Common Library Spring Boot Starter</name>
+    <description>Drop-in Spring Boot Starter that wires up every cross-cutting concern</description>
     <dependencies>
         <dependency>
             <groupId>com.ecommerce.microservices</groupId>

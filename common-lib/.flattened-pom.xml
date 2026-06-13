@@ -3,18 +3,15 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.ecommerce</groupId>
+    <groupId>com.ecommerce.microservices</groupId>
     <artifactId>ecommerce-microservices</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
-  <artifactId>common-lib-parent</artifactId>
+  <artifactId>common-lib</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Common Library :: Parent</name>
-  <description>Aggregator for shared libraries consumed by every microservice.
-        Splits public API into two artifacts:
-          - common-core    : pure Java contract (constants, view models, exceptions, i18n)
-          - common-lib     : Spring Boot Starter (auto-configuration for web, security, JPA, Kafka, etc.)</description>
+  <description>Aggregator for shared libraries consumed by every microservice</description>
   <licenses>
     <license>
       <name>Apache License, Version 2.0</name>
@@ -28,13 +25,13 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>com.ecommerce</groupId>
+        <groupId>com.ecommerce.microservices</groupId>
         <artifactId>common-core</artifactId>
         <version>${revision}</version>
       </dependency>
       <dependency>
-        <groupId>com.ecommerce</groupId>
-        <artifactId>common-lib</artifactId>
+        <groupId>com.ecommerce.microservices</groupId>
+        <artifactId>common-spring</artifactId>
         <version>${revision}</version>
       </dependency>
     </dependencies>

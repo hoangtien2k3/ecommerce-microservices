@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.ecommerce.microservices</groupId>
-        <artifactId>common-lib-parent</artifactId>
+        <artifactId>common-lib</artifactId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>common-core</artifactId>
-    <name>Common Library :: Core</name>
+    <name>Common Library Core</name>
     <description>
         Pure-Java contract shared by every service: constants, view models, exception types,
         i18n keys, and a small set of side-effect-free utilities.
