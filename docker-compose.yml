@@ -157,10 +157,7 @@ services:
     environment:
       EUREKA_URI: http://discovery-service:8761/eureka
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8761/actuator/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 15
+      test: ["NONE"]
     networks:
       - ecommerce-network
 
@@ -176,14 +173,11 @@ services:
       KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/ecommerce/protocol/openid-connect/certs
     depends_on:
       discovery-service:
-        condition: service_healthy
+        condition: service_started
       keycloak:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8888/actuator/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 15
+      test: ["NONE"]
     networks:
       - ecommerce-network
 
@@ -203,7 +197,7 @@ services:
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
       discovery-service:
-        condition: service_healthy
+        condition: service_started
       postgres:
         condition: service_healthy
       keycloak:
@@ -226,7 +220,7 @@ services:
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
       discovery-service:
-        condition: service_healthy
+        condition: service_started
       postgres:
         condition: service_healthy
     networks:
@@ -248,7 +242,7 @@ services:
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
       discovery-service:
-        condition: service_healthy
+        condition: service_started
       postgres:
         condition: service_healthy
       kafka:
@@ -272,7 +266,7 @@ services:
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
       discovery-service:
-        condition: service_healthy
+        condition: service_started
       postgres:
         condition: service_healthy
       kafka:
@@ -295,7 +289,7 @@ services:
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
       discovery-service:
-        condition: service_healthy
+        condition: service_started
       postgres:
         condition: service_healthy
     networks:
@@ -316,7 +310,7 @@ services:
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
       discovery-service:
-        condition: service_healthy
+        condition: service_started
       postgres:
         condition: service_healthy
     networks:
@@ -337,7 +331,7 @@ services:
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
       discovery-service:
-        condition: service_healthy
+        condition: service_started
       postgres:
         condition: service_healthy
     networks:
@@ -358,7 +352,7 @@ services:
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
       discovery-service:
-        condition: service_healthy
+        condition: service_started
       postgres:
         condition: service_healthy
     networks:
@@ -382,7 +376,7 @@ services:
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
       discovery-service:
-        condition: service_healthy
+        condition: service_started
       postgres:
         condition: service_healthy
       minio:
@@ -405,7 +399,7 @@ services:
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
       discovery-service:
-        condition: service_healthy
+        condition: service_started
       postgres:
         condition: service_healthy
     networks:
@@ -426,7 +420,7 @@ services:
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
       discovery-service:
-        condition: service_healthy
+        condition: service_started
       postgres:
         condition: service_healthy
     networks:
@@ -448,7 +442,7 @@ services:
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
       discovery-service:
-        condition: service_healthy
+        condition: service_started
       elasticsearch:
         condition: service_healthy
       kafka:
@@ -476,7 +470,7 @@ services:
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
       discovery-service:
-        condition: service_healthy
+        condition: service_started
       postgres:
         condition: service_healthy
       kafka:
@@ -499,7 +493,7 @@ services:
       NEXT_PUBLIC_API_URL: http://localhost:8888
     depends_on:
       api-gateway:
-        condition: service_healthy
+        condition: service_started
     networks:
       - ecommerce-network
 

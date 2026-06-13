@@ -354,7 +354,7 @@
                     <configuration>
                         <skip>${jib.skip}</skip>
                         <from>
-                            <image>gcr.io/distroless/java21-debian12</image>
+                            <image>eclipse-temurin:21-jre-alpine</image>
                         </from>
                         <container>
                             <format>OCI</format>
