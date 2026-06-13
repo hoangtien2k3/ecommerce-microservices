@@ -1,5 +1,6 @@
 package com.ecommerce.commonlib.i18n;
 
+import lombok.Setter;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -31,17 +32,10 @@ public final class Messages {
 
     private static final String BUNDLE_BASENAME = "messages.messages";
 
+    @Setter
     private static volatile MessageSource messageSource;
 
     private Messages() {
-    }
-
-    /**
-     * Injected once during application context startup by
-     * {@code CommonWebAutoConfiguration} so request-time lookups go through Spring.
-     */
-    public static void setMessageSource(MessageSource source) {
-        messageSource = source;
     }
 
     public static String get(String messageKey, Object... args) {

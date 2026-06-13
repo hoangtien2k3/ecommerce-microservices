@@ -89,12 +89,21 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler({MissingServletRequestParameterException.class,
-                       MethodArgumentTypeMismatchException.class,
-                       HttpMessageNotReadableException.class})
+                       MethodArgumentTypeMismatchException.class})
     public ResponseEntity<ApiResponse<Void>> handleMalformedRequest(Exception ex, WebRequest request) {
         return respond(HttpStatus.BAD_REQUEST,
                 ErrorCode.BAD_REQUEST.getCode(),
                 ex.getMessage(),
+                null, request, ex, false);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse<Void>> handleUnreadableMessage(HttpMessageNotReadableException ex,
+                                                                     WebRequest request) {
+        // Do NOT forward ex.getMessage() — it can contain raw JSON snippets and internal parser details
+        return respond(HttpStatus.BAD_REQUEST,
+                ErrorCode.BAD_REQUEST.getCode(),
+                Messages.get(ErrorCode.BAD_REQUEST.getMessageKey()),
                 null, request, ex, false);
     }
 

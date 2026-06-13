@@ -2,6 +2,7 @@ package com.ecommerce.commonlib.data.audit;
 
 import com.ecommerce.commonlib.security.AuthenticationUtils;
 import org.springframework.data.domain.AuditorAware;
+import org.springframework.lang.NonNull;
 
 import java.util.Optional;
 
@@ -15,7 +16,7 @@ public final class AuditorAwareImpl implements AuditorAware<String> {
     private static final String SYSTEM = "system";
 
     @Override
-    public Optional<String> getCurrentAuditor() {
+    public @NonNull Optional<String> getCurrentAuditor() {
         return Optional.of(AuthenticationUtils.currentUserId().orElse(SYSTEM));
     }
 }

@@ -1,13 +1,11 @@
 package com.ecommerce.productservice.service;
 
 import com.ecommerce.productservice.dto.ProductDto;
-import reactor.core.publisher.Flux;
 
 import java.util.List;
 
 public interface ProductService {
-//    List<ProductDto> findAll();
-    Flux<List<ProductDto>> findAll();
+    List<ProductDto> findAll();
 
     ProductDto findById(final Integer productId);
 

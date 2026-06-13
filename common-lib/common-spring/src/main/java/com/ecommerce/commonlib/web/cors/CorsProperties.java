@@ -21,7 +21,6 @@ public record CorsProperties(
         Boolean allowCredentials,
         Long maxAgeSeconds
 ) {
-
     public CorsProperties {
         if (allowedMethods == null || allowedMethods.isEmpty()) {
             allowedMethods = List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS");

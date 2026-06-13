@@ -1,5 +1,6 @@
 package com.ecommerce.commonlib.web.cors;
 
+import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.config.annotation.CorsRegistration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -14,7 +15,7 @@ import java.util.List;
 public record CorsAutoConfigurer(CorsProperties props) implements WebMvcConfigurer {
 
     @Override
-    public void addCorsMappings(CorsRegistry registry) {
+    public void addCorsMappings(@NonNull CorsRegistry registry) {
         if (!props.enabled()) {
             return;
         }

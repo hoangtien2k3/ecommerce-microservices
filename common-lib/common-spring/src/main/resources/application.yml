@@ -29,3 +29,11 @@ ecommerce:
     stateless-session: true
   i18n:
     default-locale: vi
+  rest-client:
+    connect-timeout: ${REST_CLIENT_CONNECT_TIMEOUT:5s}
+    read-timeout: ${REST_CLIENT_READ_TIMEOUT:30s}
+    pool:
+      max-total: ${REST_CLIENT_POOL_MAX_TOTAL:200}
+      max-per-route: ${REST_CLIENT_POOL_MAX_PER_ROUTE:50}
+      keep-alive: ${REST_CLIENT_POOL_KEEP_ALIVE:60s}
+      evict-idle-after: ${REST_CLIENT_POOL_EVICT_IDLE_AFTER:30s}

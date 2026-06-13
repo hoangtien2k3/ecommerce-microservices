@@ -2,37 +2,32 @@ package com.ecommerce.paymentservice.service;
 
 import com.ecommerce.paymentservice.dto.OrderDto;
 import com.ecommerce.paymentservice.dto.UserDto;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+import org.springframework.web.client.RestClient;
 
 @Component
+@RequiredArgsConstructor
 public class CallAPI {
-    private final WebClient.Builder webClientBuilder;
 
-    @Autowired
-    public CallAPI(WebClient.Builder webClientBuilder) {
-        this.webClientBuilder = webClientBuilder;
-    }
+    private final RestClient.Builder restClientBuilder;
 
-    public Mono<OrderDto> receiverPaymentDto(Integer orderId, String token) {
-        return webClientBuilder.baseUrl("http://ORDER-SERVICE").build()
+    public OrderDto receiverPaymentDto(Integer orderId, String token) {
+        return restClientBuilder.baseUrl("http://ORDER-SERVICE").build()
                 .get()
-                .uri("/api/orders/" + orderId)
+                .uri("/api/orders/{id}", orderId)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .retrieve()
-                .bodyToMono(OrderDto.class);
+                .body(OrderDto.class);
     }
 
-    public Mono<UserDto> receiverUserDto(Long userId, String token) {
-        return webClientBuilder.baseUrl("http://AUTH-SERVICE").build()
+    public UserDto receiverUserDto(Long userId, String token) {
+        return restClientBuilder.baseUrl("http://AUTH-SERVICE").build()
                 .get()
-                .uri("/api/manager/user/" + userId)
+                .uri("/api/manager/user/{id}", userId)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .retrieve()
-                .bodyToMono(UserDto.class);
+                .body(UserDto.class);
     }
-
 }

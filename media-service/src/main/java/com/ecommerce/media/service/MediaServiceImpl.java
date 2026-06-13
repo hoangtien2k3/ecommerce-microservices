@@ -97,10 +97,9 @@ public class MediaServiceImpl implements MediaService {
     public List<MediaVm> getMediaByIds(List<Long> ids) {
         return mediaRepository.findAllById(ids).stream()
                 .map(mediaVmMapper::toVm)
-                .map(media -> {
+                .peek(media -> {
                     String url = getMediaUrl(media.getId(), media.getFileName());
                     media.setUrl(url);
-                    return media;
                 }).toList();
     }
 

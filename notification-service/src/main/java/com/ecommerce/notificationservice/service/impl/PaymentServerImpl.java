@@ -5,51 +5,41 @@ import com.ecommerce.notificationservice.entity.Payment;
 import com.ecommerce.notificationservice.helper.PaymentMappingHelper;
 import com.ecommerce.notificationservice.repository.PaymentRepository;
 import com.ecommerce.notificationservice.service.PaymentService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class PaymentServerImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
 
-    @Autowired
-    public PaymentServerImpl(PaymentRepository paymentRepository) {
-        this.paymentRepository = paymentRepository;
+    @Override
+    public Payment savePayment(PaymentDto paymentDto) {
+        try {
+            return paymentRepository.save(PaymentMappingHelper.map(paymentDto));
+        } catch (Exception e) {
+            log.error("Error saving payment: {}", e.getMessage());
+            throw e;
+        }
     }
 
     @Override
-    public Mono<Payment> savePayment(PaymentDto paymentDto) {
-        return Mono.fromSupplier(() -> paymentRepository.save(PaymentMappingHelper.map(paymentDto)))
-                .onErrorResume(throwable -> {
-                    log.error("Error saving payment: {}", throwable.getMessage());
-                    return Mono.error(throwable);
-                });
+    public Payment getPayment(Long paymentId) {
+        return paymentRepository.findById(paymentId).orElse(null);
     }
 
     @Override
-    public Mono<Payment> getPayment(Long paymentId) {
-        return Mono.fromSupplier(() -> paymentRepository.findById(paymentId)
-                        .orElse(null));
+    public List<Payment> getAllPayments() {
+        return paymentRepository.findAll();
     }
 
     @Override
-    public Mono<List<Payment>> getAllPayments() {
-        return Mono.fromSupplier(paymentRepository::findAll)
-                .onErrorResume(throwable -> {
-                    log.error("Error fetching user info: {}", throwable.getMessage());
-                    return Mono.empty();
-                });
-    }
-
-    @Override
-    public Mono<Void> deletePayment(Long paymentId) {
-        log.info("Void, service; delete payment by id");
-        return Mono.fromRunnable(() -> paymentRepository.deleteById(paymentId));
+    public void deletePayment(Long paymentId) {
+        paymentRepository.deleteById(paymentId);
     }
 }

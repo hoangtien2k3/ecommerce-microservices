@@ -1,11 +1,4 @@
 package com.ecommerce.shippingservice.config.webclient;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.web.reactive.function.client.WebClient;
-
-public class WebClientConfig {
-    @Bean
-    public WebClient.Builder webClientBuilder() {
-        return WebClient.builder();
-    }
-}
+// Removed: WebClient replaced by RestClient for virtual-thread compatibility.
+// Load-balanced RestClient.Builder is provided by ClientConfig.

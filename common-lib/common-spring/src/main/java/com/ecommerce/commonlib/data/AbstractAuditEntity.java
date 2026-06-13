@@ -1,5 +1,6 @@
 package com.ecommerce.commonlib.data;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
@@ -34,9 +35,11 @@ import java.time.ZonedDateTime;
 public abstract class AbstractAuditEntity {
 
     @CreationTimestamp
+    @Column(updatable = false)
     private ZonedDateTime createdOn;
 
     @CreatedBy
+    @Column(updatable = false)
     private String createdBy;
 
     @UpdateTimestamp

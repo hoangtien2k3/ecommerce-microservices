@@ -1,66 +1,48 @@
 package com.ecommerce.notificationservice.event;
 
-import com.google.gson.Gson;
 import com.ecommerce.notificationservice.constant.KafkaConstant;
 import com.ecommerce.notificationservice.dto.EmailDetails;
 import com.ecommerce.notificationservice.dto.PaymentDto;
 import com.ecommerce.notificationservice.entity.PaymentStatus;
 import com.ecommerce.notificationservice.service.EmailService;
 import com.ecommerce.notificationservice.service.PaymentService;
+import com.google.gson.Gson;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
-import reactor.kafka.receiver.KafkaReceiver;
-import reactor.kafka.receiver.ReceiverOptions;
-import reactor.kafka.receiver.ReceiverRecord;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Collections;
-import java.util.function.Consumer;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class EventConsumer {
-
-    Gson gson = new Gson();
 
     private final EmailService emailService;
     private final PaymentService paymentService;
     private final EventProducer eventProducer;
+    private final Gson gson = new Gson();
 
-    public EventConsumer(ReceiverOptions<String, String> receiverOptions, EmailService emailService, PaymentService paymentService, EventProducer eventProducer) {
-        this.emailService = emailService;
-        this.paymentService = paymentService;
-        this.eventProducer = eventProducer;
-        subscribeToTopic(receiverOptions, KafkaConstant.PROFILE_ONBOARDING_TOPIC, this::sendEmailKafkaOnboarding);
-        subscribeToTopic(receiverOptions, KafkaConstant.STATUS_PAYMENT_SUCCESSFUL, this::paymentOrderKafkaOnboarding);
+    @KafkaListener(topics = KafkaConstant.PROFILE_ONBOARDING_TOPIC,
+            groupId = "${payment.kafka.consumer-group-id}")
+    public void sendEmailKafkaOnboarding(String message) {
+        log.info("AUTH-SERVICE Onboarding event: send email on notification service");
+        EmailDetails emailDetails = gson.fromJson(message, EmailDetails.class);
+        String result = emailService.sendSimpleMail(emailDetails);
+        log.info("Email sent: {}", result);
+        eventProducer.send(KafkaConstant.PROFILE_ONBOARDED_TOPIC, gson.toJson(result));
     }
 
-    private void subscribeToTopic(ReceiverOptions<String, String> receiverOptions, String topic, Consumer<ReceiverRecord<String, String>> handler) {
-        log.info("Subscribed to Kafka topic: {}", topic);
-        KafkaReceiver.create(receiverOptions.subscription(Collections.singleton(topic)))
-                .receive()
-                .subscribe(handler);
-    }
-
-    public void sendEmailKafkaOnboarding(ReceiverRecord<String, String> receiverRecord) {
-        log.info("AUTH-SERVICE Onboarding event send email on notification service.");
-        EmailDetails emailDetails = gson.fromJson(receiverRecord.value(), EmailDetails.class);
-
-        emailService.sendSimpleMail(emailDetails).subscribe(email -> {
-            log.info("send email successfully -> user-service change password.");
-            eventProducer.send(KafkaConstant.PROFILE_ONBOARDED_TOPIC, gson.toJson(email)).subscribe();
-        });
-    }
-
-    public void paymentOrderKafkaOnboarding(ReceiverRecord<String, String> receiverRecord) {
-        log.info("Payment Onboarding event send notification-service payment.");
-
-        PaymentDto paymentDto = gson.fromJson(receiverRecord.value(), PaymentDto.class);
-        paymentService.savePayment(paymentDto).subscribe(res -> {
-            eventProducer.send(KafkaConstant.PROFILE_ONBOARDED_TOPIC, gson.toJson(paymentDto)).subscribe();
-        });
+    @KafkaListener(topics = KafkaConstant.STATUS_PAYMENT_SUCCESSFUL,
+            groupId = "${payment.kafka.consumer-group-id}")
+    public void paymentOrderKafkaOnboarding(String message) {
+        log.info("Payment event received on notification-service");
+        PaymentDto paymentDto = gson.fromJson(message, PaymentDto.class);
+        paymentService.savePayment(paymentDto);
+        eventProducer.send(KafkaConstant.PROFILE_ONBOARDED_TOPIC, gson.toJson(paymentDto));
 
         EmailDetails emailDetails = EmailDetails.builder()
                 .recipient("hoangtien2k3dev@gmail.com")
@@ -68,18 +50,15 @@ public class EventConsumer {
                 .subject("Payment Successfully in Order with userId: " + paymentDto.getUserId())
                 .attachment("Please, check the full information in invoice: " + LocalDateTime.now())
                 .build();
-        emailService.sendSimpleMail(emailDetails).subscribe(email -> {
-            eventProducer.send(KafkaConstant.PROFILE_ONBOARDED_TOPIC, gson.toJson(email)).subscribe();
-        });
-
+        String emailResult = emailService.sendSimpleMail(emailDetails);
+        eventProducer.send(KafkaConstant.PROFILE_ONBOARDED_TOPIC, gson.toJson(emailResult));
     }
 
-    public String msgBody(Boolean isPayed, PaymentStatus paymentStatus) {
+    private String msgBody(Boolean isPayed, PaymentStatus paymentStatus) {
         return "Payment in order product cart successfully: \n " +
                 " + IsPays: " + isPayed +
                 "\n + PaymentStatus: " + paymentStatus.getStatus() +
                 "\n\nDate: " + LocalDate.now() +
                 "\nTime: " + LocalTime.now();
     }
-
 }

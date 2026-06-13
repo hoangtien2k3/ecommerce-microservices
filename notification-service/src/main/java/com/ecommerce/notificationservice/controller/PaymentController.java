@@ -4,8 +4,8 @@ import com.ecommerce.notificationservice.dto.PaymentDto;
 import com.ecommerce.notificationservice.entity.Payment;
 import com.ecommerce.notificationservice.service.PaymentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -17,23 +17,23 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping
-    public Mono<Payment> savePayment(@RequestBody PaymentDto paymentDto) {
-        return paymentService.savePayment(paymentDto);
+    public ResponseEntity<Payment> savePayment(@RequestBody PaymentDto paymentDto) {
+        return ResponseEntity.ok(paymentService.savePayment(paymentDto));
     }
 
     @GetMapping("/{paymentId}")
-    public Mono<Payment> getPayment(@PathVariable Long paymentId) {
-        return paymentService.getPayment(paymentId);
+    public ResponseEntity<Payment> getPayment(@PathVariable Long paymentId) {
+        return ResponseEntity.ok(paymentService.getPayment(paymentId));
     }
 
     @GetMapping
-    public Mono<List<Payment>> getAllPayments() {
-        return paymentService.getAllPayments();
+    public ResponseEntity<List<Payment>> getAllPayments() {
+        return ResponseEntity.ok(paymentService.getAllPayments());
     }
 
     @DeleteMapping("/{paymentId}")
-    public Mono<Void> deletePayment(@PathVariable Long paymentId) {
-        return paymentService.deletePayment(paymentId);
+    public ResponseEntity<Void> deletePayment(@PathVariable Long paymentId) {
+        paymentService.deletePayment(paymentId);
+        return ResponseEntity.noContent().build();
     }
-
 }

@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.MDC;
 import org.springframework.core.Ordered;
+import org.springframework.lang.NonNull;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -34,16 +35,15 @@ public final class CorrelationIdFilter extends OncePerRequestFilter implements O
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain chain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain chain) throws ServletException, IOException {
         String correlationId = headerOrNew(request, CORRELATION_ID_HEADER);
         String requestId = headerOrNew(request, REQUEST_ID_HEADER);
 
         MDC.put(MdcKey.CORRELATION_ID, correlationId);
         MDC.put(MdcKey.REQUEST_ID, requestId);
-        // traceId mirrors the correlation id when no OTEL/Brave is present; the
-        // dedicated tracer (when installed) will overwrite this key later in the chain.
+
         if (MDC.get(MdcKey.TRACE_ID) == null) {
             MDC.put(MdcKey.TRACE_ID, correlationId);
         }

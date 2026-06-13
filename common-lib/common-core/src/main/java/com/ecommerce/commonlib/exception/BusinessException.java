@@ -78,4 +78,8 @@ public class BusinessException extends RuntimeException {
     public static BusinessException conflict(String messageKey, Object... args) {
         return new BusinessException(ErrorCode.CONFLICT, Messages.get(messageKey, args));
     }
+
+    public static BusinessException internalServerError(String messageKey, Object... args) {
+        return new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, Messages.get(messageKey, args));
+    }
 }

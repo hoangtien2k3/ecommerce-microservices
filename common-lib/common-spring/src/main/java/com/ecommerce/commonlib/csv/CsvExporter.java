@@ -14,6 +14,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -110,9 +111,14 @@ public final class CsvExporter {
 
     /** Walks the class hierarchy parent-first so inherited columns appear before declared ones. */
     private static List<Field> allDeclaredFields(Class<?> type) {
-        List<Field> fields = new ArrayList<>();
+        // Collect child→parent, then reverse: O(n) instead of O(n²) addAll(0,…) pattern
+        ArrayDeque<Class<?>> hierarchy = new ArrayDeque<>();
         for (Class<?> c = type; c != null && c != Object.class; c = c.getSuperclass()) {
-            fields.addAll(0, List.of(c.getDeclaredFields()));
+            hierarchy.push(c); // push = addFirst, so iteration will be parent-first
+        }
+        List<Field> fields = new ArrayList<>();
+        for (Class<?> c : hierarchy) {
+            fields.addAll(List.of(c.getDeclaredFields()));
         }
         return fields;
     }

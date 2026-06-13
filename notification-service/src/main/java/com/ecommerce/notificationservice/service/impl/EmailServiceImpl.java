@@ -2,6 +2,8 @@ package com.ecommerce.notificationservice.service.impl;
 
 import com.ecommerce.notificationservice.dto.EmailDetails;
 import com.ecommerce.notificationservice.service.EmailService;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,10 +14,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import reactor.core.publisher.Mono;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Objects;
@@ -31,70 +30,60 @@ public class EmailServiceImpl implements EmailService {
     private String fromEmail;
 
     @Override
-    public Mono<String> sendSimpleMail(EmailDetails details) {
-        return Mono.fromCallable(() -> {
-                    SimpleMailMessage mailMessage = new SimpleMailMessage();
-                    mailMessage.setFrom(fromEmail);
-                    mailMessage.setTo(details.getRecipient());
-                    mailMessage.setText(details.getMsgBody());
-                    mailMessage.setSubject(details.getSubject());
-
-                    javaMailSender.send(mailMessage);
-                    return "Mail Sent Successfully";
-                })
-                .onErrorResume(ex -> {
-                    log.error("Error while sending mail", ex);
-                    return Mono.just("Error while Sending Mail");
-                });
+    public String sendSimpleMail(EmailDetails details) {
+        try {
+            SimpleMailMessage mailMessage = new SimpleMailMessage();
+            mailMessage.setFrom(fromEmail);
+            mailMessage.setTo(details.getRecipient());
+            mailMessage.setText(details.getMsgBody());
+            mailMessage.setSubject(details.getSubject());
+            javaMailSender.send(mailMessage);
+            return "Mail Sent Successfully";
+        } catch (Exception ex) {
+            log.error("Error while sending mail", ex);
+            return "Error while Sending Mail";
+        }
     }
 
     @Override
-    public Mono<String> sendMailWithAttachment(EmailDetails details) {
-        return Mono.fromCallable(() -> {
-                    MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-                    MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-
-                    mimeMessageHelper.setFrom(fromEmail);
-                    mimeMessageHelper.setTo(details.getRecipient());
-                    mimeMessageHelper.setText(details.getMsgBody());
-                    mimeMessageHelper.setSubject(details.getSubject());
-
-                    FileSystemResource file = new FileSystemResource(new File(details.getAttachment()));
-                    mimeMessageHelper.addAttachment(Objects.requireNonNull(file.getFilename()), file);
-
-                    javaMailSender.send(mimeMessage);
-                    return "Mail Sent Successfully";
-                })
-                .onErrorResume(MessagingException.class, ex -> {
-                    log.error("Error while sending mail with attachment", ex);
-                    return Mono.just("Error while Sending Mail with Attachment");
-                });
+    public String sendMailWithAttachment(EmailDetails details) {
+        try {
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
+            helper.setFrom(fromEmail);
+            helper.setTo(details.getRecipient());
+            helper.setText(details.getMsgBody());
+            helper.setSubject(details.getSubject());
+            FileSystemResource file = new FileSystemResource(new File(details.getAttachment()));
+            helper.addAttachment(Objects.requireNonNull(file.getFilename()), file);
+            javaMailSender.send(mimeMessage);
+            return "Mail Sent Successfully";
+        } catch (MessagingException ex) {
+            log.error("Error while sending mail with attachment", ex);
+            return "Error while Sending Mail with Attachment";
+        }
     }
 
     @Override
-    public Mono<String> sendMail(MultipartFile[] files, String to, String[] cc, String subject, String body) {
-        return Mono.fromCallable(() -> {
-                    MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-                    MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-                    mimeMessageHelper.setFrom(fromEmail);
-                    mimeMessageHelper.setTo(to);
-                    mimeMessageHelper.setCc(cc);
-                    mimeMessageHelper.setSubject(subject);
-                    mimeMessageHelper.setText(body);
-
-                    for (MultipartFile file : files) {
-                        mimeMessageHelper.addAttachment(
-                                Objects.requireNonNull(file.getOriginalFilename()),
-                                new ByteArrayResource(file.getBytes()));
-                    }
-
-                    javaMailSender.send(mimeMessage);
-                    return "Email sent successfully to " + Arrays.toString(cc);
-                })
-                .onErrorResume(Exception.class, ex -> {
-                    log.error("Error while sending email", ex);
-                    return Mono.just("Error while Sending Email");
-                });
+    public String sendMail(MultipartFile[] files, String to, String[] cc, String subject, String body) {
+        try {
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
+            helper.setFrom(fromEmail);
+            helper.setTo(to);
+            helper.setCc(cc);
+            helper.setSubject(subject);
+            helper.setText(body);
+            for (MultipartFile file : files) {
+                helper.addAttachment(
+                        Objects.requireNonNull(file.getOriginalFilename()),
+                        new ByteArrayResource(file.getBytes()));
+            }
+            javaMailSender.send(mimeMessage);
+            return "Email sent successfully to " + Arrays.toString(cc);
+        } catch (Exception ex) {
+            log.error("Error while sending email", ex);
+            return "Error while Sending Email";
+        }
     }
-
 }

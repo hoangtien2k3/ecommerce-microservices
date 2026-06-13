@@ -1,6 +1,5 @@
 package com.ecommerce.paymentservice.service.impl;
 
-import com.google.gson.Gson;
 import com.ecommerce.paymentservice.constant.KafkaConstant;
 import com.ecommerce.paymentservice.dto.KafkaPaymentDto;
 import com.ecommerce.paymentservice.dto.OrderDto;
@@ -13,17 +12,14 @@ import com.ecommerce.paymentservice.repository.PaymentRepository;
 import com.ecommerce.paymentservice.security.JwtTokenFilter;
 import com.ecommerce.paymentservice.service.CallAPI;
 import com.ecommerce.paymentservice.service.PaymentService;
+import com.google.gson.Gson;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
-import jakarta.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -32,150 +28,114 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
-    @Autowired
     private final PaymentRepository paymentRepository;
-
-    @Autowired
     private final ModelMapper modelMapper;
-
-    @Autowired
     private final CallAPI callAPI;
-
-    Gson gson = new Gson(); // google.code.gson
-    @Autowired
-    private EventProducer eventProducer;
+    private final EventProducer eventProducer;
+    private final Gson gson = new Gson();
 
     @Override
-    public Mono<List<PaymentDto>> findAll() {
-        log.info("*** PaymentDto List, service; fetch all payments *");
-        return Mono.fromSupplier(() -> paymentRepository.findAll()
-                        .stream()
-                        .map(PaymentMappingHelper::map)
-                        .toList())
-                .flatMap(listPaymentDtos -> Flux.fromIterable(listPaymentDtos)
-                        .flatMap(paymentDto ->
-                                callAPI.receiverPaymentDto(paymentDto.getOrderId(), JwtTokenFilter.getTokenFromRequest())
-                                        .map(orderDto -> {
-                                            paymentDto.setOrderDto(modelMapper.map(orderDto, OrderDto.class));
-                                            return paymentDto;
-                                        })
-                                        .onErrorResume(throwable -> {
-                                            log.error("Error fetching order info: {}", throwable.getMessage());
-                                            return Mono.just(paymentDto);
-                                        })
-                        ).collectList()
-                );
+    public List<PaymentDto> findAll() {
+        log.info("PaymentDto List, service; fetch all payments");
+        return paymentRepository.findAll()
+                .stream()
+                .map(PaymentMappingHelper::map)
+                .peek(paymentDto -> {
+                    try {
+                        OrderDto orderDto = callAPI.receiverPaymentDto(paymentDto.getOrderId(), JwtTokenFilter.getTokenFromRequest());
+                        if (orderDto != null) {
+                            paymentDto.setOrderDto(modelMapper.map(orderDto, OrderDto.class));
+                        }
+                    } catch (Exception e) {
+                        log.error("Error fetching order info for payment {}: {}", paymentDto.getPaymentId(), e.getMessage());
+                    }
+                })
+                .toList();
     }
 
     @Override
-    public Mono<Page<PaymentDto>> findAll(int page, int size, String sortBy, String sortOrder) {
-        log.info("PaymentDto List, service; fetch all carts with paging and sorting");
+    public Page<PaymentDto> findAll(int page, int size, String sortBy, String sortOrder) {
+        log.info("PaymentDto List, service; fetch all payments with paging");
         Sort sort = Sort.by(Sort.Direction.fromString(sortOrder), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-
-        return Mono.fromSupplier(() -> paymentRepository.findAll(pageable)
-                        .map(PaymentMappingHelper::map)
-                )
-                .flatMap(paymentDtos -> Flux.fromIterable(paymentDtos)
-                        .flatMap(paymentDto ->
-                                callAPI.receiverPaymentDto(paymentDto.getOrderId(), JwtTokenFilter.getTokenFromRequest())
-                                        .map(orderDto -> {
-                                            paymentDto.setOrderDto(modelMapper.map(orderDto, OrderDto.class));
-                                            return paymentDto;
-                                        })
-                                        .onErrorResume(throwable -> {
-                                            log.error("Error fetching order info: {}", throwable.getMessage());
-                                            return Mono.just(paymentDto);
-                                        })
-                        )
-                        .collectList()
-                        .map(resultList -> new PageImpl<>(resultList, pageable, resultList.size()))
-                );
-    }
-
-    @Override
-    public Mono<PaymentDto> findById(Integer paymentId) {
-        log.info("*** PaymentDto, service; fetch payment by id *");
-        return Mono.fromSupplier(() -> paymentRepository.findById(paymentId)
-                        .map(PaymentMappingHelper::map)
-                        .orElseThrow(() -> new PaymentNotFoundException(String.format("Order with id: %d not found", paymentId)))
-                )
-                .flatMap(paymentDto ->
-                        callAPI.receiverPaymentDto(paymentDto.getOrderDto().getOrderId(), JwtTokenFilter.getTokenFromRequest())
-                                .flatMap(orderDto -> {
-                                    paymentDto.setOrderDto(modelMapper.map(orderDto, OrderDto.class));
-
-                                    return callAPI.receiverUserDto(paymentDto.getUserId(), JwtTokenFilter.getTokenFromRequest())
-                                            .map(userDto -> {
-                                                paymentDto.setUserDto(modelMapper.map(userDto, UserDto.class));
-                                                return paymentDto;
-                                            }).publishOn(Schedulers.boundedElastic())
-                                            .switchIfEmpty(Mono.just(paymentDto));
-
-                                })
-                                .onErrorResume(throwable -> {
-                                    log.error("Error fetching order or user info: {}", throwable.getMessage());
-                                    return Mono.just(paymentDto);
-                                })
-                );
-    }
-
-    public Mono<OrderDto> getOrderDto(Integer orderId) {
-        return callAPI.receiverPaymentDto(orderId, JwtTokenFilter.getTokenFromRequest())
-                .map(orderDto -> modelMapper.map(orderDto, OrderDto.class));
-    }
-
-    @Override
-    public Mono<PaymentDto> save(PaymentDto paymentDto) {
-        log.info("PaymentDto, service; save order");
-
-        return Mono.just(paymentDto)
-                .filter(dto -> !paymentRepository.existsByOrderIdAndIsPayed(dto.getOrderId()))
-                .switchIfEmpty(Mono.error(new PaymentNotFoundException("Order has already been paid.")))
-                .flatMap(dto -> Mono.fromCallable(() -> PaymentMappingHelper.map(paymentRepository.save(PaymentMappingHelper.map(dto)))))
-                .flatMap(savedPaymentDto -> {
-                    KafkaPaymentDto newPaymentDto = KafkaPaymentDto.builder()
-                            .paymentId(savedPaymentDto.getPaymentId())
-                            .isPayed(savedPaymentDto.getIsPayed())
-                            .paymentStatus(savedPaymentDto.getPaymentStatus())
-                            .orderId(savedPaymentDto.getOrderId())
-                            .userId(savedPaymentDto.getUserId())
-                            .build();
-
-                    // Send Kafka notifications without waiting
-                    return eventProducer.send(KafkaConstant.STATUS_PAYMENT_SUCCESSFUL, gson.toJson(newPaymentDto))
-                            .thenReturn(savedPaymentDto);
+        List<PaymentDto> paymentDtos = paymentRepository.findAll(pageable)
+                .map(PaymentMappingHelper::map)
+                .stream()
+                .peek(paymentDto -> {
+                    try {
+                        OrderDto orderDto = callAPI.receiverPaymentDto(paymentDto.getOrderId(), JwtTokenFilter.getTokenFromRequest());
+                        if (orderDto != null) {
+                            paymentDto.setOrderDto(modelMapper.map(orderDto, OrderDto.class));
+                        }
+                    } catch (Exception e) {
+                        log.error("Error fetching order info: {}", e.getMessage());
+                    }
                 })
-                .onErrorResume(throwable -> {
-                    log.error("Error saving payment or sending Kafka message: {}", throwable.getMessage());
-                    return Mono.error(throwable);
-                })
-                .subscribeOn(Schedulers.boundedElastic()); // run on another thread
-    }
-
-
-    @Override
-    public Mono<PaymentDto> update(PaymentDto paymentDto) {
-        log.info("PaymentDto, service; update order");
-        return Mono.fromSupplier(() -> paymentRepository.save(PaymentMappingHelper.map(paymentDto)))
-                .map(PaymentMappingHelper::map);
+                .toList();
+        return new PageImpl<>(paymentDtos, pageable, paymentDtos.size());
     }
 
     @Override
-    public Mono<PaymentDto> update(Integer paymentId, PaymentDto paymentDto) {
-        log.info("OrderDto, service; update order with orderId");
-        return findById(paymentId).flatMap(existingPaymentDto -> {
-                    modelMapper.map(paymentDto, existingPaymentDto);
-                    return Mono.fromSupplier(() -> paymentRepository.save(PaymentMappingHelper.map(existingPaymentDto)))
-                            .map(PaymentMappingHelper::map);
-                })
-                .switchIfEmpty(Mono.error(new PaymentNotFoundException("Payment with id " + paymentId + " not found")));
+    public PaymentDto findById(Integer paymentId) {
+        log.info("PaymentDto, service; fetch payment by id");
+        PaymentDto paymentDto = paymentRepository.findById(paymentId)
+                .map(PaymentMappingHelper::map)
+                .orElseThrow(() -> new PaymentNotFoundException(String.format("Payment with id: %d not found", paymentId)));
+        try {
+            String token = JwtTokenFilter.getTokenFromRequest();
+            OrderDto orderDto = callAPI.receiverPaymentDto(paymentDto.getOrderDto().getOrderId(), token);
+            if (orderDto != null) {
+                paymentDto.setOrderDto(modelMapper.map(orderDto, OrderDto.class));
+            }
+            UserDto userDto = callAPI.receiverUserDto(paymentDto.getUserId(), token);
+            if (userDto != null) {
+                paymentDto.setUserDto(modelMapper.map(userDto, UserDto.class));
+            }
+        } catch (Exception e) {
+            log.error("Error fetching order or user info: {}", e.getMessage());
+        }
+        return paymentDto;
+    }
+
+    public OrderDto getOrderDto(Integer orderId) {
+        return callAPI.receiverPaymentDto(orderId, JwtTokenFilter.getTokenFromRequest());
     }
 
     @Override
-    public Mono<Void> deleteById(Integer paymentId) {
+    public PaymentDto save(PaymentDto paymentDto) {
+        log.info("PaymentDto, service; save payment");
+        if (paymentRepository.existsByOrderIdAndIsPayed(paymentDto.getOrderId())) {
+            throw new PaymentNotFoundException("Order has already been paid.");
+        }
+        PaymentDto savedPaymentDto = PaymentMappingHelper.map(paymentRepository.save(PaymentMappingHelper.map(paymentDto)));
+        KafkaPaymentDto kafkaPaymentDto = KafkaPaymentDto.builder()
+                .paymentId(savedPaymentDto.getPaymentId())
+                .isPayed(savedPaymentDto.getIsPayed())
+                .paymentStatus(savedPaymentDto.getPaymentStatus())
+                .orderId(savedPaymentDto.getOrderId())
+                .userId(savedPaymentDto.getUserId())
+                .build();
+        eventProducer.send(KafkaConstant.STATUS_PAYMENT_SUCCESSFUL, gson.toJson(kafkaPaymentDto));
+        return savedPaymentDto;
+    }
+
+    @Override
+    public PaymentDto update(PaymentDto paymentDto) {
+        log.info("PaymentDto, service; update payment");
+        return PaymentMappingHelper.map(paymentRepository.save(PaymentMappingHelper.map(paymentDto)));
+    }
+
+    @Override
+    public PaymentDto update(Integer paymentId, PaymentDto paymentDto) {
+        log.info("PaymentDto, service; update payment with paymentId");
+        PaymentDto existingPaymentDto = findById(paymentId);
+        modelMapper.map(paymentDto, existingPaymentDto);
+        return PaymentMappingHelper.map(paymentRepository.save(PaymentMappingHelper.map(existingPaymentDto)));
+    }
+
+    @Override
+    public void deleteById(Integer paymentId) {
         log.info("Void, service; delete payment by id");
-        return Mono.fromRunnable(() -> paymentRepository.deleteById(paymentId));
+        paymentRepository.deleteById(paymentId);
     }
-
 }
