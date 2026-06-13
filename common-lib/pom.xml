@@ -2,17 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
-        <groupId>com.ecommerce</groupId>
+        <groupId>com.ecommerce.microservices</groupId>
         <artifactId>ecommerce-microservices</artifactId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
     <artifactId>common-lib-parent</artifactId>
     <packaging>pom</packaging>
-
     <name>Common Library :: Parent</name>
     <description>
         Aggregator for shared libraries consumed by every microservice.
@@ -20,11 +17,9 @@
           - common-core    : pure Java contract (constants, view models, exceptions, i18n)
           - common-lib     : Spring Boot Starter (auto-configuration for web, security, JPA, Kafka, etc.)
     </description>
-
     <properties>
         <jib.skip>true</jib.skip>
     </properties>
-
     <modules>
         <module>common-core</module>
         <module>common-spring</module>

@@ -1,25 +1,28 @@
 server:
   port: 8086
-
+  shutdown: graceful
+---
 spring:
   application:
     name: PRODUCT-SERVICE
-
+  threads:
+    virtual:
+      enabled: true
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
   datasource:
-    url: jdbc:postgresql://localhost:5432/productservice
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/productservice}
     username: ${POSTGRES_USER:postgres}
-    password: ${POSTGRES_PASSWORD:postgres}
+    password: ${POSTGRES_PASSWORD:ecommerce@!@#}
     driver-class-name: org.postgresql.Driver
-
   jpa:
-    show-sql: false
     hibernate:
       ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        use_sql_comments: true
         format_sql: false
+    show-sql: false
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.yaml
@@ -27,48 +30,39 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${JWT_ISSUER_URI:http://identity/realms/hoangtien2k3}
-
-  # ZIPKIN & SLEUTH
-  zipkin:
-    base-url: ${ZIPKIN_URL:http://localhost:9411}
-  sleuth:
-    sampler:
-      probability: 1.0
-
+          issuer-uri: ${JWT_ISSUER_URI:http://localhost:8080/realms/ecommerce}
+---
 eureka:
   client:
     serviceUrl:
       defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+    register-with-eureka: true
+    fetch-registry: true
   instance:
     prefer-ip-address: true
-
+---
 management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: health,info,metrics,prometheus
   endpoint:
     health:
       show-details: always
-
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_URL:http://localhost:9411}/api/v2/spans
+---
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
-
-logging:
-  file:
-    name: src/main/resources/script/stage_log.log
-    clean-history-on-start: true
-  level:
-    org:
-      hibernate:
-        SQL: DEBUG
-      springframework:
-        web: INFO
-        data: INFO
-        boot:
-          autoconfigure:
-            data:
-              rest: INFO
-            orm: INFO
+    oauth:
+      use-pkce-with-authorization-code-grant: true
+      client-id: swagger-ui
+  packagesToScan: com.ecommerce.productservice
+  oauthflow:
+    authorization-url: ${KEYCLOAK_SERVER_URL:http://localhost:8080}/realms/${KEYCLOAK_REALM:ecommerce}/protocol/openid-connect/auth
+    token-url: ${KEYCLOAK_SERVER_URL:http://localhost:8080}/realms/${KEYCLOAK_REALM:ecommerce}/protocol/openid-connect/token

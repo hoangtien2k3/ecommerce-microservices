@@ -1,30 +1,31 @@
 server:
   port: 8088
-
+  shutdown: graceful
+---
 spring:
   application:
     name: AUTH-SERVICE
+  threads:
+    virtual:
+      enabled: true
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
   web:
     locale: vi_VN
     locale-resolver: accept-header
-
   datasource:
-    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/auth}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/authservice}
     username: ${POSTGRES_USER:postgres}
-    password: ${POSTGRES_PASSWORD:postgres}
+    password: ${POSTGRES_PASSWORD:ecommerce@!@#}
     driver-class-name: org.postgresql.Driver
-
   jpa:
     hibernate:
       ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        id:
-          new_generator_mapping: false
-        show_sql: false
         format_sql: false
-    generate-ddl: false
+    show-sql: false
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.yaml
@@ -33,7 +34,7 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${JWT_ISSUER_URI:http://localhost:8080/realms/ecommerce}
-
+---
 keycloak:
   client:
     server-url: ${KEYCLOAK_SERVER_URL:http://localhost:8080}
@@ -44,7 +45,7 @@ keycloak:
     admin-client-id: ${KEYCLOAK_ADMIN_CLIENT_ID:admin-cli}
     admin-username: ${KEYCLOAK_ADMIN_USERNAME:admin}
     admin-password: ${KEYCLOAK_ADMIN_PASSWORD:admin}
-
+---
 eureka:
   client:
     serviceUrl:
@@ -53,7 +54,7 @@ eureka:
     fetch-registry: true
   instance:
     prefer-ip-address: true
-
+---
 management:
   endpoints:
     web:
@@ -62,17 +63,20 @@ management:
   endpoint:
     health:
       show-details: always
-
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_URL:http://localhost:9411}/api/v2/spans
+---
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
-
-logging:
-  level:
-    org:
-      hibernate:
-        SQL: DEBUG
-        type:
-          description:
-            sql:
-              BasicBinder: TRACE
+    oauth:
+      use-pkce-with-authorization-code-grant: true
+      client-id: swagger-ui
+  packagesToScan: com.ecommerce.authservice
+  oauthflow:
+    authorization-url: ${KEYCLOAK_SERVER_URL:http://localhost:8080}/realms/${KEYCLOAK_REALM:ecommerce}/protocol/openid-connect/auth
+    token-url: ${KEYCLOAK_SERVER_URL:http://localhost:8080}/realms/${KEYCLOAK_REALM:ecommerce}/protocol/openid-connect/token

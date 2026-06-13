@@ -418,7 +418,7 @@ services:
     pull_policy: always
     container_name: promotion-service
     ports:
-      - "8093:8092"
+      - "8093:8093"
     environment:
       EUREKA_URI: http://discovery-service:8761/eureka
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
@@ -439,7 +439,7 @@ services:
     pull_policy: always
     container_name: search-service
     ports:
-      - "8094:8092"
+      - "8094:8094"
     environment:
       EUREKA_URI: http://discovery-service:8761/eureka
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
@@ -464,6 +464,8 @@ services:
     container_name: notification-service
     ports:
       - "8090:8090"
+    environment:
+      SERVER_PORT: 8090
     environment:
       EUREKA_URI: http://discovery-service:8761/eureka
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce

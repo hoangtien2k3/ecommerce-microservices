@@ -2,21 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
-        <groupId>com.ecommerce</groupId>
+        <groupId>com.ecommerce.microservices</groupId>
         <artifactId>common-lib-parent</artifactId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
-    <!--
-        IMPORTANT: artifactId is kept as `common-lib` so existing services
-        (auth-service, order-service, product-service, ...) don't need to
-        update their POMs after the multi-module refactor.
-    -->
     <artifactId>common-lib</artifactId>
-
     <name>Common Library :: Spring Boot Starter</name>
     <description>
         Drop-in Spring Boot Starter that wires up every cross-cutting concern:
@@ -24,18 +16,11 @@
         JPA auditing, Kafka CDC consumers, CSV export, OpenAPI, MapStruct base mappers.
         Every feature is gated behind @ConditionalOn... so it stays inert until needed.
     </description>
-
     <dependencies>
-        <!-- Re-export the pure-Java contract to consumers. -->
         <dependency>
-            <groupId>com.ecommerce</groupId>
+            <groupId>com.ecommerce.microservices</groupId>
             <artifactId>common-core</artifactId>
         </dependency>
-
-        <!--
-            Dependencies that nearly every service in the platform uses are inherited
-            transitively — kept non-optional so services don't need to redeclare them.
-        -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
@@ -72,12 +57,6 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
         </dependency>
-
-        <!--
-            Optional integrations — only required by some services.
-            Auto-configuration is gated by @ConditionalOnClass so the lib stays inert
-            for consumers that don't pull these in explicitly.
-        -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -108,14 +87,15 @@
             <artifactId>opencsv</artifactId>
             <optional>true</optional>
         </dependency>
-
+        <dependency>
+            <groupId>me.paulschwarz</groupId>
+            <artifactId>spring-dotenv</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
-
-        <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -142,10 +122,8 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
-            <!-- Flatten resolves ${revision} so downstream consumers see a literal version. -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>flatten-maven-plugin</artifactId>
@@ -170,7 +148,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- Publishes a -tests jar so other services can reuse AbstractControllerIT. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>

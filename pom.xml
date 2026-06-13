@@ -2,15 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.3.5</version>
         <relativePath/>
     </parent>
-
-    <groupId>com.ecommerce</groupId>
+    <groupId>com.ecommerce.microservices</groupId>
     <artifactId>ecommerce-microservices</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
@@ -21,7 +19,6 @@
         configuration, and exposes a single CI-friendly version property
         (${revision}) inherited by all modules.
     </description>
-
     <modules>
         <module>common-lib</module>
         <module>api-gateway</module>
@@ -40,30 +37,18 @@
         <module>favourite-service</module>
         <module>media-service</module>
     </modules>
-
     <properties>
-        <!-- Build -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>21</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-
-        <!-- CI-friendly version (https://maven.apache.org/maven-ci-friendly.html) -->
         <revision>1.0-SNAPSHOT</revision>
-
-        <!-- Jib: skip containerization for library modules (no main class) -->
         <jib.skip>false</jib.skip>
-
-        <!-- Annotation processors -->
         <lombok.version>1.18.34</lombok.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
-
-        <!-- Spring Cloud (compatible with Spring Boot 3.3.x) -->
         <spring-cloud.version>2023.0.3</spring-cloud.version>
-
-        <!-- Third-party libraries -->
         <springdoc-openapi.version>2.6.0</springdoc-openapi.version>
         <resilience4j.version>2.2.0</resilience4j.version>
         <modelmapper.version>3.2.0</modelmapper.version>
@@ -71,15 +56,9 @@
         <gson.version>2.11.0</gson.version>
         <org-json.version>20240303</org-json.version>
         <commons-validator.version>1.9.0</commons-validator.version>
-        <paypal-checkout-sdk.version>2.0.0</paypal-checkout-sdk.version>
         <spring-cloud-cb-reactor-resilience4j.version>3.1.3</spring-cloud-cb-reactor-resilience4j.version>
-
-        <!-- Test -->
         <instancio-junit.version>4.8.1</instancio-junit.version>
         <rest-assured.version>5.5.0</rest-assured.version>
-        <testcontainers-keycloak.version>3.3.0</testcontainers-keycloak.version>
-
-        <!-- Maven plugins -->
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
         <maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
         <maven-checkstyle-plugin.version>3.4.0</maven-checkstyle-plugin.version>
@@ -89,15 +68,12 @@
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
         <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
         <dependency-check-maven.version>10.0.4</dependency-check-maven.version>
-
-        <!-- Tooling -->
         <sonar.organization>hoangtien2k3</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <spring-dotenv.version>4.0.0</spring-dotenv.version>
     </properties>
-
     <dependencyManagement>
         <dependencies>
-            <!-- Spring Cloud BOM (also covers Eureka, OpenFeign, Gateway, Sleuth bridges...) -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
@@ -105,28 +81,29 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-
-            <!-- Platform-internal libraries -->
             <dependency>
-                <groupId>com.ecommerce</groupId>
+                <groupId>me.paulschwarz</groupId>
+                <artifactId>spring-dotenv</artifactId>
+                <version>${spring-dotenv.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ecommerce.microservices</groupId>
                 <artifactId>common-core</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>com.ecommerce</groupId>
+                <groupId>com.ecommerce.microservices</groupId>
                 <artifactId>common-lib</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>com.ecommerce</groupId>
+                <groupId>com.ecommerce.microservices</groupId>
                 <artifactId>common-lib</artifactId>
                 <version>${revision}</version>
                 <classifier>tests</classifier>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
-
-            <!-- Annotation processors -->
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
@@ -137,8 +114,6 @@
                 <artifactId>mapstruct</artifactId>
                 <version>${mapstruct.version}</version>
             </dependency>
-
-            <!-- OpenAPI / Swagger -->
             <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
@@ -149,8 +124,6 @@
                 <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
                 <version>${springdoc-openapi.version}</version>
             </dependency>
-
-            <!-- Resilience4j (servlet + reactor stacks) -->
             <dependency>
                 <groupId>io.github.resilience4j</groupId>
                 <artifactId>resilience4j-spring-boot3</artifactId>
@@ -161,28 +134,21 @@
                 <artifactId>resilience4j-reactor</artifactId>
                 <version>${resilience4j.version}</version>
             </dependency>
-            <!-- Spring Cloud's reactive circuit breaker uses its own version line -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
                 <version>${spring-cloud-cb-reactor-resilience4j.version}</version>
             </dependency>
-
-            <!-- DTO mapping (legacy services — new code should prefer MapStruct) -->
             <dependency>
                 <groupId>org.modelmapper</groupId>
                 <artifactId>modelmapper</artifactId>
                 <version>${modelmapper.version}</version>
             </dependency>
-
-            <!-- CSV export -->
             <dependency>
                 <groupId>com.opencsv</groupId>
                 <artifactId>opencsv</artifactId>
                 <version>${opencsv.version}</version>
             </dependency>
-
-            <!-- Miscellaneous third-party -->
             <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
@@ -199,12 +165,38 @@
                 <version>${commons-validator.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.paypal.sdk</groupId>
-                <artifactId>checkout-sdk</artifactId>
-                <version>${paypal-checkout-sdk.version}</version>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-tracing-bridge-brave</artifactId>
             </dependency>
-
-            <!-- Test -->
+            <dependency>
+                <groupId>io.zipkin.reporter2</groupId>
+                <artifactId>zipkin-reporter-brave</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.retry</groupId>
+                <artifactId>spring-retry</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>io.projectreactor.kafka</groupId>
+                <artifactId>reactor-kafka</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>io.projectreactor.addons</groupId>
+                <artifactId>reactor-extra</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-elasticsearch</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-mail</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <scope>test</scope>
+            </dependency>
             <dependency>
                 <groupId>org.instancio</groupId>
                 <artifactId>instancio-junit</artifactId>
@@ -219,7 +211,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
     <build>
         <pluginManagement>
             <plugins>
@@ -235,7 +226,6 @@
                         </excludes>
                     </configuration>
                 </plugin>
-
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
@@ -262,37 +252,31 @@
                         </annotationProcessorPaths>
                     </configuration>
                 </plugin>
-
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven-surefire-plugin.version}</version>
                 </plugin>
-
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>${maven-failsafe-plugin.version}</version>
                 </plugin>
-
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
                     <version>${build-helper-maven-plugin.version}</version>
                 </plugin>
-
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>flatten-maven-plugin</artifactId>
                     <version>${flatten-maven-plugin.version}</version>
                 </plugin>
-
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
                     <version>${maven-enforcer-plugin.version}</version>
                 </plugin>
-
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
@@ -303,7 +287,6 @@
                         <failOnViolation>false</failOnViolation>
                     </configuration>
                 </plugin>
-
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
@@ -335,7 +318,6 @@
                         </execution>
                     </executions>
                 </plugin>
-
                 <plugin>
                     <groupId>org.owasp</groupId>
                     <artifactId>dependency-check-maven</artifactId>
@@ -345,8 +327,6 @@
                         <skipTestScope>true</skipTestScope>
                     </configuration>
                 </plugin>
-
-                <!-- Jib: build & push container images without Docker daemon -->
                 <plugin>
                     <groupId>com.google.cloud.tools</groupId>
                     <artifactId>jib-maven-plugin</artifactId>
@@ -367,9 +347,7 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-
         <plugins>
-            <!-- Fails fast if a contributor is on an unsupported JDK / Maven version. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
@@ -394,12 +372,7 @@
             </plugin>
         </plugins>
     </build>
-
     <profiles>
-        <!--
-            Integration tests live under src/it/**. Only wired in for modules that
-            actually have the directory — keeps the build clean for the others.
-        -->
         <profile>
             <id>it</id>
             <activation>

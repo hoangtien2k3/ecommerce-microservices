@@ -2,25 +2,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
-        <groupId>com.ecommerce</groupId>
+        <groupId>com.ecommerce.microservices</groupId>
         <artifactId>ecommerce-microservices</artifactId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
     <artifactId>search-service</artifactId>
     <name>search-service</name>
     <description>Elasticsearch-backed product search.</description>
-
     <dependencies>
-        <!--
-            Pulls common-lib but skips JPA/Postgres — this service is Elasticsearch-only.
-            Spring's auto-configuration would otherwise try to wire a DataSource on startup.
-        -->
         <dependency>
-            <groupId>com.ecommerce</groupId>
+            <groupId>com.ecommerce.microservices</groupId>
             <artifactId>common-lib</artifactId>
             <exclusions>
                 <exclusion>
@@ -29,56 +22,37 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-        <!--
-            Elasticsearch — pinned to 8.15.1 because consumer code still calls into the
-            org.elasticsearch.common.unit package, which was removed from the Spring Boot
-            3.3 default ES bundle. Bump once the consumer is migrated to the new client.
-        -->
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-elasticsearch</artifactId>
-            <version>5.3.4</version>
         </dependency>
         <dependency>
-            <groupId>org.elasticsearch</groupId>
-            <artifactId>elasticsearch</artifactId>
-            <version>8.15.1</version>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
-
-        <!-- Kafka consumer for product-sync CDC events. -->
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
         </dependency>
-
-        <!-- Security -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
-
-        <!-- JSON -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>
-
-        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
-
-        <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>

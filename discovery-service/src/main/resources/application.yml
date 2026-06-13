@@ -1,10 +1,16 @@
 server:
   port: 8761
-
+  shutdown: graceful
+---
 spring:
   application:
     name: DISCOVERY-SERVICE
-
+  threads:
+    virtual:
+      enabled: true
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+---
 eureka:
   instance:
     hostname: localhost
@@ -13,3 +19,12 @@ eureka:
     fetch-registry: false
     serviceUrl:
       defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+---
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always

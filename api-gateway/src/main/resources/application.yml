@@ -1,10 +1,15 @@
 server:
   port: 8888
-
+  shutdown: graceful
+---
 spring:
   application:
     name: API-GATEWAY
-
+  threads:
+    virtual:
+      enabled: true
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
   cloud:
     gateway:
       mvc:
@@ -24,7 +29,6 @@ spring:
             uri: lb://AUTH-SERVICE
             predicates:
               - Path=/api/v1/users/**
-
           # =====================
           # PRODUCT-SERVICE
           # =====================
@@ -36,7 +40,6 @@ spring:
             uri: lb://PRODUCT-SERVICE
             predicates:
               - Path=/api/products/**
-
           # =====================
           # ORDER-SERVICE
           # =====================
@@ -48,7 +51,6 @@ spring:
             uri: lb://ORDER-SERVICE
             predicates:
               - Path=/api/orders/**
-
           # =====================
           # PAYMENT-SERVICE
           # =====================
@@ -56,7 +58,6 @@ spring:
             uri: lb://PAYMENT-SERVICE
             predicates:
               - Path=/api/payments/**
-
           # =====================
           # INVENTORY-SERVICE
           # =====================
@@ -64,7 +65,6 @@ spring:
             uri: lb://INVENTORY-SERVICE
             predicates:
               - Path=/api/inventory/**
-
           # =====================
           # SHIPPING-SERVICE
           # =====================
@@ -72,7 +72,6 @@ spring:
             uri: lb://SHIPPING-SERVICE
             predicates:
               - Path=/api/shippings/**
-
           # =====================
           # FAVOURITE-SERVICE
           # =====================
@@ -80,7 +79,6 @@ spring:
             uri: lb://FAVOURITE-SERVICE
             predicates:
               - Path=/api/favourites/**
-
           # =====================
           # NOTIFICATION-SERVICE
           # =====================
@@ -96,7 +94,6 @@ spring:
             uri: lb://NOTIFICATION-SERVICE
             predicates:
               - Path=/api/payment-notifications/**
-
           # =====================
           # MEDIA-SERVICE
           # =====================
@@ -104,7 +101,6 @@ spring:
             uri: lb://MEDIA-SERVICE
             predicates:
               - Path=/medias/**
-
           # =====================
           # RATING-SERVICE
           # =====================
@@ -116,7 +112,6 @@ spring:
             uri: lb://RATING-SERVICE
             predicates:
               - Path=/backoffice/ratings/**
-
           # =====================
           # SEARCH-SERVICE
           # =====================
@@ -124,7 +119,6 @@ spring:
             uri: lb://SEARCH-SERVICE
             predicates:
               - Path=/storefront/catalog-search,/storefront/search_suggest
-
           # =====================
           # PROMOTION-SERVICE
           # =====================
@@ -132,7 +126,6 @@ spring:
             uri: lb://PROMOTION-SERVICE
             predicates:
               - Path=/backoffice/promotions/**
-
           # =====================
           # TAX-SERVICE
           # =====================
@@ -144,7 +137,6 @@ spring:
             uri: lb://TAX-SERVICE
             predicates:
               - Path=/backoffice/tax-rates/**
-
           # =====================
           # SWAGGER-UI
           # =====================
@@ -200,14 +192,13 @@ spring:
             uri: lb://TAX-SERVICE
             predicates:
               - Path=/tax/v3/api-docs/**
-
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/ecommerce}
           jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8080/realms/ecommerce/protocol/openid-connect/certs}
-
+---
 security:
   public-paths:
     auth:
@@ -233,17 +224,30 @@ security:
       - /swagger-resources/**
       - /actuator/**
       - /error
-
+---
 eureka:
   client:
     serviceUrl:
       defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+    register-with-eureka: true
+    fetch-registry: true
   instance:
-    preferIpAddress: true
+    prefer-ip-address: true
     hostname: ${HOSTNAME:localhost}
-
-logging:
-  level:
-    root: INFO
-    "[org.springframework.cloud.gateway]": TRACE
-    "[org.springframework.security]": DEBUG
+---
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_URL:http://localhost:9411}/api/v2/spans
+    "[org.springframework.cloud.gateway]": INFO
+    "[org.springframework.security]": INFO
