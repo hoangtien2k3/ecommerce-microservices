@@ -7,7 +7,10 @@ metadata:
     app: api-gateway
 spec:
   strategy:
-    type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   replicas: 1
   selector:
     matchLabels:
@@ -19,8 +22,8 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: ghcr.io/hoangtien2k3/api-gateway:sha-374ea13
-          imagePullPolicy: IfNotPresent
+          image: ghcr.io/hoangtien2k3/api-gateway:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8888
           envFrom:
