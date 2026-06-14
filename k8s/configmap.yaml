@@ -15,9 +15,6 @@ data:
   JWT_ISSUER_URI: "http://keycloak:8080/realms/ecommerce"
   KEYCLOAK_SERVER_URL: "http://keycloak:8080"
 
-  # Eureka
-  EUREKA_URI: "http://discovery-service:8761/eureka"
-
   # Kafka
   KAFKA_SERVERS: "kafka:9092"
 
