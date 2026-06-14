@@ -8,21 +8,23 @@ import com.ecommerce.productservice.repository.CategoryRepository;
 import com.ecommerce.productservice.repository.CategoryRepositoryPagingAndSorting;
 import com.ecommerce.productservice.service.CategoryService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class CategoryServiceImpl implements CategoryService {
+
+    private static final Logger log = LoggerFactory.getLogger(CategoryServiceImpl.class);
 
     private final ModelMapper modelMapper;
     private final CategoryRepository categoryRepository;

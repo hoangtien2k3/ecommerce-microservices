@@ -7,20 +7,22 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.List;
 
-@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/carts")
 @Tag(name = "CartController", description = "Operations related to carts")
 public class CartController {
+
+    private static final Logger log = LoggerFactory.getLogger(CartController.class);
 
     private final CartService cartService;
 

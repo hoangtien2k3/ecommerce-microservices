@@ -8,17 +8,19 @@ import com.ecommerce.productservice.helper.ProductMappingHelper;
 import com.ecommerce.productservice.repository.ProductRepository;
 import com.ecommerce.productservice.service.ProductService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.List;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ProductServiceImpl implements ProductService {
+
+    private static final Logger log = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     private final ProductRepository productRepository;
 

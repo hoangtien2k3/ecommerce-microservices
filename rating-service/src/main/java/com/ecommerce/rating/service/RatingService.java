@@ -12,10 +12,11 @@ import com.ecommerce.rating.viewmodel.RatingListVm;
 import com.ecommerce.rating.viewmodel.RatingPostVm;
 import com.ecommerce.rating.viewmodel.RatingVm;
 import com.ecommerce.rating.viewmodel.ResponeStatusVm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,10 +26,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
-@Slf4j
 @Service
 @Transactional
 public class RatingService {
+
+    private static final Logger log = LoggerFactory.getLogger(RatingService.class);
 
     private final RatingRepository ratingRepository;
     private final CustomerService customerService;

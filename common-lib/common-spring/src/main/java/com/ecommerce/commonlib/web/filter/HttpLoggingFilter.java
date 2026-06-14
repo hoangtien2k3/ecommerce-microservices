@@ -7,7 +7,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.core.Ordered;
 import org.springframework.lang.NonNull;
@@ -16,6 +15,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -31,9 +32,10 @@ import java.util.List;
  * <p>Log level follows response status: INFO (2xx/3xx) · WARN (4xx) · ERROR (5xx).
  * Actuator health/metrics paths are skipped automatically.
  */
-@Slf4j
 @RequiredArgsConstructor
 public class HttpLoggingFilter extends OncePerRequestFilter implements Ordered {
+
+    private static final Logger log = LoggerFactory.getLogger(HttpLoggingFilter.class);
 
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
     private static final List<String> SKIP_PATHS = List.of(

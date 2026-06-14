@@ -3,17 +3,19 @@ package com.ecommerce.inventoryservice.service;
 import com.ecommerce.inventoryservice.dto.response.InventoryResponse;
 import com.ecommerce.inventoryservice.repository.InventoryRepository;
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.List;
 
 @RequiredArgsConstructor
-@Slf4j
 @Service
 public class InventoryService {
+
+    private static final Logger log = LoggerFactory.getLogger(InventoryService.class);
 
     @Autowired
     private final InventoryRepository inventoryRepository;

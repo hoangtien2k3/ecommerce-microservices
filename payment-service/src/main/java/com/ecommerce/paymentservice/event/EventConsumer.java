@@ -1,12 +1,13 @@
 package com.ecommerce.paymentservice.event;
 
-
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
-@Slf4j
 public class EventConsumer {
+
+    private static final Logger log = LoggerFactory.getLogger(EventConsumer.class);
 
 //    Gson gson = new Gson(); // convert Json -> DTO
 //

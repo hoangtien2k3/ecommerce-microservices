@@ -6,15 +6,17 @@ import com.ecommerce.notificationservice.helper.PaymentMappingHelper;
 import com.ecommerce.notificationservice.repository.PaymentRepository;
 import com.ecommerce.notificationservice.service.PaymentService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.List;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class PaymentServerImpl implements PaymentService {
+
+    private static final Logger log = LoggerFactory.getLogger(PaymentServerImpl.class);
 
     private final PaymentRepository paymentRepository;
 

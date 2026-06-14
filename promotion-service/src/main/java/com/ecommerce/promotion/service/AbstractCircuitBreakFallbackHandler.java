@@ -1,10 +1,12 @@
 package com.ecommerce.promotion.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 abstract class AbstractCircuitBreakFallbackHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(AbstractCircuitBreakFallbackHandler.class);
 
     protected void handleBodilessFallback(List<Long> ids, Throwable throwable) throws Throwable {
         handleError(ids, throwable);
@@ -14,7 +16,6 @@ abstract class AbstractCircuitBreakFallbackHandler {
         handleError(ids, throwable);
         return null;
     }
-
 
     private void handleError(List<Long> ids, Throwable throwable) throws Throwable {
         log.error("Circuit breaker records an error. Detail {} with ids {}", throwable.getMessage(), ids);

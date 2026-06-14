@@ -7,15 +7,17 @@ import com.ecommerce.shippingservice.service.OrderItemService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/shippings")
 public class OrderItemController {
+
+    private static final Logger log = LoggerFactory.getLogger(OrderItemController.class);
 
     private final OrderItemService orderItemService;
 

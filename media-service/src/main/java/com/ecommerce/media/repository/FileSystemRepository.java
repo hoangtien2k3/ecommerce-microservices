@@ -1,6 +1,8 @@
 package com.ecommerce.media.repository;
 
 import com.ecommerce.media.config.FilesystemConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,13 +11,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
-@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class FileSystemRepository {
+
+    private static final Logger log = LoggerFactory.getLogger(FileSystemRepository.class);
 
     private static final String DIRECTORY_DOES_NOT_EXIST = "Directory %s does not exist.";
 

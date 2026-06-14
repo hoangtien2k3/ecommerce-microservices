@@ -10,16 +10,18 @@ import com.ecommerce.shippingservice.helper.OrderItemMappingHelper;
 import com.ecommerce.shippingservice.repository.OrderItemRepository;
 import com.ecommerce.shippingservice.service.OrderItemService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.List;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class OrderItemServiceImpl implements OrderItemService {
+
+    private static final Logger log = LoggerFactory.getLogger(OrderItemServiceImpl.class);
 
     private final OrderItemRepository orderItemRepository;
     private final RestClient.Builder restClientBuilder;

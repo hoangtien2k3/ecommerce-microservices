@@ -1,9 +1,8 @@
 package com.ecommerce.tax.service;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 abstract class AbstractCircuitBreakFallbackHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(AbstractCircuitBreakFallbackHandler.class);
 
     protected void handleBodilessFallback(Throwable throwable) throws Throwable {
         handleError(throwable);

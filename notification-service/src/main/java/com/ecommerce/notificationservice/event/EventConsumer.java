@@ -8,18 +8,20 @@ import com.ecommerce.notificationservice.service.EmailService;
 import com.ecommerce.notificationservice.service.PaymentService;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class EventConsumer {
+
+    private static final Logger log = LoggerFactory.getLogger(EventConsumer.class);
 
     private final EmailService emailService;
     private final PaymentService paymentService;

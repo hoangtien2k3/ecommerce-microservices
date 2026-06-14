@@ -10,17 +10,19 @@ import com.ecommerce.orderservice.security.JwtTokenFilter;
 import com.ecommerce.orderservice.service.CallAPI;
 import com.ecommerce.orderservice.service.CartService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.List;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class CartServiceImpl implements CartService {
+
+    private static final Logger log = LoggerFactory.getLogger(CartServiceImpl.class);
 
     private final CartRepository cartRepository;
     private final OrderServiceImpl orderService;

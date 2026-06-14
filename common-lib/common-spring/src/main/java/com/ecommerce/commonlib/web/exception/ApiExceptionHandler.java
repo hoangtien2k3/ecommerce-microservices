@@ -5,7 +5,6 @@ import com.ecommerce.commonlib.exception.ErrorCode;
 import com.ecommerce.commonlib.i18n.Messages;
 import com.ecommerce.commonlib.viewmodel.ApiResponse;
 import jakarta.validation.ConstraintViolationException;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -29,6 +28,8 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.List;
 
 /**
@@ -40,10 +41,11 @@ import java.util.List;
  * the original message (validation) or a canned one (auth), and whether to log at WARN or ERROR.
  * A table-driven mapper hides those decisions and tends to drift.
  */
-@Slf4j
 @Order(Ordered.LOWEST_PRECEDENCE)
 @RestControllerAdvice
 public class ApiExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
     private static final String ERROR_LOG_FORMAT = "ApiError uri={} status={} code={} message={} cause={}";
 
