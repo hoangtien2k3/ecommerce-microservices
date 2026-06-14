@@ -5,9 +5,9 @@ import com.ecommerce.commonlib.csv.annotation.CsvName;
 import com.ecommerce.commonlib.util.DateTimeUtils;
 import com.opencsv.CSVWriter;
 import com.opencsv.ICSVWriter;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -27,10 +27,7 @@ import java.util.concurrent.ConcurrentMap;
  *
  * <h3>Performance</h3>
  * The expensive part of reflection is looking up {@link Field}/{@link Method} objects — not
- * invoking them. We compile each class into an immutable {
-
-    private static final Logger log = LoggerFactory.getLogger(into.class);
-@code Schema} of accessible
+ * invoking them. We compile each class into an immutable {@code Schema} of accessible
  * getter {@link Method}s on first encounter and cache it forever. After the first export,
  * a row write is just {@code N} method invocations.
  *
@@ -38,6 +35,8 @@ import java.util.concurrent.ConcurrentMap;
  * Schemas are immutable; the {@link ConcurrentHashMap} cache is safe under concurrent use.
  */
 public final class CsvExporter {
+
+    private static final Logger log = LoggerFactory.getLogger(CsvExporter.class);
 
     private CsvExporter() {
     }
@@ -114,10 +113,9 @@ public final class CsvExporter {
 
     /** Walks the class hierarchy parent-first so inherited columns appear before declared ones. */
     private static List<Field> allDeclaredFields(Class<?> type) {
-        // Collect child→parent, then reverse: O(n) instead of O(n²) addAll(0,…) pattern
         ArrayDeque<Class<?>> hierarchy = new ArrayDeque<>();
         for (Class<?> c = type; c != null && c != Object.class; c = c.getSuperclass()) {
-            hierarchy.push(c); // push = addFirst, so iteration will be parent-first
+            hierarchy.push(c);
         }
         List<Field> fields = new ArrayList<>();
         for (Class<?> c : hierarchy) {
