@@ -101,7 +101,7 @@ deploy_and_wait() {
   wait_for_pod "$label" "$name" "$timeout"
 }
 
-# Update /etc/hosts───
+# Update /etc/hosts
 update_hosts() {
   local entry="$1"
   if [ "$OS" = "windows" ]; then
@@ -141,7 +141,7 @@ SERVICES=(
 printf "\n"
 printf "${BOLD}${CYAN}╔══════════════════════════════════════════════════╗${NC}\n"
 printf "${BOLD}${CYAN}║   Ecommerce Microservices — k3d Setup            ║${NC}\n"
-printf "${BOLD}${CYAN}╚══════════════════════════════════════════════════╝${NC}\n\n"
+printf "${BOLD}${CYAN}╚══════════════════════════════════════════════════╝${NC}\n"
 
 # 1. Detect OS
 step "1/11 · Detecting environment"
@@ -199,13 +199,8 @@ kubectl wait --namespace ingress-nginx \
   --timeout=120s
 success "Ingress controller ready"
 
-# 7. (Skipped) Images will be pulled directly from GHCR by k3s when pods start
-step "7/11 · Images — pulled by k3s on pod start (imagePullPolicy: Always)"
-info "Skipping pre-import — k3s will pull :latest from GHCR automatically"
-info "All services use imagePullPolicy: Always → always gets the newest image"
-
-# 8. Namespace + Secrets + ConfigMaps
-step "8/11 · Applying Namespace, Secrets, ConfigMaps"
+# 7. Namespace + Secrets + ConfigMaps
+step "7/10 · Applying Namespace, Secrets, ConfigMaps"
 kubectl apply -f k8s/namespace.yaml
 success "Namespace '${NAMESPACE}' ready"
 
@@ -237,8 +232,8 @@ kubectl create configmap postgres-init-scripts -n "$NAMESPACE" \
   --dry-run=client -o yaml | kubectl apply -f -
 success "ConfigMaps ready"
 
-# 9. Infrastructure
-step "9/11 · Deploying infrastructure"
+# 8. Infrastructure
+step "8/10 · Deploying infrastructure"
 deploy_and_wait k8s/infra/postgres.yaml       postgres       "PostgreSQL"    600s
 deploy_and_wait k8s/infra/redis.yaml          redis          "Redis"         300s
 deploy_and_wait k8s/infra/kafka.yaml          kafka          "Kafka"         300s
@@ -247,8 +242,8 @@ deploy_and_wait k8s/infra/minio.yaml          minio          "MinIO"         300
 deploy_and_wait k8s/infra/keycloak.yaml       keycloak       "Keycloak"      600s
 deploy_and_wait k8s/infra/zipkin.yaml         zipkin         "Zipkin"        300s
 
-# 10. Backend + Frontend + Ingress
-step "10/11 · Deploying backend services & frontend"
+# 9. Backend + Frontend + Ingress
+step "9/10 · Deploying backend services & frontend"
 for yaml in k8s/backend/*.yaml; do
   kubectl apply -f "$yaml"
   info "Applied $(basename "$yaml" .yaml)"
@@ -257,19 +252,19 @@ kubectl apply -f k8s/frontend/frontend.yaml
 kubectl apply -f k8s/ingress/ingress.yaml
 success "All services applied"
 
-# 11. /etc/hosts
-step "11/11 · Updating hosts file"
+# 10. /etc/hosts
+step "10/10 · Updating hosts file"
 update_hosts "$HOSTS_ENTRY"
 
 # Done
 printf "\n"
 printf "${BOLD}${GREEN}╔══════════════════════════════════════════════════╗${NC}\n"
 printf "${BOLD}${GREEN}║          Deployment complete!                    ║${NC}\n"
-printf "${BOLD}${GREEN}╚══════════════════════════════════════════════════╝${NC}\n\n"
-printf "${BOLD}Frontend${NC}       →  http://ecommerce.local:9090\n"
-printf "${BOLD}API Gateway${NC}    →  http://api.ecommerce.local:9090\n"
-printf "${BOLD}Keycloak${NC}       →  http://auth.ecommerce.local:9090\n"
-printf "${BOLD}MinIO Console${NC}  →  http://minio.ecommerce.local:9090\n"
-printf "${BOLD}Zipkin${NC}         →  http://zipkin.ecommerce.local:9090\n\n"
+printf "${BOLD}${GREEN}╚══════════════════════════════════════════════════╝${NC}\n"
+printf "${BOLD}Frontend${NC}     : http://ecommerce.local:9090\n"
+printf "${BOLD}API Gateway${NC}  : http://api.ecommerce.local:9090\n"
+printf "${BOLD}Keycloak${NC}     : http://auth.ecommerce.local:9090\n"
+printf "${BOLD}MinIO Console${NC}: http://minio.ecommerce.local:9090\n"
+printf "${BOLD}Zipkin${NC}       : http://zipkin.ecommerce.local:9090\n\n"
 printf "${YELLOW}Backend services may take an additional 1-2 minutes to fully start.${NC}\n"
 printf "${YELLOW}Monitor: kubectl get pods -n %s -w${NC}\n\n" "$NAMESPACE"
