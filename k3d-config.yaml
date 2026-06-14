@@ -1,0 +1,18 @@
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: ecommerce
+servers: 1
+ports:
+  - port: 9090:80
+    nodeFilters:
+      - loadbalancer
+  - port: 9443:443
+    nodeFilters:
+      - loadbalancer
+options:
+  k3s:
+    extraArgs:
+      - arg: --disable=traefik      # disable built-in Traefik, we use NGINX
+        nodeFilters:
+          - server:*
