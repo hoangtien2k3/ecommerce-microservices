@@ -1,5 +1,8 @@
 package com.ecommerce.tax.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 abstract class AbstractCircuitBreakFallbackHandler {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractCircuitBreakFallbackHandler.class);
