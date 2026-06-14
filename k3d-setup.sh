@@ -209,43 +209,66 @@ kubectl wait --namespace ingress-nginx \
   --timeout=120s
 success "Ingress controller ready"
 
-# 7. Pre-load images (best-effort)
+# 7. Pre-load images (parallel pull + single batch import)
 step "7/11 · Pre-loading images into k3d cluster"
-info "Pulling and loading infrastructure images..."
-for img in "${INFRA_IMAGES[@]}"; do
-  if docker pull "$img" --quiet 2>/dev/null; then
-    k3d image import "$img" -c "$CLUSTER_NAME" 2>/dev/null \
-      && info "Loaded ${img}" \
-      || warn "k3d import failed for ${img} — will pull at runtime"
-  else
-    warn "Could not pull ${img} — will pull at runtime"
-  fi
-done
 
-# Detect the SHA tag used in k8s manifests (e.g. sha-374ea13)
+# Detect SHA tag from manifests
 MANIFEST_SHA=$(grep -h "image:.*${REGISTRY}" k8s/backend/*.yaml k8s/frontend/*.yaml 2>/dev/null \
   | grep -o 'sha-[a-f0-9]*' | head -1 || true)
-info "Manifest image tag: ${MANIFEST_SHA:-not detected, using latest}"
+info "Manifest image tag: ${MANIFEST_SHA:-not detected}"
 
-info "Loading service images into k3d..."
+# ── Pull all images in parallel ───────────────────────────────────────────────
+info "Pulling all images in parallel..."
+declare -a PULL_PIDS=()
+
+for img in "${INFRA_IMAGES[@]}"; do
+  docker pull "$img" --quiet 2>/dev/null &
+  PULL_PIDS+=($!)
+done
+
+for svc in "${SERVICES[@]}" frontend; do
+  docker pull "${REGISTRY}/${svc}:latest" --quiet 2>/dev/null &
+  PULL_PIDS+=($!)
+done
+
+# Wait for all pulls to finish
+PULL_FAILURES=0
+for pid in "${PULL_PIDS[@]}"; do
+  wait "$pid" 2>/dev/null || PULL_FAILURES=$((PULL_FAILURES + 1))
+done
+[ "$PULL_FAILURES" -gt 0 ] && warn "${PULL_FAILURES} image(s) failed to pull — will be pulled at runtime by k3s"
+success "All pulls completed"
+
+# ── Retag service images :latest → :SHA ──────────────────────────────────────
+declare -a IMAGES_TO_IMPORT=()
+
+for img in "${INFRA_IMAGES[@]}"; do
+  docker image inspect "$img" &>/dev/null && IMAGES_TO_IMPORT+=("$img")
+done
+
 for svc in "${SERVICES[@]}" frontend; do
   img_latest="${REGISTRY}/${svc}:latest"
   img_sha="${REGISTRY}/${svc}:${MANIFEST_SHA}"
-
-  # Pull :latest from GHCR (always exists), retag to SHA used in manifests, import
-  if docker pull "$img_latest" --quiet 2>/dev/null; then
+  if docker image inspect "$img_latest" &>/dev/null; then
     if [ -n "$MANIFEST_SHA" ]; then
-      docker tag "$img_latest" "$img_sha"
-      k3d image import "$img_sha" -c "$CLUSTER_NAME" 2>/dev/null
-      success "${svc}: GHCR :latest → :${MANIFEST_SHA} imported"
+      docker tag "$img_latest" "$img_sha" 2>/dev/null
+      IMAGES_TO_IMPORT+=("$img_sha")
     else
-      k3d image import "$img_latest" -c "$CLUSTER_NAME" 2>/dev/null
-      success "${svc}: GHCR :latest imported"
+      IMAGES_TO_IMPORT+=("$img_latest")
     fi
   else
-    warn "${svc}: could not pull from GHCR — pod will stay in ImagePullBackOff"
+    warn "${svc}: image not available — pod may stay in ImagePullBackOff"
   fi
 done
+
+# ── Single batch import into k3d (tools node started only once) ───────────────
+if [ "${#IMAGES_TO_IMPORT[@]}" -gt 0 ]; then
+  info "Importing ${#IMAGES_TO_IMPORT[@]} images into k3d in one batch..."
+  k3d image import "${IMAGES_TO_IMPORT[@]}" -c "$CLUSTER_NAME"
+  success "All images imported into k3d"
+else
+  warn "No images to import"
+fi
 
 # 8. Namespace + Secrets + ConfigMaps
 step "8/11 · Applying Namespace, Secrets, ConfigMaps"
