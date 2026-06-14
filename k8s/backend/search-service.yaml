@@ -29,7 +29,7 @@ spec:
           image: ghcr.io/hoangtien2k3/search-service:sha-374ea13
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8092
+            - containerPort: 8094
           envFrom:
             - configMapRef:
                 name: ecommerce-config
@@ -41,14 +41,14 @@ spec:
           readinessProbe:
             httpGet:
               path: /search/actuator/health
-              port: 8092
+              port: 8094
             initialDelaySeconds: 40
             periodSeconds: 10
             failureThreshold: 15
           livenessProbe:
             httpGet:
               path: /search/actuator/health
-              port: 8092
+              port: 8094
             initialDelaySeconds: 120
             periodSeconds: 15
           resources:
@@ -69,5 +69,5 @@ spec:
   selector:
     app: search-service
   ports:
-    - port: 8092
-      targetPort: 8092
+    - port: 8094
+      targetPort: 8094

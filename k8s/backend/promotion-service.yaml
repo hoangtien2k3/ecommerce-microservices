@@ -26,7 +26,7 @@ spec:
           image: ghcr.io/hoangtien2k3/promotion-service:sha-374ea13
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8092
+            - containerPort: 8093
           envFrom:
             - configMapRef:
                 name: ecommerce-config
@@ -46,14 +46,14 @@ spec:
           readinessProbe:
             httpGet:
               path: /actuator/health
-              port: 8092
+              port: 8093
             initialDelaySeconds: 40
             periodSeconds: 10
             failureThreshold: 15
           livenessProbe:
             httpGet:
               path: /actuator/health
-              port: 8092
+              port: 8093
             initialDelaySeconds: 120
             periodSeconds: 15
           resources:
@@ -74,5 +74,5 @@ spec:
   selector:
     app: promotion-service
   ports:
-    - port: 8092
-      targetPort: 8092
+    - port: 8093
+      targetPort: 8093
