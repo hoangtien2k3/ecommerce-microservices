@@ -11,6 +11,7 @@ import com.ecommerce.authservice.mapper.UserMapper;
 import com.ecommerce.authservice.repository.UserRepository;
 import com.ecommerce.commonlib.exception.BusinessException;
 import com.ecommerce.commonlib.keycloak.KeycloakAuthClient;
+import com.ecommerce.commonlib.logging.LogPerformance;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
@@ -34,6 +35,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @LogPerformance(title = "register user", logInput = true)
     public User register(RegisterRequest request) {
         if (existsByUsername(request.getUsername())) {
             throw BusinessException.conflict("auth.username.exists", request.getUsername());
@@ -122,6 +124,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @LogPerformance(title = "list users")
     public Page<UserResponse> findAllUsers(int page, int size, String sortBy, String sortOrder) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortOrder), sortBy);
         PageRequest pageRequest = PageRequest.of(page, size, sort);

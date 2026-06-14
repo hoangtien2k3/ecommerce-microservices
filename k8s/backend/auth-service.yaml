@@ -18,9 +18,6 @@ spec:
         app: auth-service
     spec:
       initContainers:
-        - name: wait-for-discovery
-          image: busybox
-          command: ["sh", "-c", "until nc -z discovery-service 8761; do sleep 3; done"]
         - name: wait-for-keycloak
           image: busybox
           command: ["sh", "-c", "until nc -z keycloak 8080; do sleep 5; done"]

@@ -1,6 +1,8 @@
 package com.ecommerce.commonlib.keycloak;
 
 import com.ecommerce.commonlib.exception.BusinessException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -39,6 +41,8 @@ import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterN
  * </ul>
  */
 public class KeycloakAuthClient {
+
+    private static final Logger log = LoggerFactory.getLogger(KeycloakAuthClient.class);
 
     private static final String BEARER_SCHEME = "Bearer ";
     private static final ParameterizedTypeReference<Map<String, Object>> MAP_TYPE =
@@ -239,13 +243,14 @@ public class KeycloakAuthClient {
     }
 
     private static BusinessException translate(RestClientResponseException ex) {
+        log.warn("Keycloak HTTP {} — body: {}", ex.getStatusCode().value(), ex.getResponseBodyAsString());
         return switch (ex.getStatusCode().value()) {
-            case 400 -> BusinessException.badRequest("keycloak.bad.request", ex.getResponseBodyAsString());
-            case 401 -> BusinessException.unauthorized("keycloak.unauthorized");
-            case 403 -> BusinessException.forbidden("keycloak.forbidden");
-            case 404 -> BusinessException.notFound("keycloak.not.found");
-            case 409 -> BusinessException.conflict("keycloak.conflict");
-            default  -> BusinessException.badRequest("keycloak.request.failed", ex.getMessage());
+            case 400 -> BusinessException.badRequest("keycloak.bad.request", ex, ex.getResponseBodyAsString());
+            case 401 -> BusinessException.unauthorized("keycloak.unauthorized", ex);
+            case 403 -> BusinessException.forbidden("keycloak.forbidden", ex);
+            case 404 -> BusinessException.notFound("keycloak.not.found", ex);
+            case 409 -> BusinessException.conflict("keycloak.conflict", ex);
+            default  -> BusinessException.badRequest("keycloak.request.failed", ex, ex.getMessage());
         };
     }
 }

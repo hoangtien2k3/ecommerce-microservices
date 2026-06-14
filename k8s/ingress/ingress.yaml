@@ -4,15 +4,33 @@ metadata:
   name: ecommerce-ingress
   namespace: ecommerce
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    # ── Proxy timeouts ────────────────────────────────────────────────
     nginx.ingress.kubernetes.io/proxy-body-size: "100m"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
-    nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    # ── WebSocket / SSE support for reactive gateway ──────────────────
+    nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+    # ── Edge-level rate limit (coarse, fine-grained done in SCG) ──────
+    nginx.ingress.kubernetes.io/limit-rps: "1000"
+    # ── Gzip compression ─────────────────────────────────────────────
+    nginx.ingress.kubernetes.io/enable-gzip: "true"
+    # ── TLS: cert-manager (uncomment when cert-manager is installed) ──
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: nginx
+  # ── TLS (uncomment after cert-manager setup) ─────────────────────
+  # tls:
+  #   - hosts:
+  #       - api.ecommerce.local
+  #       - ecommerce.local
+  #       - auth.ecommerce.local
+  #     secretName: ecommerce-tls
   rules:
-    # Frontend — http://ecommerce.local
+    # ── Frontend ─────────────────────────────────────────────────────
     - host: ecommerce.local
       http:
         paths:
@@ -24,7 +42,7 @@ spec:
                 port:
                   number: 3000
 
-    # API Gateway — http://api.ecommerce.local
+    # ── API Gateway (Spring Cloud Gateway — all traffic goes here) ────
     - host: api.ecommerce.local
       http:
         paths:
@@ -36,7 +54,7 @@ spec:
                 port:
                   number: 8888
 
-    # Keycloak — http://auth.ecommerce.local
+    # ── Keycloak ──────────────────────────────────────────────────────
     - host: auth.ecommerce.local
       http:
         paths:
@@ -48,19 +66,7 @@ spec:
                 port:
                   number: 8080
 
-    # Eureka Dashboard — http://discovery.ecommerce.local
-    - host: discovery.ecommerce.local
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: discovery-service
-                port:
-                  number: 8761
-
-    # Zipkin — http://zipkin.ecommerce.local
+    # ── Zipkin tracing UI ─────────────────────────────────────────────
     - host: zipkin.ecommerce.local
       http:
         paths:
@@ -72,7 +78,7 @@ spec:
                 port:
                   number: 9411
 
-    # MinIO Console — http://minio.ecommerce.local
+    # ── MinIO Console ─────────────────────────────────────────────────
     - host: minio.ecommerce.local
       http:
         paths:

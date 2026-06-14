@@ -4,7 +4,6 @@ import com.ecommerce.authservice.dto.request.LoginRequest;
 import com.ecommerce.authservice.dto.request.RefreshTokenRequest;
 import com.ecommerce.authservice.dto.request.RegisterRequest;
 import com.ecommerce.authservice.service.UserService;
-import com.ecommerce.commonlib.constants.ApiPaths;
 import com.ecommerce.commonlib.keycloak.KeycloakAuthClient;
 import com.ecommerce.commonlib.keycloak.KeycloakTokenResponse;
 import com.ecommerce.commonlib.viewmodel.ApiResponse;
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(ApiPaths.AUTH)
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
 

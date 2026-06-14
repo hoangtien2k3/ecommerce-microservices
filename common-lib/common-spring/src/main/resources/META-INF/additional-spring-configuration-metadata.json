@@ -1,29 +1,15 @@
 {
   "groups": [
-    {
-      "name": "ecommerce.cors",
-      "description": "Cross-origin resource sharing for the platform."
-    },
-    {
-      "name": "ecommerce.security",
-      "description": "Resource-server security knobs (JWT + public path allow-list)."
-    },
-    {
-      "name": "ecommerce.i18n",
-      "description": "i18n message-source configuration."
-    },
-    {
-      "name": "ecommerce.openapi",
-      "description": "OpenAPI metadata (title, version, description)."
-    },
-    {
-      "name": "ecommerce.web.correlation",
-      "description": "X-Correlation-Id / X-Request-Id filter."
-    },
-    {
-      "name": "ecommerce.web.exception-handler",
-      "description": "Global RestControllerAdvice that maps exceptions to ApiResponse."
-    }
+    { "name": "ecommerce.cors",                   "description": "Cross-origin resource sharing." },
+    { "name": "ecommerce.security",               "description": "Resource-server security (JWT + public path allow-list)." },
+    { "name": "ecommerce.i18n",                   "description": "i18n message-source configuration." },
+    { "name": "ecommerce.openapi",                "description": "OpenAPI metadata (title, version, description)." },
+    { "name": "ecommerce.web.correlation",        "description": "X-Correlation-Id / X-Request-Id propagation filter." },
+    { "name": "ecommerce.web.exception-handler",  "description": "Global RestControllerAdvice → ApiResponse envelope." },
+    { "name": "ecommerce.web.logging",            "description": "HTTP access log + AOP performance log." },
+    { "name": "ecommerce.web.logging.request",    "description": "Inbound request log settings." },
+    { "name": "ecommerce.web.logging.response",   "description": "Outbound response log settings." },
+    { "name": "ecommerce.web.logging.performance","description": "AOP @LogPerformance settings." }
   ],
   "properties": [
     {
@@ -61,6 +47,54 @@
       "type": "java.lang.Boolean",
       "description": "Enable the platform RestControllerAdvice.",
       "defaultValue": true
+    },
+    {
+      "name": "ecommerce.web.logging.request.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable HTTP request logging.",
+      "defaultValue": true
+    },
+    {
+      "name": "ecommerce.web.logging.request.include-body",
+      "type": "java.lang.Boolean",
+      "description": "Include request body in the log line.",
+      "defaultValue": true
+    },
+    {
+      "name": "ecommerce.web.logging.request.max-body-bytes",
+      "type": "java.lang.Integer",
+      "description": "Maximum bytes to log from the request body.",
+      "defaultValue": 2048
+    },
+    {
+      "name": "ecommerce.web.logging.response.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable HTTP response logging.",
+      "defaultValue": true
+    },
+    {
+      "name": "ecommerce.web.logging.response.include-body",
+      "type": "java.lang.Boolean",
+      "description": "Include response body in the log line. Off by default (can be large).",
+      "defaultValue": false
+    },
+    {
+      "name": "ecommerce.web.logging.response.max-body-bytes",
+      "type": "java.lang.Integer",
+      "description": "Maximum bytes to log from the response body.",
+      "defaultValue": 2048
+    },
+    {
+      "name": "ecommerce.web.logging.performance.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable AOP @LogPerformance aspect.",
+      "defaultValue": true
+    },
+    {
+      "name": "ecommerce.web.logging.performance.threshold-ms",
+      "type": "java.lang.Long",
+      "description": "Log only when execution exceeds this threshold. Fast calls are silent.",
+      "defaultValue": 50
     }
   ]
 }

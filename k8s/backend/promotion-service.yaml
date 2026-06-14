@@ -18,9 +18,6 @@ spec:
         app: promotion-service
     spec:
       initContainers:
-        - name: wait-for-discovery
-          image: busybox
-          command: ["sh", "-c", "until nc -z discovery-service 8761; do sleep 3; done"]
         - name: wait-for-postgres
           image: busybox
           command: ["sh", "-c", "until nc -z postgres 5432; do sleep 3; done"]

@@ -33,6 +33,12 @@ public class BusinessException extends RuntimeException {
         this.errorCode = code.getCode();
     }
 
+    private BusinessException(ErrorCode code, String message, Throwable cause) {
+        super(message, cause);
+        this.status = code.getHttpStatus();
+        this.errorCode = code.getCode();
+    }
+
     private BusinessException(HttpStatus status, String errorCode, String message) {
         super(message);
         this.status = status;
@@ -63,23 +69,47 @@ public class BusinessException extends RuntimeException {
         return new BusinessException(ErrorCode.BAD_REQUEST, Messages.get(messageKey, args));
     }
 
+    public static BusinessException badRequest(String messageKey, Throwable cause, Object... args) {
+        return new BusinessException(ErrorCode.BAD_REQUEST, Messages.get(messageKey, args), cause);
+    }
+
     public static BusinessException unauthorized(String messageKey, Object... args) {
         return new BusinessException(ErrorCode.UNAUTHORIZED, Messages.get(messageKey, args));
+    }
+
+    public static BusinessException unauthorized(String messageKey, Throwable cause, Object... args) {
+        return new BusinessException(ErrorCode.UNAUTHORIZED, Messages.get(messageKey, args), cause);
     }
 
     public static BusinessException forbidden(String messageKey, Object... args) {
         return new BusinessException(ErrorCode.FORBIDDEN, Messages.get(messageKey, args));
     }
 
+    public static BusinessException forbidden(String messageKey, Throwable cause, Object... args) {
+        return new BusinessException(ErrorCode.FORBIDDEN, Messages.get(messageKey, args), cause);
+    }
+
     public static BusinessException notFound(String messageKey, Object... args) {
         return new BusinessException(ErrorCode.NOT_FOUND, Messages.get(messageKey, args));
+    }
+
+    public static BusinessException notFound(String messageKey, Throwable cause, Object... args) {
+        return new BusinessException(ErrorCode.NOT_FOUND, Messages.get(messageKey, args), cause);
     }
 
     public static BusinessException conflict(String messageKey, Object... args) {
         return new BusinessException(ErrorCode.CONFLICT, Messages.get(messageKey, args));
     }
 
+    public static BusinessException conflict(String messageKey, Throwable cause, Object... args) {
+        return new BusinessException(ErrorCode.CONFLICT, Messages.get(messageKey, args), cause);
+    }
+
     public static BusinessException internalServerError(String messageKey, Object... args) {
         return new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, Messages.get(messageKey, args));
+    }
+
+    public static BusinessException internalServerError(String messageKey, Throwable cause, Object... args) {
+        return new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, Messages.get(messageKey, args), cause);
     }
 }

@@ -40,12 +40,12 @@ import java.util.List;
  * the original message (validation) or a canned one (auth), and whether to log at WARN or ERROR.
  * A table-driven mapper hides those decisions and tends to drift.
  */
-@RestControllerAdvice
-@Order(Ordered.LOWEST_PRECEDENCE)
 @Slf4j
+@Order(Ordered.LOWEST_PRECEDENCE)
+@RestControllerAdvice
 public class ApiExceptionHandler {
 
-    private static final String ERROR_LOG_FORMAT = "ApiError uri={} status={} code={} message={}";
+    private static final String ERROR_LOG_FORMAT = "ApiError uri={} status={} code={} message={} cause={}";
 
     // ------------------------------------------------------------------
     // Business — most common, log at WARN (caller mistake, not a server bug)
@@ -215,10 +215,11 @@ public class ApiExceptionHandler {
                                                       Exception ex,
                                                       boolean withStack) {
         String path = resolvePath(request);
+        Throwable root = getRootCause(ex);
         if (withStack) {
-            log.error(ERROR_LOG_FORMAT, path, status.value(), code, message, ex);
+            log.error(ERROR_LOG_FORMAT, path, status.value(), code, message, root.getMessage(), ex);
         } else {
-            log.warn(ERROR_LOG_FORMAT, path, status.value(), code, message);
+            log.warn(ERROR_LOG_FORMAT, path, status.value(), code, message, root.getMessage(), ex);
         }
         ApiResponse<Void> body = errors == null
                 ? ApiResponse.error(code, message, path)
@@ -228,5 +229,10 @@ public class ApiExceptionHandler {
 
     private static String resolvePath(WebRequest request) {
         return request instanceof ServletWebRequest swr ? swr.getRequest().getRequestURI() : null;
+    }
+
+    private static Throwable getRootCause(Throwable ex) {
+        Throwable cause = ex.getCause();
+        return cause != null ? getRootCause(cause) : ex;
     }
 }

@@ -42,15 +42,6 @@ payment:
   kafka:
     consumer-group-id: payment-groupId
 ---
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
-    register-with-eureka: true
-    fetch-registry: true
-  instance:
-    prefer-ip-address: true
----
 management:
   endpoints:
     web:
@@ -121,6 +112,18 @@ ecommerce:
       enabled: ${WEB_CORRELATION_ENABLED:true}
     exception-handler:
       enabled: ${WEB_EXCEPTION_HANDLER_ENABLED:true}
+    logging:
+      request:
+        enabled: ${HTTP_LOG_REQUEST_ENABLED:true}
+        include-body: ${HTTP_LOG_REQUEST_BODY:true}
+        max-body-bytes: ${HTTP_LOG_REQUEST_MAX_BYTES:2048}
+      response:
+        enabled: ${HTTP_LOG_RESPONSE_ENABLED:true}
+        include-body: ${HTTP_LOG_RESPONSE_BODY:false}
+        max-body-bytes: ${HTTP_LOG_RESPONSE_MAX_BYTES:2048}
+      performance:
+        enabled: ${HTTP_LOG_PERF_ENABLED:true}
+        threshold-ms: ${HTTP_LOG_PERF_THRESHOLD_MS:50}
   openapi:
     title: Payment Service API
     version: ${APP_VERSION:v1}

@@ -1,10 +1,14 @@
 package com.ecommerce.commonlib.autoconfigure;
 
+import com.ecommerce.commonlib.logging.LoggerAspect;
 import com.ecommerce.commonlib.web.cors.CorsAutoConfigurer;
 import com.ecommerce.commonlib.web.cors.CorsProperties;
 import com.ecommerce.commonlib.web.exception.ApiExceptionHandler;
 import com.ecommerce.commonlib.web.filter.CorrelationIdFilter;
+import com.ecommerce.commonlib.web.filter.HttpLogProperties;
+import com.ecommerce.commonlib.web.filter.HttpLoggingFilter;
 import jakarta.servlet.Servlet;
+import org.aspectj.lang.annotation.Aspect;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -16,7 +20,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * Wires every web-tier cross-cutter for servlet-stack services:
- * correlation id filter, CORS, the global exception handler.
+ * correlation-id filter, HTTP logging filter, CORS, global exception handler.
  *
  * <p>Skipped automatically for reactive runtimes (api-gateway) because of
  * {@code @ConditionalOnWebApplication(type = SERVLET)}.</p>
@@ -24,19 +28,29 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @AutoConfiguration(after = I18nAutoConfiguration.class)
 @ConditionalOnClass({Servlet.class, WebMvcConfigurer.class})
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-@EnableConfigurationProperties(CorsProperties.class)
+@EnableConfigurationProperties({CorsProperties.class, HttpLogProperties.class})
 public class WebAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    @ConditionalOnProperty(prefix = "ecommerce.web.correlation", name = "enabled", havingValue = "true", matchIfMissing = true)
+    @ConditionalOnProperty(prefix = "ecommerce.web.correlation", name = "enabled",
+            havingValue = "true", matchIfMissing = true)
     public CorrelationIdFilter correlationIdFilter() {
         return new CorrelationIdFilter();
     }
 
     @Bean
+    @ConditionalOnMissingBean(HttpLoggingFilter.class)
+    @ConditionalOnProperty(prefix = "ecommerce.web.logging.request", name = "enabled",
+            havingValue = "true", matchIfMissing = true)
+    public HttpLoggingFilter httpLoggingFilter(HttpLogProperties props) {
+        return new HttpLoggingFilter(props);
+    }
+
+    @Bean
     @ConditionalOnMissingBean(ApiExceptionHandler.class)
-    @ConditionalOnProperty(prefix = "ecommerce.web.exception-handler", name = "enabled", havingValue = "true", matchIfMissing = true)
+    @ConditionalOnProperty(prefix = "ecommerce.web.exception-handler", name = "enabled",
+            havingValue = "true", matchIfMissing = true)
     public ApiExceptionHandler apiExceptionHandler() {
         return new ApiExceptionHandler();
     }
@@ -45,5 +59,14 @@ public class WebAutoConfiguration {
     @ConditionalOnMissingBean(CorsAutoConfigurer.class)
     public CorsAutoConfigurer commonCorsConfigurer(CorsProperties props) {
         return new CorsAutoConfigurer(props);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(LoggerAspect.class)
+    @ConditionalOnClass(Aspect.class)
+    @ConditionalOnProperty(prefix = "ecommerce.web.logging.performance", name = "enabled",
+            havingValue = "true", matchIfMissing = true)
+    public LoggerAspect loggerAspect(HttpLogProperties props) {
+        return new LoggerAspect(props);
     }
 }

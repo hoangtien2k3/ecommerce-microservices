@@ -8,16 +8,16 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${JWT_ISSUER_URI:http://identity/realms/ecommerce}
-
+---
 logging:
   pattern:
     level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
-
+---
 springdoc:
   oauthflow:
     authorization-url: ${JWT_AUTH_URL:http://identity/realms/ecommerce/protocol/openid-connect/auth}
     token-url: ${JWT_TOKEN_URL:http://identity/realms/ecommerce/protocol/openid-connect/token}
-
+---
 ecommerce:
   cors:
     enabled: true
