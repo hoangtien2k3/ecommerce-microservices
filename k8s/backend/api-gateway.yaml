@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: ghcr.io/hoangtien2k3/api-gateway:sha-374ea13
+          image: ghcr.io/hoangtien2k3/api-gateway:sha-4591820
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8888

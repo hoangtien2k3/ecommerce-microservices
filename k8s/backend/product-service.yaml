@@ -23,7 +23,7 @@ spec:
           command: ["sh", "-c", "until nc -z postgres 5432; do sleep 3; done"]
       containers:
         - name: product-service
-          image: ghcr.io/hoangtien2k3/product-service:sha-374ea13
+          image: ghcr.io/hoangtien2k3/product-service:sha-4591820
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8086
