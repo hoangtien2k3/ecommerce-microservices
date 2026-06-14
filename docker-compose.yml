@@ -148,23 +148,6 @@ services:
   # BACKEND — Spring Boot Microservices
   # ============================================================
 
-  discovery-service:
-    image: ghcr.io/hoangtien2k3/discovery-service:latest
-    pull_policy: always
-    container_name: discovery-service
-    ports:
-      - "8761:8761"
-    environment:
-      EUREKA_URI: http://discovery-service:8761/eureka
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8761/actuator/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 15
-      start_period: 30s
-    networks:
-      - ecommerce-network
-
   api-gateway:
     image: ghcr.io/hoangtien2k3/api-gateway:latest
     pull_policy: always
@@ -172,12 +155,9 @@ services:
     ports:
       - "8888:8888"
     environment:
-      EUREKA_URI: http://discovery-service:8761/eureka
       KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/ecommerce
       KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/ecommerce/protocol/openid-connect/certs
     depends_on:
-      discovery-service:
-        condition: service_healthy
       keycloak:
         condition: service_healthy
     healthcheck:
@@ -196,7 +176,6 @@ services:
     ports:
       - "8088:8088"
     environment:
-      EUREKA_URI: http://discovery-service:8761/eureka
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
       KEYCLOAK_SERVER_URL: http://keycloak:8080
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/authservice
@@ -204,8 +183,6 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
-      discovery-service:
-        condition: service_healthy
       postgres:
         condition: service_healthy
       keycloak:
@@ -220,15 +197,12 @@ services:
     ports:
       - "8086:8086"
     environment:
-      EUREKA_URI: http://discovery-service:8761/eureka
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/productservice
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
-      discovery-service:
-        condition: service_healthy
       postgres:
         condition: service_healthy
     networks:
@@ -241,7 +215,6 @@ services:
     ports:
       - "8084:8084"
     environment:
-      EUREKA_URI: http://discovery-service:8761/eureka
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/orderservice
       POSTGRES_USER: ${POSTGRES_USER}
@@ -249,8 +222,6 @@ services:
       KAFKA_SERVERS: kafka:9092
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
-      discovery-service:
-        condition: service_healthy
       postgres:
         condition: service_healthy
       kafka:
@@ -265,7 +236,6 @@ services:
     ports:
       - "8085:8085"
     environment:
-      EUREKA_URI: http://discovery-service:8761/eureka
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/paymentservice
       POSTGRES_USER: ${POSTGRES_USER}
@@ -273,8 +243,6 @@ services:
       KAFKA_SERVERS: kafka:9092
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
-      discovery-service:
-        condition: service_healthy
       postgres:
         condition: service_healthy
       kafka:
@@ -289,15 +257,12 @@ services:
     ports:
       - "8087:8087"
     environment:
-      EUREKA_URI: http://discovery-service:8761/eureka
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/shippingservice
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
-      discovery-service:
-        condition: service_healthy
       postgres:
         condition: service_healthy
     networks:
@@ -310,15 +275,12 @@ services:
     ports:
       - "8082:8082"
     environment:
-      EUREKA_URI: http://discovery-service:8761/eureka
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/inventoryservice
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
-      discovery-service:
-        condition: service_healthy
       postgres:
         condition: service_healthy
     networks:
@@ -331,15 +293,12 @@ services:
     ports:
       - "8081:8081"
     environment:
-      EUREKA_URI: http://discovery-service:8761/eureka
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/favouriteservice
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
-      discovery-service:
-        condition: service_healthy
       postgres:
         condition: service_healthy
     networks:
@@ -352,15 +311,12 @@ services:
     ports:
       - "8089:8089"
     environment:
-      EUREKA_URI: http://discovery-service:8761/eureka
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ratingservice
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
-      discovery-service:
-        condition: service_healthy
       postgres:
         condition: service_healthy
     networks:
@@ -373,7 +329,6 @@ services:
     ports:
       - "8083:8083"
     environment:
-      EUREKA_URI: http://discovery-service:8761/eureka
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/mediaservice
       POSTGRES_USER: ${POSTGRES_USER}
@@ -383,8 +338,6 @@ services:
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
-      discovery-service:
-        condition: service_healthy
       postgres:
         condition: service_healthy
       minio:
@@ -399,15 +352,12 @@ services:
     ports:
       - "8091:8091"
     environment:
-      EUREKA_URI: http://discovery-service:8761/eureka
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/taxservice
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
-      discovery-service:
-        condition: service_healthy
       postgres:
         condition: service_healthy
     networks:
@@ -420,15 +370,12 @@ services:
     ports:
       - "8093:8093"
     environment:
-      EUREKA_URI: http://discovery-service:8761/eureka
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/promotionservice
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
-      discovery-service:
-        condition: service_healthy
       postgres:
         condition: service_healthy
     networks:
@@ -441,7 +388,6 @@ services:
     ports:
       - "8094:8094"
     environment:
-      EUREKA_URI: http://discovery-service:8761/eureka
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
       ELASTICSEARCH_URL: http://elasticsearch:9200
       ELASTICSEARCH_USERNAME: ""
@@ -449,8 +395,6 @@ services:
       KAFKA_SERVERS: kafka:9092
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
-      discovery-service:
-        condition: service_healthy
       elasticsearch:
         condition: service_healthy
       kafka:
@@ -465,9 +409,6 @@ services:
     ports:
       - "8090:8090"
     environment:
-      SERVER_PORT: 8090
-    environment:
-      EUREKA_URI: http://discovery-service:8761/eureka
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
@@ -479,8 +420,6 @@ services:
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       ZIPKIN_URL: http://zipkin:9411
     depends_on:
-      discovery-service:
-        condition: service_healthy
       postgres:
         condition: service_healthy
       kafka:
