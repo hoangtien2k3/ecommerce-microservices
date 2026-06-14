@@ -22,7 +22,6 @@
     <modules>
         <module>common-lib</module>
         <module>api-gateway</module>
-        <module>discovery-service</module>
         <module>auth-service</module>
         <module>product-service</module>
         <module>order-service</module>

@@ -21,7 +21,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       backend:              ${{ steps.filter.outputs.backend }}
-      discovery-service:    ${{ steps.filter.outputs.discovery-service }}
       api-gateway:          ${{ steps.filter.outputs.api-gateway }}
       auth-service:         ${{ steps.filter.outputs.auth-service }}
       product-service:      ${{ steps.filter.outputs.product-service }}
@@ -48,10 +47,6 @@ jobs:
               - 'common-lib/**'
               - '*-service/**'
               - 'api-gateway/**'
-            discovery-service:
-              - 'discovery-service/**'
-              - 'common-lib/**'
-              - 'pom.xml'
             api-gateway:
               - 'api-gateway/**'
               - 'common-lib/**'
@@ -129,18 +124,6 @@ jobs:
         run: mvn test -B --fail-at-end
 
   # Build & Push
-  build-discovery-service:
-    needs: [detect-changes, test]
-    if: |
-      (needs.detect-changes.outputs.discovery-service == 'true' || github.event_name == 'workflow_dispatch') &&
-      (needs.test.result == 'success' || needs.test.result == 'skipped')
-    uses: ./.github/workflows/_build-service.yml
-    with:
-      service: discovery-service
-      port: 8761
-    secrets:
-      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   build-api-gateway:
     needs: [detect-changes, test]
     if: |
@@ -345,7 +328,6 @@ jobs:
     if: always()
     needs:
       - test
-      - build-discovery-service
       - build-api-gateway
       - build-auth-service
       - build-product-service

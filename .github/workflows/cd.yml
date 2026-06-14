@@ -61,7 +61,7 @@ jobs:
           IMAGE_PREFIX="${{ env.IMAGE_PREFIX }}"
 
           SERVICES=(
-            discovery-service api-gateway auth-service product-service
+            api-gateway auth-service product-service
             order-service payment-service shipping-service inventory-service
             favourite-service rating-service notification-service media-service
             search-service promotion-service tax-service frontend
@@ -147,7 +147,7 @@ jobs:
 
       - name: Wait for rollout
         run: |
-          for svc in discovery-service api-gateway auth-service product-service \
+          for svc in api-gateway auth-service product-service \
                      order-service payment-service; do
             kubectl rollout status deployment/$svc -n ecommerce --timeout=300s || true
           done
