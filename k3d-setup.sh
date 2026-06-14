@@ -232,24 +232,18 @@ for svc in "${SERVICES[@]}" frontend; do
   img_latest="${REGISTRY}/${svc}:latest"
   img_sha="${REGISTRY}/${svc}:${MANIFEST_SHA}"
 
-  # 1. Try pulling exact SHA tag from GHCR
-  if [ -n "$MANIFEST_SHA" ] && docker pull "$img_sha" --quiet 2>/dev/null; then
-    k3d image import "$img_sha" -c "$CLUSTER_NAME" 2>/dev/null
-    success "Pulled from GHCR: ${svc}:${MANIFEST_SHA}"
-
-  # 2. Local :latest exists → retag to SHA then import
-  elif [ -n "$MANIFEST_SHA" ] && docker image inspect "$img_latest" &>/dev/null; then
-    docker tag "$img_latest" "$img_sha"
-    k3d image import "$img_sha" -c "$CLUSTER_NAME" 2>/dev/null
-    success "Retagged local image: ${svc}:latest → ${MANIFEST_SHA}"
-
-  # 3. No SHA in manifest → import :latest as-is
-  elif docker image inspect "$img_latest" &>/dev/null; then
-    k3d image import "$img_latest" -c "$CLUSTER_NAME" 2>/dev/null
-    success "Loaded ${svc}:latest"
-
+  # Pull :latest from GHCR (always exists), retag to SHA used in manifests, import
+  if docker pull "$img_latest" --quiet 2>/dev/null; then
+    if [ -n "$MANIFEST_SHA" ]; then
+      docker tag "$img_latest" "$img_sha"
+      k3d image import "$img_sha" -c "$CLUSTER_NAME" 2>/dev/null
+      success "${svc}: GHCR :latest → :${MANIFEST_SHA} imported"
+    else
+      k3d image import "$img_latest" -c "$CLUSTER_NAME" 2>/dev/null
+      success "${svc}: GHCR :latest imported"
+    fi
   else
-    warn "${svc}: no image found locally or on GHCR — pod will stay in ImagePullBackOff"
+    warn "${svc}: could not pull from GHCR — pod will stay in ImagePullBackOff"
   fi
 done
 
