@@ -7,7 +7,10 @@ metadata:
     app: frontend
 spec:
   strategy:
-    type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   replicas: 1
   selector:
     matchLabels:
@@ -23,8 +26,8 @@ spec:
           command: ["sh", "-c", "until nc -z api-gateway 8888; do sleep 5; done"]
       containers:
         - name: frontend
-          image: ghcr.io/hoangtien2k3/frontend:sha-4591820
-          imagePullPolicy: IfNotPresent
+          image: ghcr.io/hoangtien2k3/frontend:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
           env:

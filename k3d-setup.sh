@@ -101,7 +101,7 @@ deploy_and_wait() {
   wait_for_pod "$label" "$name" "$timeout"
 }
 
-# Update /etc/hosts───
+# Update /etc/hosts
 update_hosts() {
   local entry="$1"
   if [ "$OS" = "windows" ]; then
@@ -130,16 +130,6 @@ NAMESPACE="ecommerce"
 REGISTRY="ghcr.io/hoangtien2k3"
 HOSTS_ENTRY="127.0.0.1 ecommerce.local api.ecommerce.local auth.ecommerce.local zipkin.ecommerce.local minio.ecommerce.local"
 
-INFRA_IMAGES=(
-  "postgres:16"
-  "redis:7.4-alpine"
-  "apache/kafka:3.9.0"
-  "docker.elastic.co/elasticsearch/elasticsearch:8.15.0"
-  "minio/minio:latest"
-  "quay.io/keycloak/keycloak:26.0"
-  "openzipkin/zipkin:3"
-)
-
 SERVICES=(
   api-gateway auth-service product-service order-service
   payment-service shipping-service inventory-service favourite-service
@@ -151,7 +141,7 @@ SERVICES=(
 printf "\n"
 printf "${BOLD}${CYAN}╔══════════════════════════════════════════════════╗${NC}\n"
 printf "${BOLD}${CYAN}║   Ecommerce Microservices — k3d Setup            ║${NC}\n"
-printf "${BOLD}${CYAN}╚══════════════════════════════════════════════════╝${NC}\n\n"
+printf "${BOLD}${CYAN}╚══════════════════════════════════════════════════╝${NC}\n"
 
 # 1. Detect OS
 step "1/11 · Detecting environment"
@@ -209,69 +199,8 @@ kubectl wait --namespace ingress-nginx \
   --timeout=120s
 success "Ingress controller ready"
 
-# 7. Pre-load images (parallel pull + single batch import)
-step "7/11 · Pre-loading images into k3d cluster"
-
-# Detect SHA tag from manifests
-MANIFEST_SHA=$(grep -h "image:.*${REGISTRY}" k8s/backend/*.yaml k8s/frontend/*.yaml 2>/dev/null \
-  | grep -o 'sha-[a-f0-9]*' | head -1 || true)
-info "Manifest image tag: ${MANIFEST_SHA:-not detected}"
-
-# ── Pull all images in parallel ───────────────────────────────────────────────
-info "Pulling all images in parallel..."
-declare -a PULL_PIDS=()
-
-for img in "${INFRA_IMAGES[@]}"; do
-  docker pull "$img" --quiet 2>/dev/null &
-  PULL_PIDS+=($!)
-done
-
-for svc in "${SERVICES[@]}" frontend; do
-  docker pull "${REGISTRY}/${svc}:latest" --quiet 2>/dev/null &
-  PULL_PIDS+=($!)
-done
-
-# Wait for all pulls to finish
-PULL_FAILURES=0
-for pid in "${PULL_PIDS[@]}"; do
-  wait "$pid" 2>/dev/null || PULL_FAILURES=$((PULL_FAILURES + 1))
-done
-[ "$PULL_FAILURES" -gt 0 ] && warn "${PULL_FAILURES} image(s) failed to pull — will be pulled at runtime by k3s"
-success "All pulls completed"
-
-# ── Retag service images :latest → :SHA ──────────────────────────────────────
-declare -a IMAGES_TO_IMPORT=()
-
-for img in "${INFRA_IMAGES[@]}"; do
-  docker image inspect "$img" &>/dev/null && IMAGES_TO_IMPORT+=("$img")
-done
-
-for svc in "${SERVICES[@]}" frontend; do
-  img_latest="${REGISTRY}/${svc}:latest"
-  img_sha="${REGISTRY}/${svc}:${MANIFEST_SHA}"
-  if docker image inspect "$img_latest" &>/dev/null; then
-    if [ -n "$MANIFEST_SHA" ]; then
-      docker tag "$img_latest" "$img_sha" 2>/dev/null
-      IMAGES_TO_IMPORT+=("$img_sha")
-    else
-      IMAGES_TO_IMPORT+=("$img_latest")
-    fi
-  else
-    warn "${svc}: image not available — pod may stay in ImagePullBackOff"
-  fi
-done
-
-# ── Single batch import into k3d (tools node started only once) ───────────────
-if [ "${#IMAGES_TO_IMPORT[@]}" -gt 0 ]; then
-  info "Importing ${#IMAGES_TO_IMPORT[@]} images into k3d in one batch..."
-  k3d image import "${IMAGES_TO_IMPORT[@]}" -c "$CLUSTER_NAME"
-  success "All images imported into k3d"
-else
-  warn "No images to import"
-fi
-
-# 8. Namespace + Secrets + ConfigMaps
-step "8/11 · Applying Namespace, Secrets, ConfigMaps"
+# 7. Namespace + Secrets + ConfigMaps
+step "7/10 · Applying Namespace, Secrets, ConfigMaps"
 kubectl apply -f k8s/namespace.yaml
 success "Namespace '${NAMESPACE}' ready"
 
@@ -303,8 +232,8 @@ kubectl create configmap postgres-init-scripts -n "$NAMESPACE" \
   --dry-run=client -o yaml | kubectl apply -f -
 success "ConfigMaps ready"
 
-# 9. Infrastructure
-step "9/11 · Deploying infrastructure"
+# 8. Infrastructure
+step "8/10 · Deploying infrastructure"
 deploy_and_wait k8s/infra/postgres.yaml       postgres       "PostgreSQL"    600s
 deploy_and_wait k8s/infra/redis.yaml          redis          "Redis"         300s
 deploy_and_wait k8s/infra/kafka.yaml          kafka          "Kafka"         300s
@@ -313,8 +242,8 @@ deploy_and_wait k8s/infra/minio.yaml          minio          "MinIO"         300
 deploy_and_wait k8s/infra/keycloak.yaml       keycloak       "Keycloak"      600s
 deploy_and_wait k8s/infra/zipkin.yaml         zipkin         "Zipkin"        300s
 
-# 10. Backend + Frontend + Ingress
-step "10/11 · Deploying backend services & frontend"
+# 9. Backend + Frontend + Ingress
+step "9/10 · Deploying backend services & frontend"
 for yaml in k8s/backend/*.yaml; do
   kubectl apply -f "$yaml"
   info "Applied $(basename "$yaml" .yaml)"
@@ -323,19 +252,19 @@ kubectl apply -f k8s/frontend/frontend.yaml
 kubectl apply -f k8s/ingress/ingress.yaml
 success "All services applied"
 
-# 11. /etc/hosts
-step "11/11 · Updating hosts file"
+# 10. /etc/hosts
+step "10/10 · Updating hosts file"
 update_hosts "$HOSTS_ENTRY"
 
 # Done
 printf "\n"
 printf "${BOLD}${GREEN}╔══════════════════════════════════════════════════╗${NC}\n"
 printf "${BOLD}${GREEN}║          Deployment complete!                    ║${NC}\n"
-printf "${BOLD}${GREEN}╚══════════════════════════════════════════════════╝${NC}\n\n"
-printf "${BOLD}Frontend${NC}       →  http://ecommerce.local:9090\n"
-printf "${BOLD}API Gateway${NC}    →  http://api.ecommerce.local:9090\n"
-printf "${BOLD}Keycloak${NC}       →  http://auth.ecommerce.local:9090\n"
-printf "${BOLD}MinIO Console${NC}  →  http://minio.ecommerce.local:9090\n"
-printf "${BOLD}Zipkin${NC}         →  http://zipkin.ecommerce.local:9090\n\n"
+printf "${BOLD}${GREEN}╚══════════════════════════════════════════════════╝${NC}\n"
+printf "${BOLD}Frontend${NC}     : http://ecommerce.local:9090\n"
+printf "${BOLD}API Gateway${NC}  : http://api.ecommerce.local:9090\n"
+printf "${BOLD}Keycloak${NC}     : http://auth.ecommerce.local:9090\n"
+printf "${BOLD}MinIO Console${NC}: http://minio.ecommerce.local:9090\n"
+printf "${BOLD}Zipkin${NC}       : http://zipkin.ecommerce.local:9090\n\n"
 printf "${YELLOW}Backend services may take an additional 1-2 minutes to fully start.${NC}\n"
 printf "${YELLOW}Monitor: kubectl get pods -n %s -w${NC}\n\n" "$NAMESPACE"

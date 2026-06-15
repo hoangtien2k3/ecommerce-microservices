@@ -7,7 +7,10 @@ metadata:
     app: notification-service
 spec:
   strategy:
-    type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   replicas: 1
   selector:
     matchLabels:
@@ -23,8 +26,8 @@ spec:
           command: ["sh", "-c", "until nc -z kafka 9092; do sleep 5; done"]
       containers:
         - name: notification-service
-          image: ghcr.io/hoangtien2k3/notification-service:sha-4591820
-          imagePullPolicy: IfNotPresent
+          image: ghcr.io/hoangtien2k3/notification-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8090
           envFrom:

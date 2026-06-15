@@ -7,7 +7,10 @@ metadata:
     app: order-service
 spec:
   strategy:
-    type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   replicas: 1
   selector:
     matchLabels:
@@ -26,8 +29,8 @@ spec:
           command: ["sh", "-c", "until nc -z kafka 9092; do sleep 5; done"]
       containers:
         - name: order-service
-          image: ghcr.io/hoangtien2k3/order-service:sha-4591820
-          imagePullPolicy: IfNotPresent
+          image: ghcr.io/hoangtien2k3/order-service:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8084
           envFrom:
