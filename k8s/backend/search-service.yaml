@@ -29,7 +29,7 @@ spec:
           command: ["sh", "-c", "until nc -z kafka 9092; do sleep 5; done"]
       containers:
         - name: search-service
-          image: ghcr.io/hoangtien2k3/search-service:latest
+          image: ghcr.io/hoangtien2k3/search-service:sha-846d2b0
           imagePullPolicy: Always
           ports:
             - containerPort: 8094
