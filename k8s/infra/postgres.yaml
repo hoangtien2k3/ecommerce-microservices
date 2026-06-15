@@ -9,7 +9,6 @@ spec:
   resources:
     requests:
       storage: 10Gi
-
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -77,7 +76,6 @@ spec:
         - name: init-scripts
           configMap:
             name: postgres-init-scripts
-
 ---
 apiVersion: v1
 kind: Service

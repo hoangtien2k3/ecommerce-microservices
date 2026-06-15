@@ -31,8 +31,8 @@ data:
   # Zipkin
   ZIPKIN_URL: "http://zipkin:9411"
 
-  # Hibernate — create/update first deploy
+  # Hibernate
   SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
 
-  # JVM heap limit — prevents OOMKilled in kind (limited RAM)
+  # JVM heap limit
   JAVA_TOOL_OPTIONS: "-Xmx200m -Xms100m -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"

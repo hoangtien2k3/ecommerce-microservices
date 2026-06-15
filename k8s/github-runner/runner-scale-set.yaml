@@ -1,18 +1,3 @@
-# GitHub Actions Runner Scale Set (Actions Runner Controller - ARC)
-# Docs: https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners-with-actions-runner-controller
-#
-# Cách cài:
-#   1. helm install arc ... (xem Makefile target: arc-install)
-#   2. kubectl apply -f k8s/github-runner/runner-secret.yaml  (tạo tay với PAT)
-#   3. helm install arc-runner-set ... (xem Makefile)
-#
-# Runner này chạy trong cluster, có thể:
-#   - kubectl apply trực tiếp
-#   - argocd login qua internal DNS: argocd-server.argocd.svc.cluster.local
-
----
-# Secret chứa GitHub PAT (tạo tay, KHÔNG commit file này có giá trị thật)
-# Tạo PAT tại: github.com/settings/tokens → Fine-grained → repo scope
 apiVersion: v1
 kind: Secret
 metadata:

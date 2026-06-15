@@ -9,7 +9,6 @@ spec:
   resources:
     requests:
       storage: 20Gi
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -68,7 +67,6 @@ spec:
         - name: minio-data
           persistentVolumeClaim:
             claimName: minio-pvc
-
 ---
 apiVersion: v1
 kind: Service

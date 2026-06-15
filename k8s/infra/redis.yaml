@@ -9,7 +9,6 @@ spec:
   resources:
     requests:
       storage: 2Gi
-
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -63,7 +62,6 @@ spec:
         - name: redis-data
           persistentVolumeClaim:
             claimName: redis-pvc
-
 ---
 apiVersion: v1
 kind: Service

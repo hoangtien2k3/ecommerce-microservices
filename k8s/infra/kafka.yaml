@@ -9,7 +9,6 @@ spec:
   resources:
     requests:
       storage: 5Gi
-
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -84,7 +83,6 @@ spec:
         - name: kafka-data
           persistentVolumeClaim:
             claimName: kafka-pvc
-
 ---
 apiVersion: v1
 kind: Service

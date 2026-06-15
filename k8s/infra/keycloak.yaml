@@ -84,7 +84,6 @@ spec:
         - name: keycloak-import
           configMap:
             name: keycloak-realm
-
 ---
 apiVersion: v1
 kind: Service

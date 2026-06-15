@@ -13,6 +13,6 @@ ports:
 options:
   k3s:
     extraArgs:
-      - arg: --disable=traefik      # disable built-in Traefik, we use NGINX
+      - arg: --disable=traefik
         nodeFilters:
           - server:*
