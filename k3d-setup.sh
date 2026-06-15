@@ -144,11 +144,11 @@ printf "${BOLD}${CYAN}║   Ecommerce Microservices — k3d Setup            ║
 printf "${BOLD}${CYAN}╚══════════════════════════════════════════════════╝${NC}\n"
 
 # 1. Detect OS
-step "1/11 · Detecting environment"
+step "1/10 · Detecting environment"
 detect_os_arch
 
 # 2. Docker
-step "2/11 · Checking Docker"
+step "2/10 · Checking Docker"
 command -v docker &>/dev/null \
   || error "Docker not found. Install Docker Desktop at: https://www.docker.com/get-started"
 docker info &>/dev/null \
@@ -156,7 +156,7 @@ docker info &>/dev/null \
 success "Docker is running"
 
 # 3. k3d
-step "3/11 · Checking k3d"
+step "3/10 · Checking k3d"
 if command -v k3d &>/dev/null; then
   success "k3d already installed: $(k3d version | head -1)"
 else
@@ -165,7 +165,7 @@ else
 fi
 
 # 4. kubectl
-step "4/11 · Checking kubectl"
+step "4/10 · Checking kubectl"
 if command -v kubectl &>/dev/null; then
   success "kubectl already installed: $(kubectl version --client 2>/dev/null | head -1)"
 else
@@ -174,9 +174,15 @@ else
 fi
 
 # 5. k3d cluster
-step "5/11 · Setting up k3d cluster"
+step "5/10 · Setting up k3d cluster"
 if k3d cluster list 2>/dev/null | grep -q "^${CLUSTER_NAME}"; then
-  warn "Cluster '${CLUSTER_NAME}' already exists — skipping"
+  if k3d cluster list 2>/dev/null | grep "^${CLUSTER_NAME}" | grep -q "running"; then
+    warn "Cluster '${CLUSTER_NAME}' already running — skipping"
+  else
+    info "Cluster stopped (machine restarted?) — starting it..."
+    k3d cluster start "$CLUSTER_NAME"
+    success "Cluster started"
+  fi
 else
   info "Creating cluster '${CLUSTER_NAME}' with k3d..."
   k3d cluster create --config k3d-config.yaml
@@ -184,13 +190,17 @@ else
 fi
 kubectl config use-context "k3d-${CLUSTER_NAME}"
 
+info "Waiting for API server to be ready..."
+until kubectl get nodes &>/dev/null 2>&1; do sleep 2; done
+success "API server ready"
+
 # 6. NGINX Ingress Controller
-step "6/11 · Installing NGINX Ingress Controller"
+step "6/10 · Installing NGINX Ingress Controller"
 if kubectl get ns ingress-nginx &>/dev/null; then
   warn "ingress-nginx already installed — skipping"
 else
-  # Use cloud/LoadBalancer manifest so k3d's built-in lb picks it up
-  kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
+  kubectl apply --validate=false \
+    -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
 fi
 info "Waiting for ingress controller to be ready..."
 kubectl wait --namespace ingress-nginx \
