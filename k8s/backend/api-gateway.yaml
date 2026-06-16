@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: ghcr.io/hoangtien2k3/api-gateway:sha-ff2d374
+          image: ghcr.io/hoangtien2k3/api-gateway:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8888

@@ -311,9 +311,8 @@ jobs:
         with:
           images: ${{ env.IMAGE_PREFIX }}/frontend
           tags: |
-            type=sha,prefix=sha-,format=short
-            type=ref,event=branch
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            type=ref,event=branch
       - uses: docker/build-push-action@v6
         with:
           context: frontend

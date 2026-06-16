@@ -31,6 +31,7 @@ public record SecurityProperties(
 ) {
 
     private static final List<String> ALWAYS_PUBLIC = List.of(
+            "/actuator/health",
             "/actuator/health/**",
             "/actuator/info",
             "/actuator/prometheus",

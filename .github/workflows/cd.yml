@@ -34,60 +34,10 @@ jobs:
     steps:
       - run: echo "CI passed, proceeding with deploy to ${{ env.ENVIRONMENT }}"
 
-  update-manifests:
-    name: Update image tags
-    needs: check-ci
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
-      contents: write
-    outputs:
-      sha-short: ${{ steps.sha.outputs.short }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 1
-
-      - name: Get short SHA
-        id: sha
-        run: echo "short=sha-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-
-      - name: Update image tags in k8s manifests
-        run: |
-          SHA="${{ steps.sha.outputs.short }}"
-          IMAGE_PREFIX="${{ env.IMAGE_PREFIX }}"
-
-          SERVICES=(
-            api-gateway auth-service product-service
-            order-service payment-service shipping-service inventory-service
-            favourite-service rating-service notification-service media-service
-            search-service promotion-service tax-service frontend
-          )
-
-          for svc in "${SERVICES[@]}"; do
-            find k8s/ -name "*.yaml" -exec \
-              sed -i "s|${IMAGE_PREFIX}/${svc}:[^ ]*|${IMAGE_PREFIX}/${svc}:${SHA}|g" {} \;
-          done
-
-          echo "Updated all image tags to: $SHA"
-          git diff k8s/ || true
-
-      - name: Commit manifest changes
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add k8s/
-          git diff --staged --quiet \
-            || git commit -m "ci: update images to ${{ steps.sha.outputs.short }} [skip ci]"
-          git push
-
   # Deploy: ArgoCD
   deploy-argocd:
     name: Deploy via ArgoCD
-    needs: update-manifests
+    needs: check-ci
     runs-on: arc-runner-set
     timeout-minutes: 15
     environment:
@@ -110,7 +60,7 @@ jobs:
   # Deploy: kubectl direct
   deploy-kubectl:
     name: Deploy via kubectl
-    needs: update-manifests
+    needs: check-ci
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment:
@@ -145,6 +95,18 @@ jobs:
       - name: Apply ingress
         run: kubectl apply -f k8s/ingress/ || true
 
+      - name: Rollout restart all services
+        run: |
+          SERVICES=(
+            api-gateway auth-service product-service
+            order-service payment-service shipping-service inventory-service
+            favourite-service rating-service notification-service media-service
+            search-service promotion-service tax-service frontend
+          )
+          for svc in "${SERVICES[@]}"; do
+            kubectl rollout restart deployment/$svc -n ecommerce || true
+          done
+
       - name: Wait for rollout
         run: |
           for svc in api-gateway auth-service product-service \
@@ -165,6 +127,6 @@ jobs:
       - name: Deployment summary
         run: |
           echo "## Deployment to ${{ env.ENVIRONMENT }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **SHA**: ${{ needs.update-manifests.outputs.sha-short }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Image tag**: latest" >> $GITHUB_STEP_SUMMARY
           echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Time**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY

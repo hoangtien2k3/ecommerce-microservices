@@ -26,7 +26,7 @@ spec:
           command: ["sh", "-c", "until nc -z api-gateway 8888; do sleep 5; done"]
       containers:
         - name: frontend
-          image: ghcr.io/hoangtien2k3/frontend:sha-ff2d374
+          image: ghcr.io/hoangtien2k3/frontend:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 3000

@@ -44,16 +44,13 @@ jobs:
       - name: Generate image metadata
         id: meta
         run: |
-          SHA="sha-$(git rev-parse --short HEAD)"
           IMAGE="ghcr.io/${{ github.repository_owner }}/${{ inputs.service }}"
           echo "image=${IMAGE}" >> $GITHUB_OUTPUT
-          echo "sha=${SHA}" >> $GITHUB_OUTPUT
 
-          TAGS="${SHA}"
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            TAGS="${TAGS},latest"
-          elif [[ "${{ github.ref_type }}" == "branch" ]]; then
-            TAGS="${TAGS},${{ github.ref_name }}"
+            TAGS="latest"
+          else
+            TAGS="${{ github.ref_name }}"
           fi
           echo "tags=${TAGS}" >> $GITHUB_OUTPUT
 
@@ -76,7 +73,7 @@ jobs:
             mvn -pl ${{ inputs.service }} -am \
               package jib:build \
               -DskipTests -B \
-              -Djib.to.image=${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.sha }} \
+              -Djib.to.image=${{ steps.meta.outputs.image }} \
               -Djib.to.tags=${{ steps.meta.outputs.tags }} \
               -Djib.container.ports=${{ inputs.port }} \
             && { SUCCESS=true; break; }
@@ -97,4 +94,4 @@ jobs:
             -Djib.container.ports=${{ inputs.port }}
 
       - name: Image digest
-        run: echo "Pushed ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.sha }}"
+        run: echo "Pushed ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tags }}"
