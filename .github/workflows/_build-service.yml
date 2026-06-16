@@ -74,7 +74,7 @@ jobs:
           SUCCESS=false
           for i in 1 2 3; do
             mvn -pl ${{ inputs.service }} -am \
-              compile jib:build \
+              package jib:build \
               -DskipTests -B \
               -Djib.to.image=${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.sha }} \
               -Djib.to.tags=${{ steps.meta.outputs.tags }} \
@@ -91,7 +91,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           mvn -pl ${{ inputs.service }} -am \
-            compile jib:buildTar \
+            package jib:buildTar \
             -DskipTests -B \
             -Djib.to.image=${{ steps.meta.outputs.image }}:pr-check \
             -Djib.container.ports=${{ inputs.port }}

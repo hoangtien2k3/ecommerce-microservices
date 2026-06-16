@@ -16,7 +16,7 @@ on:
 
 concurrency:
   group: cd-${{ github.ref }}
-  cancel-in-progress: false   # never cancel a deploy mid-flight
+  cancel-in-progress: false
 
 env:
   REGISTRY: ghcr.io
