@@ -10,7 +10,7 @@
     </parent>
     <artifactId>auth-service</artifactId>
     <name>auth-service</name>
-    <description>Authentication + user management. Delegates identity to Keycloak.</description>
+    <description>Authentication user management. Delegates identity to Keycloak.</description>
     <dependencies>
         <dependency>
             <groupId>com.ecommerce.microservices</groupId>
