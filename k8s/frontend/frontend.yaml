@@ -31,7 +31,7 @@ spec:
           ports:
             - containerPort: 3000
           env:
-            - name: NEXT_PUBLIC_API_URL
+            - name: INTERNAL_API_URL
               value: http://api-gateway:8888
             - name: NODE_ENV
               value: production
