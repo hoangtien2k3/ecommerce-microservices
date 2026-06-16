@@ -26,7 +26,7 @@ spec:
           command: ["sh", "-c", "until nc -z keycloak 8080; do sleep 5; done"]
       containers:
         - name: auth-service
-          image: ghcr.io/hoangtien2k3/auth-service:sha-846d2b0
+          image: ghcr.io/hoangtien2k3/auth-service:sha-ff2d374
           imagePullPolicy: Always
           ports:
             - containerPort: 8088
