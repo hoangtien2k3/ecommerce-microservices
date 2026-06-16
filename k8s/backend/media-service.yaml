@@ -29,7 +29,7 @@ spec:
           command: ["sh", "-c", "until nc -z minio 9000; do sleep 3; done"]
       containers:
         - name: media-service
-          image: ghcr.io/hoangtien2k3/media-service:sha-846d2b0
+          image: ghcr.io/hoangtien2k3/media-service:sha-ff2d374
           imagePullPolicy: Always
           ports:
             - containerPort: 8083
