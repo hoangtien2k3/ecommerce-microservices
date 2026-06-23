@@ -18,7 +18,7 @@
         </dependency>
         <dependency>
             <groupId>com.ecommerce.microservices</groupId>
-            <artifactId>common-spring</artifactId>
+            <artifactId>common-storage</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

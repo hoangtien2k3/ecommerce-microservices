@@ -71,6 +71,7 @@
         <sonar.organization>hoangtien2k3</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <spring-dotenv.version>4.0.0</spring-dotenv.version>
+        <aws-sdk.version>2.31.6</aws-sdk.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -85,9 +86,41 @@
                 <version>${revision}</version>
             </dependency>
             <dependency>
+                <groupId>com.ecommerce.microservices</groupId>
+                <artifactId>common-storage</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ecommerce.microservices</groupId>
+                <artifactId>common-security</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ecommerce.microservices</groupId>
+                <artifactId>common-logging</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ecommerce.microservices</groupId>
+                <artifactId>common-keycloak</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ecommerce.microservices</groupId>
+                <artifactId>common-kafka</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
                 <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>${aws-sdk.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

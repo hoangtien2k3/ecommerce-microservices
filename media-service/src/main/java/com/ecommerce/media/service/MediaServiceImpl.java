@@ -1,17 +1,18 @@
 package com.ecommerce.media.service;
 
+import com.ecommerce.commonlib.storage.ObjectStorageService;
+import com.ecommerce.commonlib.storage.StorageObject;
 import com.ecommerce.media.mapper.MediaVmMapper;
 import com.ecommerce.media.model.Media;
 import com.ecommerce.media.model.dto.MediaDto;
 import com.ecommerce.media.model.dto.MediaDto.MediaDtoBuilder;
-import com.ecommerce.media.repository.FileSystemRepository;
 import com.ecommerce.media.repository.MediaRepository;
 import com.ecommerce.media.utils.StringUtils;
 import com.ecommerce.media.viewmodel.MediaPostVm;
 import com.ecommerce.media.viewmodel.MediaVm;
 import com.ecommerce.media.viewmodel.NoFileMediaVm;
-import java.io.InputStream;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +26,7 @@ public class MediaServiceImpl implements MediaService {
 
     private final MediaVmMapper mediaVmMapper;
     private final MediaRepository mediaRepository;
-    private final FileSystemRepository fileSystemRepository;
+    private final ObjectStorageService objectStorageService;
     @Value("${hoangtien2k3.publicUrl:http://localhost:8083}")
     private String publicUrl;
 
@@ -41,17 +42,27 @@ public class MediaServiceImpl implements MediaService {
         } else {
             media.setFileName(mediaPostVm.multipartFile().getOriginalFilename());
         }
-        String filePath = fileSystemRepository.persistFile(media.getFileName(),
-            mediaPostVm.multipartFile().getBytes());
-        media.setFilePath(filePath);
+
+        String objectKey = buildObjectKey(media.getFileName());
+        objectStorageService.upload(
+            objectKey,
+            mediaPostVm.multipartFile().getBytes(),
+            media.getMediaType());
+        media.setFilePath(objectKey);
 
         return mediaRepository.save(media);
     }
 
     @Override
     public void removeMedia(Long id) {
-        NoFileMediaVm noFileMediaVm = mediaRepository.findByIdWithoutFileInReturn(id);
+        Media media = mediaRepository.findById(id).orElse(null);
+        if (media == null) {
+            return;
+        }
         try {
+            if (StringUtils.hasText(media.getFilePath())) {
+                objectStorageService.delete(media.getFilePath());
+            }
             mediaRepository.deleteById(id);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -85,10 +96,10 @@ public class MediaServiceImpl implements MediaService {
             return builder.build();
         }
         MediaType mediaType = MediaType.valueOf(media.getMediaType());
-        InputStream fileContent = fileSystemRepository.getFile(media.getFilePath());
+        StorageObject storageObject = objectStorageService.download(media.getFilePath());
 
         return builder
-            .content(fileContent)
+            .content(storageObject.getContent())
             .mediaType(mediaType)
             .build();
     }
@@ -101,6 +112,11 @@ public class MediaServiceImpl implements MediaService {
                     String url = getMediaUrl(media.getId(), media.getFileName());
                     media.setUrl(url);
                 }).toList();
+    }
+
+    private String buildObjectKey(String fileName) {
+        String safeName = fileName == null ? "file" : fileName.replaceAll("[^a-zA-Z0-9._-]", "_");
+        return UUID.randomUUID() + "-" + safeName;
     }
 
     private String getMediaUrl(Long mediaId, String fileName) {

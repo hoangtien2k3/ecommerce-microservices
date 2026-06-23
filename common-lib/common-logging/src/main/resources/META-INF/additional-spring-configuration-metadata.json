@@ -1,0 +1,19 @@
+{
+  "groups": [
+    { "name": "ecommerce.web.logging.performance", "description": "AOP @LogPerformance settings." }
+  ],
+  "properties": [
+    {
+      "name": "ecommerce.web.logging.performance.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable AOP @LogPerformance aspect.",
+      "defaultValue": true
+    },
+    {
+      "name": "ecommerce.web.logging.performance.threshold-ms",
+      "type": "java.lang.Long",
+      "description": "Log only when execution exceeds this threshold. Fast calls are silent.",
+      "defaultValue": 50
+    }
+  ]
+}

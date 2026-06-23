@@ -1,0 +1,25 @@
+{
+  "groups": [
+    { "name": "ecommerce.security", "description": "Resource-server security (JWT + public path allow-list)." }
+  ],
+  "properties": [
+    {
+      "name": "ecommerce.security.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable platform JWT resource-server config.",
+      "defaultValue": true
+    },
+    {
+      "name": "ecommerce.security.csrf-disabled",
+      "type": "java.lang.Boolean",
+      "description": "Disable CSRF (stateless JWT auth).",
+      "defaultValue": true
+    },
+    {
+      "name": "ecommerce.security.stateless-session",
+      "type": "java.lang.Boolean",
+      "description": "Force SessionCreationPolicy.STATELESS.",
+      "defaultValue": true
+    }
+  ]
+}

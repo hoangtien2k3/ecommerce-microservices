@@ -24,9 +24,9 @@ spec:
         - name: wait-for-postgres
           image: busybox
           command: ["sh", "-c", "until nc -z postgres 5432; do sleep 3; done"]
-        - name: wait-for-floci
+        - name: wait-for-rustfs
           image: busybox
-          command: ["sh", "-c", "until nc -z floci 4566; do sleep 3; done"]
+          command: ["sh", "-c", "until nc -z rustfs 9000; do sleep 3; done"]
       securityContext:
         seccompProfile:
           type: RuntimeDefault

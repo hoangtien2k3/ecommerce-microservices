@@ -1,6 +1,5 @@
 package com.ecommerce.commonlib.autoconfigure;
 
-import com.ecommerce.commonlib.logging.LoggerAspect;
 import com.ecommerce.commonlib.web.cors.CorsAutoConfigurer;
 import com.ecommerce.commonlib.web.cors.CorsProperties;
 import com.ecommerce.commonlib.web.exception.ApiExceptionHandler;
@@ -8,7 +7,6 @@ import com.ecommerce.commonlib.web.filter.CorrelationIdFilter;
 import com.ecommerce.commonlib.web.filter.HttpLogProperties;
 import com.ecommerce.commonlib.web.filter.HttpLoggingFilter;
 import jakarta.servlet.Servlet;
-import org.aspectj.lang.annotation.Aspect;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -59,14 +57,5 @@ public class WebAutoConfiguration {
     @ConditionalOnMissingBean(CorsAutoConfigurer.class)
     public CorsAutoConfigurer commonCorsConfigurer(CorsProperties props) {
         return new CorsAutoConfigurer(props);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean(LoggerAspect.class)
-    @ConditionalOnClass(Aspect.class)
-    @ConditionalOnProperty(prefix = "ecommerce.web.logging.performance", name = "enabled",
-            havingValue = "true", matchIfMissing = true)
-    public LoggerAspect loggerAspect(HttpLogProperties props) {
-        return new LoggerAspect(props);
     }
 }

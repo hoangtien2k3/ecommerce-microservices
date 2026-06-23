@@ -1,8 +1,6 @@
 com.ecommerce.commonlib.autoconfigure.I18nAutoConfiguration
 com.ecommerce.commonlib.autoconfigure.WebAutoConfiguration
 com.ecommerce.commonlib.autoconfigure.RestClientAutoConfiguration
-com.ecommerce.commonlib.autoconfigure.SecurityAutoConfiguration
 com.ecommerce.commonlib.autoconfigure.JpaAutoConfiguration
-com.ecommerce.commonlib.autoconfigure.KeycloakAdminAutoConfiguration
 com.ecommerce.commonlib.autoconfigure.OpenApiAutoConfiguration
 com.ecommerce.commonlib.autoconfigure.ModelMapperAutoConfiguration

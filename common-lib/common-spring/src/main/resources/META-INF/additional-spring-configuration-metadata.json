@@ -1,39 +1,19 @@
 {
   "groups": [
     { "name": "ecommerce.cors",                   "description": "Cross-origin resource sharing." },
-    { "name": "ecommerce.security",               "description": "Resource-server security (JWT + public path allow-list)." },
     { "name": "ecommerce.i18n",                   "description": "i18n message-source configuration." },
     { "name": "ecommerce.openapi",                "description": "OpenAPI metadata (title, version, description)." },
     { "name": "ecommerce.web.correlation",        "description": "X-Correlation-Id / X-Request-Id propagation filter." },
     { "name": "ecommerce.web.exception-handler",  "description": "Global RestControllerAdvice → ApiResponse envelope." },
-    { "name": "ecommerce.web.logging",            "description": "HTTP access log + AOP performance log." },
+    { "name": "ecommerce.web.logging",            "description": "HTTP access log settings." },
     { "name": "ecommerce.web.logging.request",    "description": "Inbound request log settings." },
-    { "name": "ecommerce.web.logging.response",   "description": "Outbound response log settings." },
-    { "name": "ecommerce.web.logging.performance","description": "AOP @LogPerformance settings." }
+    { "name": "ecommerce.web.logging.response",   "description": "Outbound response log settings." }
   ],
   "properties": [
     {
       "name": "ecommerce.cors.enabled",
       "type": "java.lang.Boolean",
       "description": "Enable platform CORS filter.",
-      "defaultValue": true
-    },
-    {
-      "name": "ecommerce.security.enabled",
-      "type": "java.lang.Boolean",
-      "description": "Enable platform JWT resource-server config.",
-      "defaultValue": true
-    },
-    {
-      "name": "ecommerce.security.csrf-disabled",
-      "type": "java.lang.Boolean",
-      "description": "Disable CSRF (stateless JWT auth).",
-      "defaultValue": true
-    },
-    {
-      "name": "ecommerce.security.stateless-session",
-      "type": "java.lang.Boolean",
-      "description": "Force SessionCreationPolicy.STATELESS.",
       "defaultValue": true
     },
     {
@@ -83,18 +63,6 @@
       "type": "java.lang.Integer",
       "description": "Maximum bytes to log from the response body.",
       "defaultValue": 2048
-    },
-    {
-      "name": "ecommerce.web.logging.performance.enabled",
-      "type": "java.lang.Boolean",
-      "description": "Enable AOP @LogPerformance aspect.",
-      "defaultValue": true
-    },
-    {
-      "name": "ecommerce.web.logging.performance.threshold-ms",
-      "type": "java.lang.Long",
-      "description": "Log only when execution exceeds this threshold. Fast calls are silent.",
-      "defaultValue": 50
     }
   ]
 }

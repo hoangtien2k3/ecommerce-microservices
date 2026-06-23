@@ -6,7 +6,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 /**
- * Configuration for HTTP request/response and AOP performance logging.
+ * Configuration for HTTP request/response logging.
+ *
+ * <p>AOP performance logging ({@code ecommerce.web.logging.performance.*}) lives in the
+ * {@code common-logging} module's {@code PerformanceLogProperties}.</p>
  *
  * <pre>{@code
  * ecommerce:
@@ -20,9 +23,6 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
  *         enabled: true
  *         include-body: false
  *         max-body-bytes: 2048
- *       performance:
- *         enabled: true
- *         threshold-ms: 50
  * }</pre>
  */
 @Getter
@@ -35,9 +35,6 @@ public class HttpLogProperties {
 
     @NestedConfigurationProperty
     private Response response = new Response();
-
-    @NestedConfigurationProperty
-    private Performance performance = new Performance();
 
     @Getter
     @Setter
@@ -54,13 +51,5 @@ public class HttpLogProperties {
         /** Off by default — response bodies can be large; enable only when debugging. */
         private boolean includeBody = false;
         private int maxBodyBytes = 2048;
-    }
-
-    @Getter
-    @Setter
-    public static class Performance {
-        private boolean enabled = true;
-        /** Only log if execution exceeds this threshold. Avoids noise for fast calls. */
-        private long thresholdMs = 50;
     }
 }

@@ -32,10 +32,16 @@ spring:
         jwt:
           issuer-uri: ${JWT_ISSUER_URI:http://localhost:8080/realms/ecommerce}
 ---
-minio:
-  endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
-  access-key: ${MINIO_ACCESS_KEY:admin}
-  secret-key: ${MINIO_SECRET_KEY:ecommerce@!@#}
+ecommerce:
+  storage:
+    endpoint: ${STORAGE_ENDPOINT:http://localhost:9000}
+    region: ${STORAGE_REGION:us-east-1}
+    access-key: ${STORAGE_ACCESS_KEY:rustfsadmin}
+    secret-key: ${STORAGE_SECRET_KEY:rustfsadmin}
+    bucket: ${STORAGE_BUCKET:ecommerce-media}
+    path-style-access: true
+    auto-create-bucket: true
+    presign-duration: 1h
 ---
 management:
   endpoints:

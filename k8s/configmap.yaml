@@ -25,8 +25,8 @@ data:
   # Elasticsearch
   ELASTICSEARCH_URL: "http://elasticsearch:9200"
 
-  # Object storage (floci - S3-compatible)
-  STORAGE_ENDPOINT: "http://floci:4566"
+  # Object storage (RustFS - S3-compatible)
+  STORAGE_ENDPOINT: "http://rustfs:9000"
   STORAGE_REGION: "us-east-1"
   STORAGE_BUCKET: "ecommerce-media"
 

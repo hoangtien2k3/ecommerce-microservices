@@ -1,7 +1,5 @@
-package com.ecommerce.commonlib.autoconfigure;
+package com.ecommerce.commonlib.security;
 
-import com.ecommerce.commonlib.security.BaseSecurityConfig;
-import com.ecommerce.commonlib.security.SecurityProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

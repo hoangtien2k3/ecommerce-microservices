@@ -71,14 +71,14 @@ spec:
                 port:
                   number: 9411
 
-    # floci (S3-compatible object storage API)
-    - host: floci.ecommerce.local
+    # rustfs (S3-compatible object storage API)
+    - host: rustfs.ecommerce.local
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: floci
+                name: rustfs
                 port:
-                  number: 4566
+                  number: 9000

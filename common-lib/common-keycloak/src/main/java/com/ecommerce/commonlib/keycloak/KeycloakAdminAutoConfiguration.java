@@ -1,7 +1,5 @@
-package com.ecommerce.commonlib.autoconfigure;
+package com.ecommerce.commonlib.keycloak;
 
-import com.ecommerce.commonlib.keycloak.KeycloakAuthClient;
-import com.ecommerce.commonlib.keycloak.KeycloakClientProperties;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -23,7 +21,7 @@ import org.springframework.web.client.RestClient;
  *
  * <p>Only activates when {@code keycloak.client.admin-username} is set.</p>
  */
-@AutoConfiguration(after = RestClientAutoConfiguration.class)
+@AutoConfiguration(afterName = "com.ecommerce.commonlib.autoconfigure.RestClientAutoConfiguration")
 @ConditionalOnClass({RestClient.class, CloseableHttpClient.class})
 @ConditionalOnProperty(prefix = "keycloak.client", name = "admin-username")
 @EnableConfigurationProperties(KeycloakClientProperties.class)

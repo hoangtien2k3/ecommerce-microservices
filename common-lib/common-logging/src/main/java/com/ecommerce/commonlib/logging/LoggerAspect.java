@@ -1,7 +1,6 @@
 package com.ecommerce.commonlib.logging;
 
 import com.ecommerce.commonlib.constants.MdcKey;
-import com.ecommerce.commonlib.web.filter.HttpLogProperties;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -16,7 +15,7 @@ import java.util.Arrays;
 /**
  * AOP aspect for {@link LogPerformance} and {@link Loggable} annotations.
  *
- * <p>Registered as a bean by {@code WebAutoConfiguration} — NOT via {@code @Component} —
+ * <p>Registered as a bean by {@code LoggingAutoConfiguration} — NOT via {@code @Component} —
  * so it is discovered regardless of the service's component-scan base package.
  *
  * <h3>Performance log format (INFO via "perfLogger")</h3>
@@ -37,7 +36,7 @@ public class LoggerAspect {
     private static final Logger perfLog = LoggerFactory.getLogger("perfLogger");
     private static final Logger log     = LoggerFactory.getLogger(LoggerAspect.class);
 
-    private final HttpLogProperties props;
+    private final PerformanceLogProperties props;
 
     // ----------------------------------------------------------------
     // @LogPerformance — duration + optional input/output
@@ -54,7 +53,7 @@ public class LoggerAspect {
         try {
             Object result = pjp.proceed();
             long duration = System.currentTimeMillis() - start;
-            if (duration >= props.getPerformance().getThresholdMs()) {
+            if (duration >= props.getThresholdMs()) {
                 String inputs  = logPerformance.logInput()  ? stringify(pjp.getArgs()) : "-";
                 String output  = logPerformance.logOutput() ? stringify(result)         : "-";
                 logPerf(action, title, duration, LogField.SUCCESS, inputs, output);
