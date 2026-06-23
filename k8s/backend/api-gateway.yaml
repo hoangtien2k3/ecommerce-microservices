@@ -20,10 +20,20 @@ spec:
       labels:
         app: api-gateway
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        runAsNonRoot: true
       containers:
         - name: api-gateway
           image: ghcr.io/hoangtien2k3/api-gateway:latest
           imagePullPolicy: Always
+          terminationMessagePolicy: FallbackToLogsOnError
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            privileged: false
           ports:
             - containerPort: 8888
           envFrom:
@@ -40,23 +50,22 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: POSTGRES_PASSWORD
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8888
+            periodSeconds: 10
+            failureThreshold: 30
           readinessProbe:
             httpGet:
               path: /actuator/health
               port: 8888
-            initialDelaySeconds: 40
             periodSeconds: 10
-            failureThreshold: 15
-          livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8888
-            initialDelaySeconds: 120
-            periodSeconds: 15
+            failureThreshold: 3
           resources:
             requests:
               memory: "512Mi"
-              cpu: "50m"
+              cpu: "250m"
             limits:
               memory: "512Mi"
               cpu: "1000m"
@@ -67,9 +76,9 @@ metadata:
   name: api-gateway
   namespace: ecommerce
 spec:
+  type: ClusterIP
   selector:
     app: api-gateway
   ports:
     - port: 8888
       targetPort: 8888
-  type: ClusterIP

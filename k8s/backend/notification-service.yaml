@@ -24,10 +24,20 @@ spec:
         - name: wait-for-kafka
           image: busybox
           command: ["sh", "-c", "until nc -z kafka 9092; do sleep 5; done"]
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        runAsNonRoot: true
       containers:
         - name: notification-service
           image: ghcr.io/hoangtien2k3/notification-service:latest
           imagePullPolicy: Always
+          terminationMessagePolicy: FallbackToLogsOnError
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            privileged: false
           ports:
             - containerPort: 8090
           envFrom:
@@ -54,23 +64,22 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: POSTGRES_PASSWORD
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8090
+            periodSeconds: 10
+            failureThreshold: 30
           readinessProbe:
             httpGet:
               path: /actuator/health
               port: 8090
-            initialDelaySeconds: 40
             periodSeconds: 10
-            failureThreshold: 15
-          livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8090
-            initialDelaySeconds: 120
-            periodSeconds: 15
+            failureThreshold: 3
           resources:
             requests:
               memory: "512Mi"
-              cpu: "50m"
+              cpu: "250m"
             limits:
               memory: "512Mi"
               cpu: "1000m"
@@ -81,6 +90,7 @@ metadata:
   name: notification-service
   namespace: ecommerce
 spec:
+  type: ClusterIP
   selector:
     app: notification-service
   ports:

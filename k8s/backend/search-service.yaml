@@ -27,10 +27,20 @@ spec:
         - name: wait-for-kafka
           image: busybox
           command: ["sh", "-c", "until nc -z kafka 9092; do sleep 5; done"]
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        runAsNonRoot: true
       containers:
         - name: search-service
           image: ghcr.io/hoangtien2k3/search-service:latest
           imagePullPolicy: Always
+          terminationMessagePolicy: FallbackToLogsOnError
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            privileged: false
           ports:
             - containerPort: 8094
           envFrom:
@@ -41,23 +51,22 @@ spec:
               value: ""
             - name: ELASTICSEARCH_PASSWORD
               value: ""
+          startupProbe:
+            httpGet:
+              path: /search/actuator/health
+              port: 8094
+            periodSeconds: 10
+            failureThreshold: 30
           readinessProbe:
             httpGet:
               path: /search/actuator/health
               port: 8094
-            initialDelaySeconds: 40
             periodSeconds: 10
-            failureThreshold: 15
-          livenessProbe:
-            httpGet:
-              path: /search/actuator/health
-              port: 8094
-            initialDelaySeconds: 120
-            periodSeconds: 15
+            failureThreshold: 3
           resources:
             requests:
               memory: "512Mi"
-              cpu: "50m"
+              cpu: "250m"
             limits:
               memory: "512Mi"
               cpu: "1000m"
@@ -68,6 +77,7 @@ metadata:
   name: search-service
   namespace: ecommerce
 spec:
+  type: ClusterIP
   selector:
     app: search-service
   ports:

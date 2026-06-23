@@ -71,14 +71,14 @@ spec:
                 port:
                   number: 9411
 
-    # MinIO Console
-    - host: minio.ecommerce.local
+    # floci (S3-compatible object storage API)
+    - host: floci.ecommerce.local
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: minio
+                name: floci
                 port:
-                  number: 9001
+                  number: 4566

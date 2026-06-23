@@ -24,10 +24,20 @@ spec:
         - name: wait-for-postgres
           image: busybox
           command: ["sh", "-c", "until nc -z postgres 5432; do sleep 3; done"]
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        runAsNonRoot: true
       containers:
         - name: shipping-service
           image: ghcr.io/hoangtien2k3/shipping-service:latest
           imagePullPolicy: Always
+          terminationMessagePolicy: FallbackToLogsOnError
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            privileged: false
           ports:
             - containerPort: 8087
           envFrom:
@@ -46,23 +56,22 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: POSTGRES_PASSWORD
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8087
+            periodSeconds: 10
+            failureThreshold: 30
           readinessProbe:
             httpGet:
               path: /actuator/health
               port: 8087
-            initialDelaySeconds: 40
             periodSeconds: 10
-            failureThreshold: 15
-          livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8087
-            initialDelaySeconds: 120
-            periodSeconds: 15
+            failureThreshold: 3
           resources:
             requests:
               memory: "512Mi"
-              cpu: "50m"
+              cpu: "250m"
             limits:
               memory: "512Mi"
               cpu: "1000m"
@@ -73,6 +82,7 @@ metadata:
   name: shipping-service
   namespace: ecommerce
 spec:
+  type: ClusterIP
   selector:
     app: shipping-service
   ports:
