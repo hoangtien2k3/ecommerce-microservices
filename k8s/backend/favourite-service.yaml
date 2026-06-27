@@ -25,7 +25,6 @@ spec:
           image: busybox
           command: ["sh", "-c", "until nc -z postgres 5432; do sleep 3; done"]
           securityContext:
-            runAsNonRoot: true
             runAsUser: 65534
             allowPrivilegeEscalation: false
             capabilities:
@@ -33,7 +32,6 @@ spec:
       securityContext:
         seccompProfile:
           type: RuntimeDefault
-        runAsNonRoot: true
       containers:
         - name: favourite-service
           image: ghcr.io/hoangtien2k3/favourite-service:latest

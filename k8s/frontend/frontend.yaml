@@ -23,7 +23,6 @@ spec:
       securityContext:
         seccompProfile:
           type: RuntimeDefault
-        runAsNonRoot: true
       containers:
         - name: frontend
           image: ghcr.io/hoangtien2k3/frontend:latest
