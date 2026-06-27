@@ -20,7 +20,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * Wires every web-tier cross-cutter for servlet-stack services:
  * correlation-id filter, HTTP logging filter, CORS, global exception handler.
  *
- * <p>Skipped automatically for reactive runtimes (api-gateway) because of
+ * <p>Skipped automatically for reactive runtimes because of
  * {@code @ConditionalOnWebApplication(type = SERVLET)}.</p>
  */
 @AutoConfiguration(after = I18nAutoConfiguration.class)

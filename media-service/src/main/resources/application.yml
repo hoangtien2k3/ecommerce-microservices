@@ -1,6 +1,8 @@
 server:
   port: 8083
   shutdown: graceful
+  servlet:
+    context-path: /media
 ---
 spring:
   application:
@@ -44,6 +46,8 @@ ecommerce:
     presign-duration: 1h
 ---
 management:
+  server:
+    port: ${MANAGEMENT_PORT:9000}
   endpoints:
     web:
       exposure:

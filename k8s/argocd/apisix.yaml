@@ -1,0 +1,56 @@
+# Installs the Apache APISIX stack — gateway (data plane) + etcd + the APISIX
+# Ingress Controller (which watches ApisixRoute/ApisixPluginConfig/ApisixGlobalRule
+# CRDs in k8s/gateway/ and syncs them into APISIX automatically).
+#
+# Bootstrap this Application BEFORE the main `ecommerce-dev` app so the CRDs exist
+# before k8s/gateway/*.yaml is applied:
+#   kubectl apply -f k8s/argocd/apisix.yaml
+#
+# Verify the chart version / values against the chart you pull:
+#   helm repo add apisix https://apache.github.io/apisix-helm-chart
+#   helm show values apisix/apisix
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: apisix
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://apache.github.io/apisix-helm-chart
+    chart: apisix
+    targetRevision: 2.15.0
+    helm:
+      releaseName: apisix
+      values: |
+        # APISIX data plane (etcd-backed). APISIX is the single edge for the API —
+        # exposed directly (no second proxy in front). Swap to an internal LB /
+        # add cloud-LB annotations as needed.
+        service:
+          type: LoadBalancer
+        etcd:
+          enabled: true          # bundled etcd — raise replicaCount + PVs for prod HA
+        # Bundle + enable the Ingress Controller that reconciles the CRDs.
+        ingress-controller:
+          enabled: true
+          config:
+            apisix:
+              serviceNamespace: ecommerce
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ecommerce
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true      # APISIX CRDs are large — needs SSA
+    retry:
+      limit: 5
+      backoff:
+        duration: 15s
+        factor: 2
+        maxDuration: 5m

@@ -1,0 +1,116 @@
+# =============================================================================
+# Apache APISIX — API gateway for the LOCAL k3d cluster, run in STANDALONE mode
+# (no etcd, no Helm, no APISIX Ingress Controller / CRDs).
+#
+# It reads its whole configuration from two files mounted as ConfigMaps, which
+# k3d-setup.sh creates straight from the single-source-of-truth files:
+#   deploy/apisix/config.yaml   -> configmap apisix-config   (core config)
+#   deploy/apisix/apisix.yaml   -> configmap apisix-routes   (routes/upstreams/plugins)
+#
+# A real cluster instead runs APISIX via the Ingress Controller (Helm/ArgoCD,
+# see k8s/argocd/apisix.yaml) reconciling the ApisixRoute CRDs in k8s/gateway/.
+# =============================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apisix
+  namespace: ecommerce
+  labels:
+    app: apisix
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apisix
+  template:
+    metadata:
+      labels:
+        app: apisix
+    spec:
+      containers:
+        - name: apisix
+          image: apache/apisix:3.9.1-debian
+          ports:
+            - name: proxy
+              containerPort: 9080
+            - name: metrics
+              containerPort: 9091
+          env:
+            # ecommerce-client is a PUBLIC Keycloak client (no secret); APISIX
+            # validates bearer JWTs via JWKS, so this is only a schema placeholder.
+            - name: KEYCLOAK_CLIENT_SECRET
+              value: changeme-ecommerce-client-secret
+          volumeMounts:
+            - name: apisix-config
+              mountPath: /usr/local/apisix/conf/config.yaml
+              subPath: config.yaml
+              readOnly: true
+            - name: apisix-routes
+              mountPath: /usr/local/apisix/conf/apisix.yaml
+              subPath: apisix.yaml
+              readOnly: true
+          readinessProbe:
+            tcpSocket:
+              port: 9080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 9080
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "1000m"
+      volumes:
+        - name: apisix-config
+          configMap:
+            name: apisix-config
+        - name: apisix-routes
+          configMap:
+            name: apisix-routes
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: apisix-gateway
+  namespace: ecommerce
+  labels:
+    app: apisix
+spec:
+  type: ClusterIP
+  selector:
+    app: apisix
+  ports:
+    - name: proxy
+      port: 9080
+      targetPort: 9080
+---
+# Local k3d edge: publish APISIX to the browser through the NGINX ingress, since
+# k3d only exposes the ingress on host port 9090. Production fronts APISIX with
+# its own LoadBalancer instead (k8s/ingress/ingress.yaml documents this).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: apisix-api
+  namespace: ecommerce
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: api.ecommerce.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: apisix-gateway
+                port:
+                  number: 9080

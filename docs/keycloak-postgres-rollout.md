@@ -58,8 +58,8 @@ Converter hiện tại chấp nhận cả `ROLE_ADMIN` và `ADMIN` để tương
 ## 4) Expected token flow
 
 1. Client gọi `AUTH-SERVICE` (`/api/auth/login`) để lấy access token/refresh token từ Keycloak.
-2. Client gọi API qua `api-gateway` với header `Authorization: Bearer <token>`.
-3. Gateway relay token xuống service đích.
+2. Client gọi API qua `apisix` (Apache APISIX gateway) với header `Authorization: Bearer <token>`.
+3. APISIX xác thực JWT (openid-connect) rồi relay token xuống service đích (service tự validate lại — defense in depth).
 4. Service đích verify token qua `issuer-uri` của Keycloak và authorize theo role.
 
 ## 5) Quick verification checklist

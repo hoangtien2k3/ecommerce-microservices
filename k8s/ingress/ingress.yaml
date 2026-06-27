@@ -35,17 +35,9 @@ spec:
                 port:
                   number: 3000
 
-    # API Gateway
-    - host: api.ecommerce.local
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: api-gateway
-                port:
-                  number: 8888
+    # NOTE: the API is NOT routed through NGINX anymore. Apache APISIX is the single
+    # edge for the API — reach it directly via the `apisix-gateway` LoadBalancer Service
+    # (point api.ecommerce.local DNS at that LB). NGINX here only fronts the web/admin UIs.
 
     # Keycloak
     - host: auth.ecommerce.local

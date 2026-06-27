@@ -8,6 +8,11 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
+# Optional override only — left EMPTY on purpose. When unset, the client derives
+# the API origin from the browser location at runtime (api.<host>), so a single
+# image works in every environment. Pass --build-arg only to pin a different host.
+ARG NEXT_PUBLIC_API_URL=
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 RUN npm run build
 
 FROM node:24-alpine AS runner

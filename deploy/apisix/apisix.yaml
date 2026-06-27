@@ -1,0 +1,76 @@
+# LOCAL DOCKER-COMPOSE ONLY — static mirror of the Kubernetes ApisixRoute CRDs
+# (k8s/gateway/02-routes.yaml). Paths are namespaced by each service's context-path
+# (/auth, /product, ...). Production routing is driven by the APISIX Ingress Controller.
+upstreams:
+  - { id: 1, type: roundrobin, nodes: { "auth-service:8088": 1 } }
+  - { id: 2, type: roundrobin, nodes: { "product-service:8086": 1 } }
+  - { id: 3, type: roundrobin, nodes: { "order-service:8084": 1 } }
+  - { id: 4, type: roundrobin, nodes: { "payment-service:8085": 1 } }
+  - { id: 5, type: roundrobin, nodes: { "inventory-service:8082": 1 } }
+  - { id: 6, type: roundrobin, nodes: { "shipping-service:8087": 1 } }
+  - { id: 7, type: roundrobin, nodes: { "favourite-service:8081": 1 } }
+  - { id: 8, type: roundrobin, nodes: { "notification-service:8090": 1 } }
+  - { id: 9, type: roundrobin, nodes: { "media-service:8083": 1 } }
+  - { id: 10, type: roundrobin, nodes: { "rating-service:8089": 1 } }
+  - { id: 11, type: roundrobin, nodes: { "search-service:8094": 1 } }
+  - { id: 12, type: roundrobin, nodes: { "promotion-service:8093": 1 } }
+  - { id: 13, type: roundrobin, nodes: { "tax-service:8091": 1 } }
+
+global_rules:
+  - id: 1
+    plugins:
+      prometheus: {}
+      cors: { allow_origins: "http://localhost:3000,http://ecommerce.local:9090", allow_methods: "GET,POST,PUT,DELETE,PATCH,OPTIONS", allow_headers: "Authorization,Content-Type,X-Requested-With", max_age: 3600 }
+      zipkin: { endpoint: http://zipkin:9411/api/v2/spans, sample_ratio: 1, service_name: apisix }
+      limit-count: { count: 1200, time_window: 60, rejected_code: 429, key_type: var, key: remote_addr, policy: local }
+
+routes:
+  # public storefront contract (clean /api/... + /storefront/...), proxy-rewrite re-adds the context-path
+  - { id: auth-public, uri: /api/v1/auth/*, upstream_id: 1, plugins: { proxy-rewrite: { regex_uri: [ "^/(.*)", "/auth/$1" ] } } }
+  - { id: product-catalog, uris: [ /api/categories, /api/categories/*, /api/products, /api/products/* ], upstream_id: 2, plugins: { proxy-rewrite: { regex_uri: [ "^/(.*)", "/product/$1" ] } } }
+  - { id: rating-storefront, uris: [ /storefront/ratings, /storefront/ratings/* ], upstream_id: 10, plugins: { proxy-rewrite: { regex_uri: [ "^/(.*)", "/rating/$1" ] } } }
+  - { id: search-storefront, uris: [ /storefront/catalog-search, /storefront/search_suggest ], upstream_id: 11, plugins: { proxy-rewrite: { regex_uri: [ "^/(.*)", "/search/$1" ] } } }
+  - { id: openapi-auth, uri: /auth/v3/api-docs/*, upstream_id: 1 }
+  - { id: openapi-product, uri: /product/v3/api-docs/*, upstream_id: 2 }
+  - { id: openapi-order, uri: /order/v3/api-docs/*, upstream_id: 3 }
+  - { id: openapi-payment, uri: /payment/v3/api-docs/*, upstream_id: 4 }
+  - { id: openapi-inventory, uri: /inventory/v3/api-docs/*, upstream_id: 5 }
+  - { id: openapi-shipping, uri: /shipping/v3/api-docs/*, upstream_id: 6 }
+  - { id: openapi-favourite, uri: /favourite/v3/api-docs/*, upstream_id: 7 }
+  - { id: openapi-notification, uri: /notification/v3/api-docs/*, upstream_id: 8 }
+  - { id: openapi-media, uri: /media/v3/api-docs/*, upstream_id: 9 }
+  - { id: openapi-rating, uri: /rating/v3/api-docs/*, upstream_id: 10 }
+  - { id: openapi-search, uri: /search/v3/api-docs/*, upstream_id: 11 }
+  - { id: openapi-promotion, uri: /promotion/v3/api-docs/*, upstream_id: 12 }
+  - { id: openapi-tax, uri: /tax/v3/api-docs/*, upstream_id: 13 }
+  # secured (JWT)
+  - id: auth-roles
+    uris: [ /api/v1/roles, /api/v1/roles/* ]
+    upstream_id: 1
+    plugins:
+      openid-connect: &oidc
+        client_id: ecommerce-client
+        client_secret: "$env://KEYCLOAK_CLIENT_SECRET"
+        discovery: http://keycloak:8080/realms/ecommerce/.well-known/openid-configuration
+        realm: ecommerce
+        bearer_only: true
+        use_jwks: true
+        token_signing_alg_values_expected: RS256
+      proxy-rewrite:
+        regex_uri: [ "^/(.*)", "/auth/$1" ]
+  - { id: auth-users, uris: [ /api/v1/users, /api/v1/users/* ], upstream_id: 1, plugins: { openid-connect: *oidc, proxy-rewrite: { regex_uri: [ "^/(.*)", "/auth/$1" ] } } }
+  - { id: order-carts, uris: [ /api/carts, /api/carts/* ], upstream_id: 3, plugins: { openid-connect: *oidc, proxy-rewrite: { regex_uri: [ "^/(.*)", "/order/$1" ] } } }
+  - { id: order-orders, uris: [ /api/orders, /api/orders/* ], upstream_id: 3, plugins: { openid-connect: *oidc, proxy-rewrite: { regex_uri: [ "^/(.*)", "/order/$1" ] } } }
+  - { id: payment, uris: [ /api/payments, /api/payments/* ], upstream_id: 4, plugins: { openid-connect: *oidc, proxy-rewrite: { regex_uri: [ "^/(.*)", "/payment/$1" ] } } }
+  - { id: inventory, uris: [ /api/inventory, /api/inventory/* ], upstream_id: 5, plugins: { openid-connect: *oidc, proxy-rewrite: { regex_uri: [ "^/(.*)", "/inventory/$1" ] } } }
+  - { id: shipping, uri: /shipping/api/shippings/*, upstream_id: 6, plugins: { openid-connect: *oidc } }
+  - { id: favourite, uris: [ /api/favourites, /api/favourites/* ], upstream_id: 7, plugins: { openid-connect: *oidc, proxy-rewrite: { regex_uri: [ "^/(.*)", "/favourite/$1" ] } } }
+  - { id: notif-email, uri: /notification/api/email/*, upstream_id: 8, plugins: { openid-connect: *oidc } }
+  - { id: notif-notifications, uri: /notification/api/notifications/*, upstream_id: 8, plugins: { openid-connect: *oidc } }
+  - { id: notif-payment, uri: /notification/api/payment-notifications/*, upstream_id: 8, plugins: { openid-connect: *oidc } }
+  - { id: media, uri: /media/medias/*, upstream_id: 9, plugins: { openid-connect: *oidc } }
+  - { id: rating-backoffice, uri: /rating/backoffice/ratings/*, upstream_id: 10, plugins: { openid-connect: *oidc } }
+  - { id: promotion-backoffice, uri: /promotion/backoffice/promotions/*, upstream_id: 12, plugins: { openid-connect: *oidc } }
+  - { id: tax-classes, uri: /tax/backoffice/tax-classes/*, upstream_id: 13, plugins: { openid-connect: *oidc } }
+  - { id: tax-rates, uri: /tax/backoffice/tax-rates/*, upstream_id: 13, plugins: { openid-connect: *oidc } }
+#END

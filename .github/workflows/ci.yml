@@ -21,7 +21,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       backend:              ${{ steps.filter.outputs.backend }}
-      api-gateway:          ${{ steps.filter.outputs.api-gateway }}
       auth-service:         ${{ steps.filter.outputs.auth-service }}
       product-service:      ${{ steps.filter.outputs.product-service }}
       order-service:        ${{ steps.filter.outputs.order-service }}
@@ -46,11 +45,6 @@ jobs:
               - 'pom.xml'
               - 'common-lib/**'
               - '*-service/**'
-              - 'api-gateway/**'
-            api-gateway:
-              - 'api-gateway/**'
-              - 'common-lib/**'
-              - 'pom.xml'
             auth-service:
               - 'auth-service/**'
               - 'common-lib/**'
@@ -124,18 +118,6 @@ jobs:
         run: mvn test -B --fail-at-end
 
   # Build & Push
-  build-api-gateway:
-    needs: [detect-changes, test]
-    if: |
-      (needs.detect-changes.outputs.api-gateway == 'true' || github.event_name == 'workflow_dispatch') &&
-      (needs.test.result == 'success' || needs.test.result == 'skipped')
-    uses: ./.github/workflows/_build-service.yml
-    with:
-      service: api-gateway
-      port: 8888
-    secrets:
-      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   build-auth-service:
     needs: [detect-changes, test]
     if: |
@@ -327,7 +309,6 @@ jobs:
     if: always()
     needs:
       - test
-      - build-api-gateway
       - build-auth-service
       - build-product-service
       - build-order-service

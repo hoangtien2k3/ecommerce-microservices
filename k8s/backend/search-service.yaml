@@ -53,14 +53,14 @@ spec:
               value: ""
           startupProbe:
             httpGet:
-              path: /search/actuator/health
-              port: 8094
+              path: /actuator/health
+              port: 9000
             periodSeconds: 10
             failureThreshold: 30
           readinessProbe:
             httpGet:
-              path: /search/actuator/health
-              port: 8094
+              path: /actuator/health
+              port: 9000
             periodSeconds: 10
             failureThreshold: 3
           resources:

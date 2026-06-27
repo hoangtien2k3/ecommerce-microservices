@@ -1,6 +1,8 @@
 server:
   port: 8088
   shutdown: graceful
+  servlet:
+    context-path: /auth
 ---
 spring:
   application:
@@ -47,6 +49,8 @@ keycloak:
     admin-password: ${KEYCLOAK_ADMIN_PASSWORD:admin}
 ---
 management:
+  server:
+    port: ${MANAGEMENT_PORT:9000}
   endpoints:
     web:
       exposure:

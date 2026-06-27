@@ -49,6 +49,8 @@ resilience4j:
         permitted-number-of-calls-in-half-open-state: 3
 ---
 management:
+  server:
+    port: ${MANAGEMENT_PORT:9000}
   endpoints:
     web:
       exposure:

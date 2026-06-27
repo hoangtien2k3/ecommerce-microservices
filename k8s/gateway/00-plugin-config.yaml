@@ -1,0 +1,22 @@
+# Reusable JWT (Keycloak openid-connect) plugin, referenced by every secured route
+# via `plugin_config_name: jwt-auth`. Public routes simply omit it.
+#
+# NOTE: client_secret is inline here for simplicity. Replace the placeholder before going
+# live (or wire APISIX secret integration). Backends still re-validate the JWT themselves.
+apiVersion: apisix.apache.org/v2
+kind: ApisixPluginConfig
+metadata:
+  name: jwt-auth
+  namespace: ecommerce
+spec:
+  plugins:
+    - name: openid-connect
+      enable: true
+      config:
+        client_id: ecommerce-client
+        client_secret: changeme-ecommerce-client-secret
+        discovery: http://keycloak:8080/realms/ecommerce/.well-known/openid-configuration
+        realm: ecommerce
+        bearer_only: true
+        use_jwks: true
+        token_signing_alg_values_expected: RS256

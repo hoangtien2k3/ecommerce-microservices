@@ -70,10 +70,10 @@ elapsed_fmt() {
 CLUSTER_NAME="ecommerce"
 NAMESPACE="ecommerce"
 REGISTRY="ghcr.io/hoangtien2k3"
-HOSTS_ENTRY="127.0.0.1 ecommerce.local api.ecommerce.local auth.ecommerce.local zipkin.ecommerce.local minio.ecommerce.local"
+HOSTS_ENTRY="127.0.0.1 ecommerce.local api.ecommerce.local auth.ecommerce.local zipkin.ecommerce.local rustfs.ecommerce.local"
 
 SERVICES=(
-  api-gateway auth-service product-service order-service
+  auth-service product-service order-service
   payment-service shipping-service inventory-service favourite-service
   rating-service media-service tax-service promotion-service
   search-service notification-service
@@ -273,7 +273,7 @@ else
     kubectl create secret generic postgres-secret      -n "$NAMESPACE" --from-literal=POSTGRES_USER="${POSTGRES_USER:-postgres}"         --from-literal=POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-ecommerce@!@#}" > /dev/null
     kubectl create secret generic keycloak-secret      -n "$NAMESPACE" --from-literal=KEYCLOAK_ADMIN="${KEYCLOAK_ADMIN:-admin}"           --from-literal=KEYCLOAK_ADMIN_PASSWORD="${KEYCLOAK_ADMIN_PASSWORD:-ecommerce@!@#}" > /dev/null
     kubectl create secret generic redis-secret         -n "$NAMESPACE" --from-literal=REDIS_PASSWORD="${REDIS_PASSWORD:-ecommerce@!@#}" > /dev/null
-    kubectl create secret generic minio-secret         -n "$NAMESPACE" --from-literal=MINIO_ROOT_USER="${MINIO_ROOT_USER:-admin}"         --from-literal=MINIO_ROOT_PASSWORD="${MINIO_ROOT_PASSWORD:-ecommerce@!@#}" > /dev/null
+    kubectl create secret generic storage-secret       -n "$NAMESPACE" --from-literal=STORAGE_ACCESS_KEY="${STORAGE_ACCESS_KEY:-test}"     --from-literal=STORAGE_SECRET_KEY="${STORAGE_SECRET_KEY:-test}" > /dev/null
     kubectl create secret generic elasticsearch-secret -n "$NAMESPACE" --from-literal=ELASTIC_PASSWORD="${ELASTIC_PASSWORD:-ecommerce@!@#}" > /dev/null
     kubectl create secret generic mail-secret          -n "$NAMESPACE" --from-literal=MAIL_USERNAME="${MAIL_USERNAME:-}"                  --from-literal=MAIL_PASSWORD="${MAIL_PASSWORD:-}" > /dev/null
   else
@@ -290,6 +290,13 @@ kubectl create configmap keycloak-realm        -n "$NAMESPACE" \
 kubectl create configmap postgres-init-scripts -n "$NAMESPACE" \
   --from-file=create-all-databases.sql=docker/postgres/init/create-all-databases.sql \
   --dry-run=client -o yaml | kubectl apply -f - > /dev/null
+# Apache APISIX standalone config (data plane reads these two files directly).
+kubectl create configmap apisix-config         -n "$NAMESPACE" \
+  --from-file=config.yaml=deploy/apisix/config.yaml \
+  --dry-run=client -o yaml | kubectl apply -f - > /dev/null
+kubectl create configmap apisix-routes         -n "$NAMESPACE" \
+  --from-file=apisix.yaml=deploy/apisix/apisix.yaml \
+  --dry-run=client -o yaml | kubectl apply -f - > /dev/null
 success "ConfigMaps applied"
 step_done
 
@@ -299,20 +306,23 @@ deploy_and_wait k8s/infra/postgres.yaml       postgres       "PostgreSQL"    600
 deploy_and_wait k8s/infra/redis.yaml          redis          "Redis"         300s
 deploy_and_wait k8s/infra/kafka.yaml          kafka          "Kafka"         300s
 deploy_and_wait k8s/infra/elasticsearch.yaml  elasticsearch  "Elasticsearch" 600s
-deploy_and_wait k8s/infra/minio.yaml          minio          "MinIO"         300s
+deploy_and_wait k8s/infra/rustfs.yaml         rustfs         "RustFS"        300s
 deploy_and_wait k8s/infra/keycloak.yaml       keycloak       "Keycloak"      600s
 deploy_and_wait k8s/infra/zipkin.yaml         zipkin         "Zipkin"        300s
 step_done
 
-# 9. Backend + Frontend + Ingress
-step "Deploy backend services & frontend"
+# 9. API gateway + Backend + Frontend + Ingress
+step "Deploy API gateway, backend services & frontend"
 for yaml in k8s/backend/*.yaml; do
   kubectl apply -f "$yaml" > /dev/null
 done
 kubectl apply -f k8s/frontend/frontend.yaml > /dev/null
 kubectl apply -f k8s/ingress/ingress.yaml   > /dev/null
-success "14 backend services + frontend applied"
+success "13 backend services + frontend applied"
 info   "Pods are pulling images from GHCR (imagePullPolicy: Always)"
+
+# Apache APISIX (standalone, no etcd/Helm) — the single edge for all API traffic.
+deploy_and_wait k8s/infra/apisix.yaml apisix "Apache APISIX" 300s
 step_done
 
 # 10. /etc/hosts
@@ -332,7 +342,7 @@ printf "  ${DIM}%-16s  %s${NC}\n"  "──────────────�
 printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "Frontend"       "http://ecommerce.local:9090"
 printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "API Gateway"    "http://api.ecommerce.local:9090"
 printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "Keycloak"       "http://auth.ecommerce.local:9090"
-printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "MinIO Console"  "http://minio.ecommerce.local:9090"
+printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "RustFS (S3)"    "http://rustfs.ecommerce.local:9090"
 printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "Zipkin"         "http://zipkin.ecommerce.local:9090"
 printf "\n"
 printf "  ${DIM}Pods may take 1-2 min to pull images and become ready.${NC}\n"

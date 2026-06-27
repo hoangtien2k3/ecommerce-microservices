@@ -1,0 +1,16 @@
+# APISIX core config for LOCAL DOCKER-COMPOSE ONLY (standalone, no etcd).
+# Production/Kubernetes does NOT use this file — it runs APISIX via the APISIX Ingress
+# Controller with ApisixRoute CRDs (see k8s/gateway/). This is just a dev mirror so the
+# whole stack is runnable with `docker compose up`.
+deployment:
+  role: data_plane
+  role_data_plane:
+    config_provider: yaml
+apisix:
+  node_listen: 9080
+  enable_server_tokens: false
+plugin_attr:
+  prometheus:
+    export_addr:
+      ip: 0.0.0.0
+      port: 9091

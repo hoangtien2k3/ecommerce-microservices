@@ -1,6 +1,8 @@
 server:
   port: 8081
   shutdown: graceful
+  servlet:
+    context-path: /favourite
 ---
 spring:
   application:
@@ -33,6 +35,8 @@ spring:
           issuer-uri: ${JWT_ISSUER_URI:http://localhost:8080/realms/ecommerce}
 ---
 management:
+  server:
+    port: ${MANAGEMENT_PORT:9000}
   endpoints:
     web:
       exposure:

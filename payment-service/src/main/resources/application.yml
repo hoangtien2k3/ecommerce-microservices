@@ -1,6 +1,8 @@
 server:
   port: 8085
   shutdown: graceful
+  servlet:
+    context-path: /payment
 ---
 spring:
   application:
@@ -43,6 +45,8 @@ payment:
     consumer-group-id: payment-groupId
 ---
 management:
+  server:
+    port: ${MANAGEMENT_PORT:9000}
   endpoints:
     web:
       exposure:

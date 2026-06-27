@@ -20,10 +20,6 @@ spec:
       labels:
         app: frontend
     spec:
-      initContainers:
-        - name: wait-for-api-gateway
-          image: busybox
-          command: ["sh", "-c", "until nc -z api-gateway 8888; do sleep 5; done"]
       securityContext:
         seccompProfile:
           type: RuntimeDefault
@@ -40,9 +36,10 @@ spec:
             privileged: false
           ports:
             - containerPort: 3000
+          # The browser calls APISIX directly at NEXT_PUBLIC_API_URL, which is baked
+          # into the image at build time (see Dockerfile / CI build-args) — there is
+          # no runtime API URL to inject here.
           env:
-            - name: INTERNAL_API_URL
-              value: http://api-gateway:8888
             - name: NODE_ENV
               value: production
           startupProbe:

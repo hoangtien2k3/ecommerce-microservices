@@ -8,13 +8,8 @@ const nextConfig: NextConfig = {
       { protocol: "http", hostname: "**" },
     ],
   },
-  async rewrites() {
-    const apiBase = process.env.INTERNAL_API_URL || "http://api-gateway:8888";
-    return [
-      { source: "/api/:path*",        destination: `${apiBase}/api/:path*` },
-      { source: "/storefront/:path*", destination: `${apiBase}/storefront/:path*` },
-    ];
-  },
+  // No API rewrites: the browser calls Apache APISIX directly (NEXT_PUBLIC_API_URL).
+  // Next.js only serves the UI — it is no longer a proxy for API traffic.
 };
 
 export default nextConfig;

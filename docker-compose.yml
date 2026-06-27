@@ -151,24 +151,23 @@ services:
   # BACKEND — Spring Boot Microservices
   # ============================================================
 
-  api-gateway:
-    image: ghcr.io/hoangtien2k3/api-gateway:latest
-    pull_policy: always
-    container_name: api-gateway
+  # API gateway — Apache APISIX (standalone file mode, LOCAL DEV ONLY).
+  # Production/Kubernetes uses the APISIX Ingress Controller + ApisixRoute CRDs
+  # (see k8s/gateway/) — this compose service is just a runnable dev mirror.
+  apisix:
+    image: apache/apisix:3.9.1-debian
+    container_name: apisix
     ports:
-      - "8888:8888"
+      - "9080:9080"   # client-facing proxy
+      - "9091:9091"   # prometheus metrics
     environment:
-      KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/ecommerce
-      KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/ecommerce/protocol/openid-connect/certs
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET:-changeme-ecommerce-client-secret}
+    volumes:
+      - ./deploy/apisix/config.yaml:/usr/local/apisix/conf/config.yaml:ro
+      - ./deploy/apisix/apisix.yaml:/usr/local/apisix/conf/apisix.yaml:ro
     depends_on:
       keycloak:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8888/actuator/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 15
-      start_period: 40s
     networks:
       - ecommerce-network
 
@@ -443,10 +442,10 @@ services:
       - "3000:3000"
     environment:
       NODE_ENV: production
-      NEXT_PUBLIC_API_URL: http://localhost:8888
+      NEXT_PUBLIC_API_URL: http://localhost:9080
     depends_on:
-      api-gateway:
-        condition: service_healthy
+      apisix:
+        condition: service_started
     networks:
       - ecommerce-network
 

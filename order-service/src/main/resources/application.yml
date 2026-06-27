@@ -1,6 +1,8 @@
 server:
   port: 8084
   shutdown: graceful
+  servlet:
+    context-path: /order
 ---
 spring:
   application:
@@ -35,6 +37,8 @@ spring:
     bootstrap-servers: ${KAFKA_SERVERS:localhost:9092}
 ---
 management:
+  server:
+    port: ${MANAGEMENT_PORT:9000}
   endpoints:
     web:
       exposure:

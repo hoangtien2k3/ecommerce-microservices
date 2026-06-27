@@ -1,0 +1,354 @@
+# =============================================================================
+# Declarative API routes (APISIX Ingress Controller auto-syncs these to APISIX).
+#
+# PUBLIC STOREFRONT CONTRACT IS CLEAN: the browser calls /api/... and
+# /storefront/... and never sees the internal service topology. Each backend
+# still runs under a servlet context-path (/auth, /product, ...), so a
+# `proxy-rewrite` plugin re-adds that prefix before the request is forwarded
+# (e.g. /api/products -> /product/api/products).
+#
+#   secured  -> plugin_config_name: jwt-auth   (Keycloak JWT verified at the edge)
+#   public   -> no plugin_config_name
+#
+# OpenAPI docs and not-yet-wired backoffice/admin APIs stay service-namespaced
+# (they are internal tooling, not part of the public storefront contract).
+# =============================================================================
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: auth-service
+  namespace: ecommerce
+spec:
+  http:
+    - name: auth
+      match:
+        paths: [ /api/v1/auth/* ]
+      backends:
+        - serviceName: auth-service
+          servicePort: 8088
+      plugins:
+        - name: proxy-rewrite
+          enable: true
+          config:
+            regex_uri: [ "^/(.*)", "/auth/$1" ]
+    - name: roles
+      match:
+        paths: [ /api/v1/roles, /api/v1/roles/* ]
+      backends:
+        - serviceName: auth-service
+          servicePort: 8088
+      plugin_config_name: jwt-auth
+      plugins:
+        - name: proxy-rewrite
+          enable: true
+          config:
+            regex_uri: [ "^/(.*)", "/auth/$1" ]
+    - name: users
+      match:
+        paths: [ /api/v1/users, /api/v1/users/* ]
+      backends:
+        - serviceName: auth-service
+          servicePort: 8088
+      plugin_config_name: jwt-auth
+      plugins:
+        - name: proxy-rewrite
+          enable: true
+          config:
+            regex_uri: [ "^/(.*)", "/auth/$1" ]
+    - name: docs
+      match:
+        paths: [ /auth/v3/api-docs/* ]
+      backends:
+        - serviceName: auth-service
+          servicePort: 8088
+---
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: product-service
+  namespace: ecommerce
+spec:
+  http:
+    - name: catalog
+      match:
+        paths: [ /api/categories, /api/categories/*, /api/products, /api/products/* ]
+      backends:
+        - serviceName: product-service
+          servicePort: 8086
+      plugins:
+        - name: proxy-rewrite
+          enable: true
+          config:
+            regex_uri: [ "^/(.*)", "/product/$1" ]
+    - name: docs
+      match:
+        paths: [ /product/v3/api-docs/* ]
+      backends:
+        - serviceName: product-service
+          servicePort: 8086
+---
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: order-service
+  namespace: ecommerce
+spec:
+  http:
+    - name: orders
+      match:
+        paths: [ /api/carts, /api/carts/*, /api/orders, /api/orders/* ]
+      backends:
+        - serviceName: order-service
+          servicePort: 8084
+      plugin_config_name: jwt-auth
+      plugins:
+        - name: proxy-rewrite
+          enable: true
+          config:
+            regex_uri: [ "^/(.*)", "/order/$1" ]
+    - name: docs
+      match:
+        paths: [ /order/v3/api-docs/* ]
+      backends:
+        - serviceName: order-service
+          servicePort: 8084
+---
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: payment-service
+  namespace: ecommerce
+spec:
+  http:
+    - name: payments
+      match:
+        paths: [ /api/payments, /api/payments/* ]
+      backends:
+        - serviceName: payment-service
+          servicePort: 8085
+      plugin_config_name: jwt-auth
+      plugins:
+        - name: proxy-rewrite
+          enable: true
+          config:
+            regex_uri: [ "^/(.*)", "/payment/$1" ]
+    - name: docs
+      match:
+        paths: [ /payment/v3/api-docs/* ]
+      backends:
+        - serviceName: payment-service
+          servicePort: 8085
+---
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: inventory-service
+  namespace: ecommerce
+spec:
+  http:
+    - name: inventory
+      match:
+        paths: [ /api/inventory, /api/inventory/* ]
+      backends:
+        - serviceName: inventory-service
+          servicePort: 8082
+      plugin_config_name: jwt-auth
+      plugins:
+        - name: proxy-rewrite
+          enable: true
+          config:
+            regex_uri: [ "^/(.*)", "/inventory/$1" ]
+    - name: docs
+      match:
+        paths: [ /inventory/v3/api-docs/* ]
+      backends:
+        - serviceName: inventory-service
+          servicePort: 8082
+---
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: favourite-service
+  namespace: ecommerce
+spec:
+  http:
+    - name: favourites
+      match:
+        paths: [ /api/favourites, /api/favourites/* ]
+      backends:
+        - serviceName: favourite-service
+          servicePort: 8081
+      plugin_config_name: jwt-auth
+      plugins:
+        - name: proxy-rewrite
+          enable: true
+          config:
+            regex_uri: [ "^/(.*)", "/favourite/$1" ]
+    - name: docs
+      match:
+        paths: [ /favourite/v3/api-docs/* ]
+      backends:
+        - serviceName: favourite-service
+          servicePort: 8081
+---
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: notification-service
+  namespace: ecommerce
+spec:
+  http:
+    - name: email
+      match:
+        paths: [ /notification/api/email/* ]
+      backends:
+        - serviceName: notification-service
+          servicePort: 8090
+      plugin_config_name: jwt-auth
+    - name: notifications
+      match:
+        paths: [ /notification/api/notifications/* ]
+      backends:
+        - serviceName: notification-service
+          servicePort: 8090
+      plugin_config_name: jwt-auth
+    - name: payment-notifications
+      match:
+        paths: [ /notification/api/payment-notifications/* ]
+      backends:
+        - serviceName: notification-service
+          servicePort: 8090
+      plugin_config_name: jwt-auth
+    - name: docs
+      match:
+        paths: [ /notification/v3/api-docs/* ]
+      backends:
+        - serviceName: notification-service
+          servicePort: 8090
+---
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: media-service
+  namespace: ecommerce
+spec:
+  http:
+    - name: medias
+      match:
+        paths: [ /media/medias/* ]
+      backends:
+        - serviceName: media-service
+          servicePort: 8083
+      plugin_config_name: jwt-auth
+    - name: docs
+      match:
+        paths: [ /media/v3/api-docs/* ]
+      backends:
+        - serviceName: media-service
+          servicePort: 8083
+---
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: rating-service
+  namespace: ecommerce
+spec:
+  http:
+    - name: storefront
+      match:
+        paths: [ /storefront/ratings, /storefront/ratings/* ]
+      backends:
+        - serviceName: rating-service
+          servicePort: 8089
+      plugins:
+        - name: proxy-rewrite
+          enable: true
+          config:
+            regex_uri: [ "^/(.*)", "/rating/$1" ]
+    - name: backoffice
+      match:
+        paths: [ /rating/backoffice/ratings/* ]
+      backends:
+        - serviceName: rating-service
+          servicePort: 8089
+      plugin_config_name: jwt-auth
+    - name: docs
+      match:
+        paths: [ /rating/v3/api-docs/* ]
+      backends:
+        - serviceName: rating-service
+          servicePort: 8089
+---
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: search-service
+  namespace: ecommerce
+spec:
+  http:
+    - name: storefront
+      match:
+        paths: [ /storefront/catalog-search, /storefront/search_suggest ]
+      backends:
+        - serviceName: search-service
+          servicePort: 8094
+      plugins:
+        - name: proxy-rewrite
+          enable: true
+          config:
+            regex_uri: [ "^/(.*)", "/search/$1" ]
+    - name: docs
+      match:
+        paths: [ /search/v3/api-docs/* ]
+      backends:
+        - serviceName: search-service
+          servicePort: 8094
+---
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: promotion-service
+  namespace: ecommerce
+spec:
+  http:
+    - name: backoffice
+      match:
+        paths: [ /promotion/backoffice/promotions/* ]
+      backends:
+        - serviceName: promotion-service
+          servicePort: 8093
+      plugin_config_name: jwt-auth
+    - name: docs
+      match:
+        paths: [ /promotion/v3/api-docs/* ]
+      backends:
+        - serviceName: promotion-service
+          servicePort: 8093
+---
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: tax-service
+  namespace: ecommerce
+spec:
+  http:
+    - name: tax-classes
+      match:
+        paths: [ /tax/backoffice/tax-classes/* ]
+      backends:
+        - serviceName: tax-service
+          servicePort: 8091
+      plugin_config_name: jwt-auth
+    - name: tax-rates
+      match:
+        paths: [ /tax/backoffice/tax-rates/* ]
+      backends:
+        - serviceName: tax-service
+          servicePort: 8091
+      plugin_config_name: jwt-auth
+    - name: docs
+      match:
+        paths: [ /tax/v3/api-docs/* ]
+      backends:
+        - serviceName: tax-service
+          servicePort: 8091

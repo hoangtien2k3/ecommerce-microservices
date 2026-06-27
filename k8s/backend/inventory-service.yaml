@@ -59,13 +59,13 @@ spec:
           startupProbe:
             httpGet:
               path: /actuator/health
-              port: 8082
+              port: 9000
             periodSeconds: 10
             failureThreshold: 30
           readinessProbe:
             httpGet:
               path: /actuator/health
-              port: 8082
+              port: 9000
             periodSeconds: 10
             failureThreshold: 3
           resources:
