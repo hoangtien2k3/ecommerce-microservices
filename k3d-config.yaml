@@ -4,7 +4,7 @@ metadata:
   name: ecommerce
 servers: 1
 ports:
-  - port: 9090:80
+  - port: 80:80
     nodeFilters:
       - loadbalancer
   - port: 9443:443

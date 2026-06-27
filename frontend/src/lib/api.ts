@@ -4,7 +4,7 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 // — NOT through this Next.js server. By convention the API lives on the `api.`
 // sub-host of wherever the app is served, sharing the same scheme and port, so we
 // derive it from window.location: ONE image then works in every environment
-// (k3d: http://ecommerce.local:9090 -> http://api.ecommerce.local:9090; prod:
+// (k3d: http://ecommerce.local -> http://api.ecommerce.local; prod:
 // https://ecommerce.local -> https://api.ecommerce.local). Set NEXT_PUBLIC_API_URL
 // at build time only if the API lives on an unrelated host.
 function resolveApiBaseUrl(): string {

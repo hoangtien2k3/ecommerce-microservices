@@ -70,7 +70,7 @@ elapsed_fmt() {
 CLUSTER_NAME="ecommerce"
 NAMESPACE="ecommerce"
 REGISTRY="ghcr.io/hoangtien2k3"
-HOSTS_ENTRY="127.0.0.1 ecommerce.local api.ecommerce.local auth.ecommerce.local rustfs.ecommerce.local"
+HOSTS_ENTRY="127.0.0.1 ecommerce.local api.ecommerce.local keycloak.ecommerce.local rustfs.ecommerce.local"
 
 SERVICES=(
   auth-service product-service order-service
@@ -357,10 +357,10 @@ printf "  ${DIM}Kubernetes now pulls images & starts pods in the background — 
 printf "\n"
 printf "  ${BOLD}%-16s${NC}  %s\n" "Service" "URL"
 printf "  ${DIM}%-16s  %s${NC}\n"  "───────────────" "───────────────────────────────────────────"
-printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "Frontend"       "http://ecommerce.local:9090"
-printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "API Gateway"    "http://api.ecommerce.local:9090"
-printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "Keycloak"       "http://auth.ecommerce.local:9090"
-printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "RustFS Console" "http://rustfs.ecommerce.local:9090/rustfs/console/"
+printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "Frontend"       "http://ecommerce.local"
+printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "API Gateway"    "http://api.ecommerce.local"
+printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "Keycloak"       "http://keycloak.ecommerce.local"
+printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "RustFS Console" "http://rustfs.ecommerce.local/rustfs/console/"
 printf "\n"
 printf "  ${DIM}Pods are still pulling/starting — give them a few minutes.${NC}\n"
 printf "  ${DIM}Watch:        kubectl get pods -n %s -w${NC}\n" "$NAMESPACE"

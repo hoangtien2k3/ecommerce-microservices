@@ -157,7 +157,7 @@ k8s-all: k8s-infra k8s-backend k8s-frontend k8s-ingress
 	@echo ""
 	@echo "==> All services deployed to namespace '$(NAMESPACE)'"
 	@echo "==> Add these entries to /etc/hosts:"
-	@echo "    127.0.0.1  ecommerce.local api.ecommerce.local auth.ecommerce.local"
+	@echo "    127.0.0.1  ecommerce.local api.ecommerce.local keycloak.ecommerce.local"
 	@echo "    127.0.0.1  discovery.ecommerce.local minio.ecommerce.local"
 
 ## Delete all K8S resources (keeps PVCs to preserve data)

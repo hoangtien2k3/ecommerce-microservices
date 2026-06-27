@@ -20,7 +20,7 @@ spec:
   #   - hosts:
   #       - api.ecommerce.local
   #       - ecommerce.local
-  #       - auth.ecommerce.local
+  #       - keycloak.ecommerce.local
   #     secretName: ecommerce-tls
   rules:
     # Frontend
@@ -35,7 +35,7 @@ spec:
                 port:
                   number: 3000
     # Keycloak
-    - host: auth.ecommerce.local
+    - host: keycloak.ecommerce.local
       http:
         paths:
           - path: /
@@ -49,7 +49,7 @@ spec:
     - host: rustfs.ecommerce.local
       http:
         paths:
-          # Web console UI → http://rustfs.ecommerce.local:9090/rustfs/console/
+          # Web console UI → http://rustfs.ecommerce.local/rustfs/console/
           - path: /rustfs/console
             pathType: Prefix
             backend:
