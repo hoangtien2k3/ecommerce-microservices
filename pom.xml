@@ -48,7 +48,7 @@
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <springdoc-openapi.version>2.6.0</springdoc-openapi.version>
         <resilience4j.version>2.2.0</resilience4j.version>
-        <modelmapper.version>3.2.0</modelmapper.version>
+        <modelmapper.version>3.2.6</modelmapper.version>
         <!-- removed: spring-cloud (gateway migrated to Apache APISIX) -->
 
         <opencsv.version>5.9</opencsv.version>
