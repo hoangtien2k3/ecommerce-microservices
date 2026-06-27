@@ -45,10 +45,19 @@ spec:
                 name: keycloak
                 port:
                   number: 8080
-    # rustfs (S3-compatible object storage API)
+    # rustfs (S3-compatible object storage)
     - host: rustfs.ecommerce.local
       http:
         paths:
+          # Web console UI → http://rustfs.ecommerce.local:9090/rustfs/console/
+          - path: /rustfs/console
+            pathType: Prefix
+            backend:
+              service:
+                name: rustfs
+                port:
+                  number: 9001
+          # S3 API (everything else; used by services for media storage)
           - path: /
             pathType: Prefix
             backend:

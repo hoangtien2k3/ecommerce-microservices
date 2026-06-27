@@ -172,9 +172,12 @@ update_hosts() {
       printf "\n     Add-Content -Path C:\\Windows\\System32\\drivers\\etc\\hosts -Value '%s'\n\n" "$entry"
     fi
   else
-    if grep -qF "ecommerce.local" /etc/hosts 2>/dev/null; then
-      warn "Hosts file already configured — skipping"
+    if grep -qxF "$entry" /etc/hosts 2>/dev/null; then
+      warn "Hosts file already up to date — skipping"
     else
+      # Replace any stale managed line (old hostnames change between versions) then
+      # append the current one, so the entry never drifts out of date.
+      sudo sed -i.bak '/[[:space:]]ecommerce\.local[[:space:]]/d;/[[:space:]]ecommerce\.local$/d' /etc/hosts 2>/dev/null || true
       printf "%s\n" "$entry" | sudo tee -a /etc/hosts > /dev/null
       success "/etc/hosts updated"
     fi
@@ -286,11 +289,11 @@ if [ -f .env ]; then
   info "Loading secrets from .env..."
   set -a; source .env; set +a
   mk_secret() { kubectl create secret generic "$@" -n "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f - > /dev/null; }
-  mk_secret postgres-secret      --from-literal=POSTGRES_USER="${POSTGRES_USER:-postgres}"         --from-literal=POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-ecommerce@!@#}"
-  mk_secret keycloak-secret      --from-literal=KEYCLOAK_ADMIN="${KEYCLOAK_ADMIN:-admin}"           --from-literal=KEYCLOAK_ADMIN_PASSWORD="${KEYCLOAK_ADMIN_PASSWORD:-ecommerce@!@#}"
-  mk_secret redis-secret         --from-literal=REDIS_PASSWORD="${REDIS_PASSWORD:-ecommerce@!@#}"
-  mk_secret storage-secret       --from-literal=STORAGE_ACCESS_KEY="${STORAGE_ACCESS_KEY:-test}"     --from-literal=STORAGE_SECRET_KEY="${STORAGE_SECRET_KEY:-test}"
-  mk_secret elasticsearch-secret --from-literal=ELASTIC_PASSWORD="${ELASTIC_PASSWORD:-ecommerce@!@#}"
+  mk_secret postgres-secret      --from-literal=POSTGRES_USER="${POSTGRES_USER:-admin}"         --from-literal=POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-admin}"
+  mk_secret keycloak-secret      --from-literal=KEYCLOAK_ADMIN="${KEYCLOAK_ADMIN:-admin}"           --from-literal=KEYCLOAK_ADMIN_PASSWORD="${KEYCLOAK_ADMIN_PASSWORD:-admin}"
+  mk_secret redis-secret         --from-literal=REDIS_PASSWORD="${REDIS_PASSWORD:-admin}"
+  mk_secret storage-secret       --from-literal=STORAGE_ACCESS_KEY="${STORAGE_ACCESS_KEY:-admin}"     --from-literal=STORAGE_SECRET_KEY="${STORAGE_SECRET_KEY:-admin}"
+  mk_secret elasticsearch-secret --from-literal=ELASTIC_PASSWORD="${ELASTIC_PASSWORD:-admin}"
   mk_secret mail-secret          --from-literal=MAIL_USERNAME="${MAIL_USERNAME:-}"                  --from-literal=MAIL_PASSWORD="${MAIL_PASSWORD:-}"
 else
   info "No .env found — applying k8s/secrets.yaml (default dev values)"
@@ -357,7 +360,7 @@ printf "  ${DIM}%-16s  %s${NC}\n"  "──────────────�
 printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "Frontend"       "http://ecommerce.local:9090"
 printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "API Gateway"    "http://api.ecommerce.local:9090"
 printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "Keycloak"       "http://auth.ecommerce.local:9090"
-printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "RustFS (S3)"    "http://rustfs.ecommerce.local:9090"
+printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "RustFS Console" "http://rustfs.ecommerce.local:9090/rustfs/console/"
 printf "\n"
 printf "  ${DIM}Pods are still pulling/starting — give them a few minutes.${NC}\n"
 printf "  ${DIM}Watch:        kubectl get pods -n %s -w${NC}\n" "$NAMESPACE"

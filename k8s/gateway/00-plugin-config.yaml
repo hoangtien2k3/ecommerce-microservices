@@ -1,8 +1,3 @@
-# Reusable JWT (Keycloak openid-connect) plugin, referenced by every secured route
-# via `plugin_config_name: jwt-auth`. Public routes simply omit it.
-#
-# NOTE: client_secret is inline here for simplicity. Replace the placeholder before going
-# live (or wire APISIX secret integration). Backends still re-validate the JWT themselves.
 apiVersion: apisix.apache.org/v2
 kind: ApisixPluginConfig
 metadata:

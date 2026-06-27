@@ -14,8 +14,8 @@ spring:
     timeout-per-shutdown-phase: 30s
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/mediaservice}
-    username: ${POSTGRES_USER:postgres}
-    password: ${POSTGRES_PASSWORD:ecommerce@!@#}
+    username: ${POSTGRES_USER:admin}
+    password: ${POSTGRES_PASSWORD:admin}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -38,8 +38,8 @@ ecommerce:
   storage:
     endpoint: ${STORAGE_ENDPOINT:http://localhost:9000}
     region: ${STORAGE_REGION:us-east-1}
-    access-key: ${STORAGE_ACCESS_KEY:rustfsadmin}
-    secret-key: ${STORAGE_SECRET_KEY:rustfsadmin}
+    access-key: ${STORAGE_ACCESS_KEY:admin}
+    secret-key: ${STORAGE_SECRET_KEY:admin}
     bucket: ${STORAGE_BUCKET:ecommerce-media}
     path-style-access: true
     auto-create-bucket: true

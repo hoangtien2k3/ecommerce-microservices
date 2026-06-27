@@ -1,18 +1,3 @@
-# =============================================================================
-# Declarative API routes (APISIX Ingress Controller auto-syncs these to APISIX).
-#
-# PUBLIC STOREFRONT CONTRACT IS CLEAN: the browser calls /api/... and
-# /storefront/... and never sees the internal service topology. Each backend
-# still runs under a servlet context-path (/auth, /product, ...), so a
-# `proxy-rewrite` plugin re-adds that prefix before the request is forwarded
-# (e.g. /api/products -> /product/api/products).
-#
-#   secured  -> plugin_config_name: jwt-auth   (Keycloak JWT verified at the edge)
-#   public   -> no plugin_config_name
-#
-# OpenAPI docs and not-yet-wired backoffice/admin APIs stay service-namespaced
-# (they are internal tooling, not part of the public storefront contract).
-# =============================================================================
 apiVersion: apisix.apache.org/v2
 kind: ApisixRoute
 metadata:

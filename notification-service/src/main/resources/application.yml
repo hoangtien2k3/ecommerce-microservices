@@ -29,8 +29,8 @@ spring:
             enable: true
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/ecommerce}
-    username: ${POSTGRES_USER:postgres}
-    password: ${POSTGRES_PASSWORD:ecommerce@!@#}
+    username: ${POSTGRES_USER:admin}
+    password: ${POSTGRES_PASSWORD:admin}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
