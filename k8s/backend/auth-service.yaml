@@ -24,6 +24,12 @@ spec:
         - name: wait-for-keycloak
           image: busybox
           command: ["sh", "-c", "until nc -z keycloak 8080; do sleep 5; done"]
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65534
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
       securityContext:
         seccompProfile:
           type: RuntimeDefault

@@ -24,9 +24,21 @@ spec:
         - name: wait-for-elasticsearch
           image: busybox
           command: ["sh", "-c", "until nc -z elasticsearch 9200; do sleep 5; done"]
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65534
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
         - name: wait-for-kafka
           image: busybox
           command: ["sh", "-c", "until nc -z kafka 9092; do sleep 5; done"]
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65534
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
       securityContext:
         seccompProfile:
           type: RuntimeDefault

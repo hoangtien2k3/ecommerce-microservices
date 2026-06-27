@@ -274,24 +274,29 @@ step "Apply Namespace, Secrets & ConfigMaps"
 kubectl apply -f k8s/namespace.yaml > /dev/null
 success "Namespace '${NAMESPACE}'"
 
-if kubectl get secret postgres-secret -n "$NAMESPACE" &>/dev/null; then
-  warn "Secrets already exist — skipping  (delete manually to reset)"
+# Remove workloads that were dropped from the project so re-runs on an existing
+# cluster don't leave zombie pods holding memory (api-gateway, MinIO and Zipkin
+# are gone; MinIO was replaced by RustFS).
+kubectl delete deploy,svc,statefulset api-gateway minio zipkin \
+  -n "$NAMESPACE" --ignore-not-found > /dev/null 2>&1 || true
+
+# Secrets — idempotent (apply, never skip) so secrets added later (e.g. storage-secret)
+# are always present even when the cluster was created by an earlier run.
+if [ -f .env ]; then
+  info "Loading secrets from .env..."
+  set -a; source .env; set +a
+  mk_secret() { kubectl create secret generic "$@" -n "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f - > /dev/null; }
+  mk_secret postgres-secret      --from-literal=POSTGRES_USER="${POSTGRES_USER:-postgres}"         --from-literal=POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-ecommerce@!@#}"
+  mk_secret keycloak-secret      --from-literal=KEYCLOAK_ADMIN="${KEYCLOAK_ADMIN:-admin}"           --from-literal=KEYCLOAK_ADMIN_PASSWORD="${KEYCLOAK_ADMIN_PASSWORD:-ecommerce@!@#}"
+  mk_secret redis-secret         --from-literal=REDIS_PASSWORD="${REDIS_PASSWORD:-ecommerce@!@#}"
+  mk_secret storage-secret       --from-literal=STORAGE_ACCESS_KEY="${STORAGE_ACCESS_KEY:-test}"     --from-literal=STORAGE_SECRET_KEY="${STORAGE_SECRET_KEY:-test}"
+  mk_secret elasticsearch-secret --from-literal=ELASTIC_PASSWORD="${ELASTIC_PASSWORD:-ecommerce@!@#}"
+  mk_secret mail-secret          --from-literal=MAIL_USERNAME="${MAIL_USERNAME:-}"                  --from-literal=MAIL_PASSWORD="${MAIL_PASSWORD:-}"
 else
-  if [ -f .env ]; then
-    info "Loading secrets from .env..."
-    set -a; source .env; set +a
-    kubectl create secret generic postgres-secret      -n "$NAMESPACE" --from-literal=POSTGRES_USER="${POSTGRES_USER:-postgres}"         --from-literal=POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-ecommerce@!@#}" > /dev/null
-    kubectl create secret generic keycloak-secret      -n "$NAMESPACE" --from-literal=KEYCLOAK_ADMIN="${KEYCLOAK_ADMIN:-admin}"           --from-literal=KEYCLOAK_ADMIN_PASSWORD="${KEYCLOAK_ADMIN_PASSWORD:-ecommerce@!@#}" > /dev/null
-    kubectl create secret generic redis-secret         -n "$NAMESPACE" --from-literal=REDIS_PASSWORD="${REDIS_PASSWORD:-ecommerce@!@#}" > /dev/null
-    kubectl create secret generic storage-secret       -n "$NAMESPACE" --from-literal=STORAGE_ACCESS_KEY="${STORAGE_ACCESS_KEY:-test}"     --from-literal=STORAGE_SECRET_KEY="${STORAGE_SECRET_KEY:-test}" > /dev/null
-    kubectl create secret generic elasticsearch-secret -n "$NAMESPACE" --from-literal=ELASTIC_PASSWORD="${ELASTIC_PASSWORD:-ecommerce@!@#}" > /dev/null
-    kubectl create secret generic mail-secret          -n "$NAMESPACE" --from-literal=MAIL_USERNAME="${MAIL_USERNAME:-}"                  --from-literal=MAIL_PASSWORD="${MAIL_PASSWORD:-}" > /dev/null
-  else
-    info "No .env found — using k8s/secrets.yaml (default dev values)"
-    kubectl apply -f k8s/secrets.yaml > /dev/null
-  fi
-  success "Secrets created"
+  info "No .env found — applying k8s/secrets.yaml (default dev values)"
+  kubectl apply -f k8s/secrets.yaml > /dev/null
 fi
+success "Secrets applied"
 
 kubectl apply -f k8s/configmap.yaml > /dev/null
 kubectl create configmap keycloak-realm        -n "$NAMESPACE" \
@@ -310,37 +315,28 @@ kubectl create configmap apisix-routes         -n "$NAMESPACE" \
 success "ConfigMaps applied"
 step_done
 
-# 8. Infrastructure
-# Apply every manifest up front so image pulls and pod startup overlap, then wait.
-# Ordering is enforced by the pods themselves (Keycloak and the backends carry
-# wait-for-postgres / wait-for-kafka initContainers), so awaiting concurrently is
-# safe and total time drops to ~the slowest component instead of the sum.
+# 8. Infrastructure — fire-and-forget: apply everything, let Kubernetes converge on
+# its own. Pod ordering is handled by the pods (Keycloak + backends carry
+# wait-for-postgres / wait-for-kafka initContainers), so we do NOT block on readiness.
 step "Deploy infrastructure"
 for f in postgres redis kafka elasticsearch rustfs keycloak; do
   kubectl apply -f "k8s/infra/${f}.yaml" > /dev/null
 done
-info "Infrastructure manifests applied — pulling images in parallel"
-
-wait_only postgres       "PostgreSQL"    600s
-wait_only redis          "Redis"         300s
-wait_only kafka          "Kafka"         300s
-wait_only elasticsearch  "Elasticsearch" 600s
-wait_only rustfs         "RustFS"        300s
-wait_only keycloak       "Keycloak"      600s
+success "Infrastructure manifests applied (pods start in the background)"
 step_done
 
-# 9. API gateway + Backend + Frontend + Ingress
+# 9. API gateway + Backend + Frontend + Ingress — fire-and-forget as well.
 step "Deploy API gateway, backend services & frontend"
 for yaml in k8s/backend/*.yaml; do
   kubectl apply -f "$yaml" > /dev/null
 done
-kubectl apply -f k8s/frontend/frontend.yaml > /dev/null
+# Ingress BEFORE APISIX: reconcile the shared ecommerce-ingress first so the
+# apisix-api Ingress (api.ecommerce.local) can't clash with a stale host rule.
 kubectl apply -f k8s/ingress/ingress.yaml   > /dev/null
-success "13 backend services + frontend applied"
-info   "Pods are pulling images from GHCR (imagePullPolicy: Always)"
-
-# Apache APISIX (standalone, no etcd/Helm) — the single edge for all API traffic.
-deploy_and_wait k8s/infra/apisix.yaml apisix "Apache APISIX" 300s
+kubectl apply -f k8s/infra/apisix.yaml      > /dev/null   # Apache APISIX (standalone edge)
+kubectl apply -f k8s/frontend/frontend.yaml > /dev/null
+success "API gateway + 13 backend services + frontend applied"
+info   "Pods pull images & start in the background — nothing to wait for here"
 step_done
 
 # 10. /etc/hosts
@@ -353,7 +349,8 @@ TOTAL_ELAPSED=$(elapsed_fmt $((SECONDS - GLOBAL_START)))
 
 printf "\n"
 hr
-printf "  ${BOLD}${GREEN}✓ Deployment complete!${NC}  ${DIM}Total time: %s${NC}\n" "$TOTAL_ELAPSED"
+printf "  ${BOLD}${GREEN}✓ All manifests applied!${NC}  ${DIM}Total time: %s${NC}\n" "$TOTAL_ELAPSED"
+printf "  ${DIM}Kubernetes now pulls images & starts pods in the background — they come up on their own.${NC}\n"
 printf "\n"
 printf "  ${BOLD}%-16s${NC}  %s\n" "Service" "URL"
 printf "  ${DIM}%-16s  %s${NC}\n"  "───────────────" "───────────────────────────────────────────"
@@ -362,6 +359,7 @@ printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "API Gateway"    "http://api.ecom
 printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "Keycloak"       "http://auth.ecommerce.local:9090"
 printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "RustFS (S3)"    "http://rustfs.ecommerce.local:9090"
 printf "\n"
-printf "  ${DIM}Pods may take 1-2 min to pull images and become ready.${NC}\n"
-printf "  ${DIM}Monitor: kubectl get pods -n %s -w${NC}\n" "$NAMESPACE"
+printf "  ${DIM}Pods are still pulling/starting — give them a few minutes.${NC}\n"
+printf "  ${DIM}Watch:        kubectl get pods -n %s -w${NC}\n" "$NAMESPACE"
+printf "  ${DIM}Wait-all:     kubectl wait --for=condition=Ready pod --all -n %s --timeout=600s${NC}\n" "$NAMESPACE"
 hr

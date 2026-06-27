@@ -1,75 +1,387 @@
-# LOCAL DOCKER-COMPOSE ONLY — static mirror of the Kubernetes ApisixRoute CRDs
-# (k8s/gateway/02-routes.yaml). Paths are namespaced by each service's context-path
-# (/auth, /product, ...). Production routing is driven by the APISIX Ingress Controller.
+# LOCAL docker-compose / k3d STANDALONE config — mirror of k8s/gateway/02-routes.yaml.
+# BLOCK style on purpose: APISIX's standalone parser (tinyyaml) cannot handle compact
+# flow maps with colon-bearing keys (e.g. {"auth-service:8088": 1}) or YAML anchors.
 upstreams:
-  - { id: 1, type: roundrobin, nodes: { "auth-service:8088": 1 } }
-  - { id: 2, type: roundrobin, nodes: { "product-service:8086": 1 } }
-  - { id: 3, type: roundrobin, nodes: { "order-service:8084": 1 } }
-  - { id: 4, type: roundrobin, nodes: { "payment-service:8085": 1 } }
-  - { id: 5, type: roundrobin, nodes: { "inventory-service:8082": 1 } }
-  - { id: 6, type: roundrobin, nodes: { "shipping-service:8087": 1 } }
-  - { id: 7, type: roundrobin, nodes: { "favourite-service:8081": 1 } }
-  - { id: 8, type: roundrobin, nodes: { "notification-service:8090": 1 } }
-  - { id: 9, type: roundrobin, nodes: { "media-service:8083": 1 } }
-  - { id: 10, type: roundrobin, nodes: { "rating-service:8089": 1 } }
-  - { id: 11, type: roundrobin, nodes: { "search-service:8094": 1 } }
-  - { id: 12, type: roundrobin, nodes: { "promotion-service:8093": 1 } }
-  - { id: 13, type: roundrobin, nodes: { "tax-service:8091": 1 } }
-
+- id: 1
+  type: roundrobin
+  nodes:
+    auth-service:8088: 1
+- id: 2
+  type: roundrobin
+  nodes:
+    product-service:8086: 1
+- id: 3
+  type: roundrobin
+  nodes:
+    order-service:8084: 1
+- id: 4
+  type: roundrobin
+  nodes:
+    payment-service:8085: 1
+- id: 5
+  type: roundrobin
+  nodes:
+    inventory-service:8082: 1
+- id: 6
+  type: roundrobin
+  nodes:
+    shipping-service:8087: 1
+- id: 7
+  type: roundrobin
+  nodes:
+    favourite-service:8081: 1
+- id: 8
+  type: roundrobin
+  nodes:
+    notification-service:8090: 1
+- id: 9
+  type: roundrobin
+  nodes:
+    media-service:8083: 1
+- id: 10
+  type: roundrobin
+  nodes:
+    rating-service:8089: 1
+- id: 11
+  type: roundrobin
+  nodes:
+    search-service:8094: 1
+- id: 12
+  type: roundrobin
+  nodes:
+    promotion-service:8093: 1
+- id: 13
+  type: roundrobin
+  nodes:
+    tax-service:8091: 1
 global_rules:
-  - id: 1
-    plugins:
-      prometheus: {}
-      cors: { allow_origins: "http://localhost:3000,http://ecommerce.local:9090", allow_methods: "GET,POST,PUT,DELETE,PATCH,OPTIONS", allow_headers: "Authorization,Content-Type,X-Requested-With", max_age: 3600 }
-      limit-count: { count: 1200, time_window: 60, rejected_code: 429, key_type: var, key: remote_addr, policy: local }
-
+- id: 1
+  plugins:
+    prometheus: {}
+    cors:
+      allow_origins: http://localhost:3000,http://ecommerce.local:9090
+      allow_methods: GET,POST,PUT,DELETE,PATCH,OPTIONS
+      allow_headers: Authorization,Content-Type,X-Requested-With
+      max_age: 3600
+    limit-count:
+      count: 1200
+      time_window: 60
+      rejected_code: 429
+      key_type: var
+      key: remote_addr
+      policy: local
 routes:
-  # public storefront contract (clean /api/... + /storefront/...), proxy-rewrite re-adds the context-path
-  - { id: auth-public, uri: /api/v1/auth/*, upstream_id: 1, plugins: { proxy-rewrite: { regex_uri: [ "^/(.*)", "/auth/$1" ] } } }
-  - { id: product-catalog, uris: [ /api/categories, /api/categories/*, /api/products, /api/products/* ], upstream_id: 2, plugins: { proxy-rewrite: { regex_uri: [ "^/(.*)", "/product/$1" ] } } }
-  - { id: rating-storefront, uris: [ /storefront/ratings, /storefront/ratings/* ], upstream_id: 10, plugins: { proxy-rewrite: { regex_uri: [ "^/(.*)", "/rating/$1" ] } } }
-  - { id: search-storefront, uris: [ /storefront/catalog-search, /storefront/search_suggest ], upstream_id: 11, plugins: { proxy-rewrite: { regex_uri: [ "^/(.*)", "/search/$1" ] } } }
-  - { id: openapi-auth, uri: /auth/v3/api-docs/*, upstream_id: 1 }
-  - { id: openapi-product, uri: /product/v3/api-docs/*, upstream_id: 2 }
-  - { id: openapi-order, uri: /order/v3/api-docs/*, upstream_id: 3 }
-  - { id: openapi-payment, uri: /payment/v3/api-docs/*, upstream_id: 4 }
-  - { id: openapi-inventory, uri: /inventory/v3/api-docs/*, upstream_id: 5 }
-  - { id: openapi-shipping, uri: /shipping/v3/api-docs/*, upstream_id: 6 }
-  - { id: openapi-favourite, uri: /favourite/v3/api-docs/*, upstream_id: 7 }
-  - { id: openapi-notification, uri: /notification/v3/api-docs/*, upstream_id: 8 }
-  - { id: openapi-media, uri: /media/v3/api-docs/*, upstream_id: 9 }
-  - { id: openapi-rating, uri: /rating/v3/api-docs/*, upstream_id: 10 }
-  - { id: openapi-search, uri: /search/v3/api-docs/*, upstream_id: 11 }
-  - { id: openapi-promotion, uri: /promotion/v3/api-docs/*, upstream_id: 12 }
-  - { id: openapi-tax, uri: /tax/v3/api-docs/*, upstream_id: 13 }
-  # secured (JWT)
-  - id: auth-roles
-    uris: [ /api/v1/roles, /api/v1/roles/* ]
-    upstream_id: 1
-    plugins:
-      openid-connect: &oidc
-        client_id: ecommerce-client
-        client_secret: "$env://KEYCLOAK_CLIENT_SECRET"
-        discovery: http://keycloak:8080/realms/ecommerce/.well-known/openid-configuration
-        realm: ecommerce
-        bearer_only: true
-        use_jwks: true
-        token_signing_alg_values_expected: RS256
-      proxy-rewrite:
-        regex_uri: [ "^/(.*)", "/auth/$1" ]
-  - { id: auth-users, uris: [ /api/v1/users, /api/v1/users/* ], upstream_id: 1, plugins: { openid-connect: *oidc, proxy-rewrite: { regex_uri: [ "^/(.*)", "/auth/$1" ] } } }
-  - { id: order-carts, uris: [ /api/carts, /api/carts/* ], upstream_id: 3, plugins: { openid-connect: *oidc, proxy-rewrite: { regex_uri: [ "^/(.*)", "/order/$1" ] } } }
-  - { id: order-orders, uris: [ /api/orders, /api/orders/* ], upstream_id: 3, plugins: { openid-connect: *oidc, proxy-rewrite: { regex_uri: [ "^/(.*)", "/order/$1" ] } } }
-  - { id: payment, uris: [ /api/payments, /api/payments/* ], upstream_id: 4, plugins: { openid-connect: *oidc, proxy-rewrite: { regex_uri: [ "^/(.*)", "/payment/$1" ] } } }
-  - { id: inventory, uris: [ /api/inventory, /api/inventory/* ], upstream_id: 5, plugins: { openid-connect: *oidc, proxy-rewrite: { regex_uri: [ "^/(.*)", "/inventory/$1" ] } } }
-  - { id: shipping, uri: /shipping/api/shippings/*, upstream_id: 6, plugins: { openid-connect: *oidc } }
-  - { id: favourite, uris: [ /api/favourites, /api/favourites/* ], upstream_id: 7, plugins: { openid-connect: *oidc, proxy-rewrite: { regex_uri: [ "^/(.*)", "/favourite/$1" ] } } }
-  - { id: notif-email, uri: /notification/api/email/*, upstream_id: 8, plugins: { openid-connect: *oidc } }
-  - { id: notif-notifications, uri: /notification/api/notifications/*, upstream_id: 8, plugins: { openid-connect: *oidc } }
-  - { id: notif-payment, uri: /notification/api/payment-notifications/*, upstream_id: 8, plugins: { openid-connect: *oidc } }
-  - { id: media, uri: /media/medias/*, upstream_id: 9, plugins: { openid-connect: *oidc } }
-  - { id: rating-backoffice, uri: /rating/backoffice/ratings/*, upstream_id: 10, plugins: { openid-connect: *oidc } }
-  - { id: promotion-backoffice, uri: /promotion/backoffice/promotions/*, upstream_id: 12, plugins: { openid-connect: *oidc } }
-  - { id: tax-classes, uri: /tax/backoffice/tax-classes/*, upstream_id: 13, plugins: { openid-connect: *oidc } }
-  - { id: tax-rates, uri: /tax/backoffice/tax-rates/*, upstream_id: 13, plugins: { openid-connect: *oidc } }
+- id: auth-public
+  upstream_id: 1
+  uri: /api/v1/auth/*
+  plugins:
+    proxy-rewrite:
+      regex_uri:
+      - ^/(.*)
+      - /auth/$1
+- id: product-catalog
+  upstream_id: 2
+  uris:
+  - /api/categories
+  - /api/categories/*
+  - /api/products
+  - /api/products/*
+  plugins:
+    proxy-rewrite:
+      regex_uri:
+      - ^/(.*)
+      - /product/$1
+- id: rating-storefront
+  upstream_id: 10
+  uris:
+  - /storefront/ratings
+  - /storefront/ratings/*
+  plugins:
+    proxy-rewrite:
+      regex_uri:
+      - ^/(.*)
+      - /rating/$1
+- id: search-storefront
+  upstream_id: 11
+  uris:
+  - /storefront/catalog-search
+  - /storefront/search_suggest
+  plugins:
+    proxy-rewrite:
+      regex_uri:
+      - ^/(.*)
+      - /search/$1
+- id: openapi-auth
+  upstream_id: 1
+  uri: /auth/v3/api-docs/*
+- id: openapi-product
+  upstream_id: 2
+  uri: /product/v3/api-docs/*
+- id: openapi-order
+  upstream_id: 3
+  uri: /order/v3/api-docs/*
+- id: openapi-payment
+  upstream_id: 4
+  uri: /payment/v3/api-docs/*
+- id: openapi-inventory
+  upstream_id: 5
+  uri: /inventory/v3/api-docs/*
+- id: openapi-shipping
+  upstream_id: 6
+  uri: /shipping/v3/api-docs/*
+- id: openapi-favourite
+  upstream_id: 7
+  uri: /favourite/v3/api-docs/*
+- id: openapi-notification
+  upstream_id: 8
+  uri: /notification/v3/api-docs/*
+- id: openapi-media
+  upstream_id: 9
+  uri: /media/v3/api-docs/*
+- id: openapi-rating
+  upstream_id: 10
+  uri: /rating/v3/api-docs/*
+- id: openapi-search
+  upstream_id: 11
+  uri: /search/v3/api-docs/*
+- id: openapi-promotion
+  upstream_id: 12
+  uri: /promotion/v3/api-docs/*
+- id: openapi-tax
+  upstream_id: 13
+  uri: /tax/v3/api-docs/*
+- id: auth-roles
+  upstream_id: 1
+  uris:
+  - /api/v1/roles
+  - /api/v1/roles/*
+  plugins:
+    openid-connect:
+      client_id: ecommerce-client
+      client_secret: $env://KEYCLOAK_CLIENT_SECRET
+      discovery: http://keycloak:8080/realms/ecommerce/.well-known/openid-configuration
+      realm: ecommerce
+      bearer_only: true
+      use_jwks: true
+      token_signing_alg_values_expected: RS256
+    proxy-rewrite:
+      regex_uri:
+      - ^/(.*)
+      - /auth/$1
+- id: auth-users
+  upstream_id: 1
+  uris:
+  - /api/v1/users
+  - /api/v1/users/*
+  plugins:
+    openid-connect:
+      client_id: ecommerce-client
+      client_secret: $env://KEYCLOAK_CLIENT_SECRET
+      discovery: http://keycloak:8080/realms/ecommerce/.well-known/openid-configuration
+      realm: ecommerce
+      bearer_only: true
+      use_jwks: true
+      token_signing_alg_values_expected: RS256
+    proxy-rewrite:
+      regex_uri:
+      - ^/(.*)
+      - /auth/$1
+- id: order-carts
+  upstream_id: 3
+  uris:
+  - /api/carts
+  - /api/carts/*
+  plugins:
+    openid-connect:
+      client_id: ecommerce-client
+      client_secret: $env://KEYCLOAK_CLIENT_SECRET
+      discovery: http://keycloak:8080/realms/ecommerce/.well-known/openid-configuration
+      realm: ecommerce
+      bearer_only: true
+      use_jwks: true
+      token_signing_alg_values_expected: RS256
+    proxy-rewrite:
+      regex_uri:
+      - ^/(.*)
+      - /order/$1
+- id: order-orders
+  upstream_id: 3
+  uris:
+  - /api/orders
+  - /api/orders/*
+  plugins:
+    openid-connect:
+      client_id: ecommerce-client
+      client_secret: $env://KEYCLOAK_CLIENT_SECRET
+      discovery: http://keycloak:8080/realms/ecommerce/.well-known/openid-configuration
+      realm: ecommerce
+      bearer_only: true
+      use_jwks: true
+      token_signing_alg_values_expected: RS256
+    proxy-rewrite:
+      regex_uri:
+      - ^/(.*)
+      - /order/$1
+- id: payment
+  upstream_id: 4
+  uris:
+  - /api/payments
+  - /api/payments/*
+  plugins:
+    openid-connect:
+      client_id: ecommerce-client
+      client_secret: $env://KEYCLOAK_CLIENT_SECRET
+      discovery: http://keycloak:8080/realms/ecommerce/.well-known/openid-configuration
+      realm: ecommerce
+      bearer_only: true
+      use_jwks: true
+      token_signing_alg_values_expected: RS256
+    proxy-rewrite:
+      regex_uri:
+      - ^/(.*)
+      - /payment/$1
+- id: inventory
+  upstream_id: 5
+  uris:
+  - /api/inventory
+  - /api/inventory/*
+  plugins:
+    openid-connect:
+      client_id: ecommerce-client
+      client_secret: $env://KEYCLOAK_CLIENT_SECRET
+      discovery: http://keycloak:8080/realms/ecommerce/.well-known/openid-configuration
+      realm: ecommerce
+      bearer_only: true
+      use_jwks: true
+      token_signing_alg_values_expected: RS256
+    proxy-rewrite:
+      regex_uri:
+      - ^/(.*)
+      - /inventory/$1
+- id: favourite
+  upstream_id: 7
+  uris:
+  - /api/favourites
+  - /api/favourites/*
+  plugins:
+    openid-connect:
+      client_id: ecommerce-client
+      client_secret: $env://KEYCLOAK_CLIENT_SECRET
+      discovery: http://keycloak:8080/realms/ecommerce/.well-known/openid-configuration
+      realm: ecommerce
+      bearer_only: true
+      use_jwks: true
+      token_signing_alg_values_expected: RS256
+    proxy-rewrite:
+      regex_uri:
+      - ^/(.*)
+      - /favourite/$1
+- id: shipping
+  upstream_id: 6
+  uri: /shipping/api/shippings/*
+  plugins:
+    openid-connect:
+      client_id: ecommerce-client
+      client_secret: $env://KEYCLOAK_CLIENT_SECRET
+      discovery: http://keycloak:8080/realms/ecommerce/.well-known/openid-configuration
+      realm: ecommerce
+      bearer_only: true
+      use_jwks: true
+      token_signing_alg_values_expected: RS256
+- id: notif-email
+  upstream_id: 8
+  uri: /notification/api/email/*
+  plugins:
+    openid-connect:
+      client_id: ecommerce-client
+      client_secret: $env://KEYCLOAK_CLIENT_SECRET
+      discovery: http://keycloak:8080/realms/ecommerce/.well-known/openid-configuration
+      realm: ecommerce
+      bearer_only: true
+      use_jwks: true
+      token_signing_alg_values_expected: RS256
+- id: notif-notifications
+  upstream_id: 8
+  uri: /notification/api/notifications/*
+  plugins:
+    openid-connect:
+      client_id: ecommerce-client
+      client_secret: $env://KEYCLOAK_CLIENT_SECRET
+      discovery: http://keycloak:8080/realms/ecommerce/.well-known/openid-configuration
+      realm: ecommerce
+      bearer_only: true
+      use_jwks: true
+      token_signing_alg_values_expected: RS256
+- id: notif-payment
+  upstream_id: 8
+  uri: /notification/api/payment-notifications/*
+  plugins:
+    openid-connect:
+      client_id: ecommerce-client
+      client_secret: $env://KEYCLOAK_CLIENT_SECRET
+      discovery: http://keycloak:8080/realms/ecommerce/.well-known/openid-configuration
+      realm: ecommerce
+      bearer_only: true
+      use_jwks: true
+      token_signing_alg_values_expected: RS256
+- id: media
+  upstream_id: 9
+  uri: /media/medias/*
+  plugins:
+    openid-connect:
+      client_id: ecommerce-client
+      client_secret: $env://KEYCLOAK_CLIENT_SECRET
+      discovery: http://keycloak:8080/realms/ecommerce/.well-known/openid-configuration
+      realm: ecommerce
+      bearer_only: true
+      use_jwks: true
+      token_signing_alg_values_expected: RS256
+- id: rating-backoffice
+  upstream_id: 10
+  uri: /rating/backoffice/ratings/*
+  plugins:
+    openid-connect:
+      client_id: ecommerce-client
+      client_secret: $env://KEYCLOAK_CLIENT_SECRET
+      discovery: http://keycloak:8080/realms/ecommerce/.well-known/openid-configuration
+      realm: ecommerce
+      bearer_only: true
+      use_jwks: true
+      token_signing_alg_values_expected: RS256
+- id: promotion-backoffice
+  upstream_id: 12
+  uri: /promotion/backoffice/promotions/*
+  plugins:
+    openid-connect:
+      client_id: ecommerce-client
+      client_secret: $env://KEYCLOAK_CLIENT_SECRET
+      discovery: http://keycloak:8080/realms/ecommerce/.well-known/openid-configuration
+      realm: ecommerce
+      bearer_only: true
+      use_jwks: true
+      token_signing_alg_values_expected: RS256
+- id: tax-classes
+  upstream_id: 13
+  uri: /tax/backoffice/tax-classes/*
+  plugins:
+    openid-connect:
+      client_id: ecommerce-client
+      client_secret: $env://KEYCLOAK_CLIENT_SECRET
+      discovery: http://keycloak:8080/realms/ecommerce/.well-known/openid-configuration
+      realm: ecommerce
+      bearer_only: true
+      use_jwks: true
+      token_signing_alg_values_expected: RS256
+- id: tax-rates
+  upstream_id: 13
+  uri: /tax/backoffice/tax-rates/*
+  plugins:
+    openid-connect:
+      client_id: ecommerce-client
+      client_secret: $env://KEYCLOAK_CLIENT_SECRET
+      discovery: http://keycloak:8080/realms/ecommerce/.well-known/openid-configuration
+      realm: ecommerce
+      bearer_only: true
+      use_jwks: true
+      token_signing_alg_values_expected: RS256
 #END
