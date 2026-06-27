@@ -30,9 +30,6 @@ data:
   STORAGE_REGION: "us-east-1"
   STORAGE_BUCKET: "ecommerce-media"
 
-  # Zipkin
-  ZIPKIN_URL: "http://zipkin:9411"
-
   # Hibernate
   SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
 

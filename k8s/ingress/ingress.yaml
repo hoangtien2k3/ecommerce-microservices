@@ -34,11 +34,6 @@ spec:
                 name: frontend
                 port:
                   number: 3000
-
-    # NOTE: the API is NOT routed through NGINX anymore. Apache APISIX is the single
-    # edge for the API — reach it directly via the `apisix-gateway` LoadBalancer Service
-    # (point api.ecommerce.local DNS at that LB). NGINX here only fronts the web/admin UIs.
-
     # Keycloak
     - host: auth.ecommerce.local
       http:
@@ -50,19 +45,6 @@ spec:
                 name: keycloak
                 port:
                   number: 8080
-
-    # Zipkin tracing UI
-    - host: zipkin.ecommerce.local
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: zipkin
-                port:
-                  number: 9411
-
     # rustfs (S3-compatible object storage API)
     - host: rustfs.ecommerce.local
       http:

@@ -1,14 +1,5 @@
 # =============================================================================
-# Apache APISIX — API gateway for the LOCAL k3d cluster, run in STANDALONE mode
-# (no etcd, no Helm, no APISIX Ingress Controller / CRDs).
-#
-# It reads its whole configuration from two files mounted as ConfigMaps, which
-# k3d-setup.sh creates straight from the single-source-of-truth files:
-#   deploy/apisix/config.yaml   -> configmap apisix-config   (core config)
-#   deploy/apisix/apisix.yaml   -> configmap apisix-routes   (routes/upstreams/plugins)
-#
-# A real cluster instead runs APISIX via the Ingress Controller (Helm/ArgoCD,
-# see k8s/argocd/apisix.yaml) reconciling the ApisixRoute CRDs in k8s/gateway/.
+# Apache APISIX — API gateway for the LOCAL k3d cluster
 # =============================================================================
 apiVersion: apps/v1
 kind: Deployment
@@ -90,9 +81,6 @@ spec:
       port: 9080
       targetPort: 9080
 ---
-# Local k3d edge: publish APISIX to the browser through the NGINX ingress, since
-# k3d only exposes the ingress on host port 9090. Production fronts APISIX with
-# its own LoadBalancer instead (k8s/ingress/ingress.yaml documents this).
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:

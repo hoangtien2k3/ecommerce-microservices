@@ -9,7 +9,6 @@ spec:
   resources:
     requests:
       storage: 10Gi
-
 ---
 apiVersion: apps/v1
 kind: StatefulSet

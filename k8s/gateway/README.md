@@ -16,7 +16,7 @@ Client ──▶ apisix-gateway (LoadBalancer)         ← APISIX is the single 
 | File | Kind | Purpose |
 |------|------|---------|
 | `00-plugin-config.yaml` | `ApisixPluginConfig` | Reusable Keycloak JWT (`openid-connect`) named `jwt-auth` |
-| `01-global-rule.yaml`   | `ApisixGlobalRule`   | CORS + Prometheus + Zipkin + rate-limit for every route |
+| `01-global-rule.yaml`   | `ApisixGlobalRule`   | CORS + Prometheus + rate-limit for every route |
 | `02-routes.yaml`        | `ApisixRoute` × 13   | One per service; `plugin_config_name: jwt-auth` = secured |
 
 ## Install order

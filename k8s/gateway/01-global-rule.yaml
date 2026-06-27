@@ -1,5 +1,5 @@
-# Plugins applied to every route in the cluster: CORS, Prometheus metrics,
-# Zipkin tracing and a per-IP rate limit.
+# Plugins applied to every route in the cluster: CORS, Prometheus metrics
+# and a per-IP rate limit.
 apiVersion: apisix.apache.org/v2
 kind: ApisixGlobalRule
 metadata:
@@ -17,12 +17,6 @@ spec:
         max_age: 3600
     - name: prometheus
       enable: true
-    - name: zipkin
-      enable: true
-      config:
-        endpoint: http://zipkin:9411/api/v2/spans
-        sample_ratio: 1
-        service_name: apisix
     - name: limit-count
       enable: true
       config:

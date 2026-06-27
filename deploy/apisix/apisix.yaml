@@ -21,7 +21,6 @@ global_rules:
     plugins:
       prometheus: {}
       cors: { allow_origins: "http://localhost:3000,http://ecommerce.local:9090", allow_methods: "GET,POST,PUT,DELETE,PATCH,OPTIONS", allow_headers: "Authorization,Content-Type,X-Requested-With", max_age: 3600 }
-      zipkin: { endpoint: http://zipkin:9411/api/v2/spans, sample_ratio: 1, service_name: apisix }
       limit-count: { count: 1200, time_window: 60, rejected_code: 429, key_type: var, key: remote_addr, policy: local }
 
 routes:

@@ -1,9 +1,7 @@
 services:
-
   # ============================================================
   # INFRASTRUCTURE
   # ============================================================
-
   postgres:
     image: postgres:16
     container_name: postgres
@@ -139,21 +137,9 @@ services:
     networks:
       - ecommerce-network
 
-  zipkin:
-    image: openzipkin/zipkin:3
-    container_name: zipkin
-    ports:
-      - "9411:9411"
-    networks:
-      - ecommerce-network
-
   # ============================================================
   # BACKEND — Spring Boot Microservices
   # ============================================================
-
-  # API gateway — Apache APISIX (standalone file mode, LOCAL DEV ONLY).
-  # Production/Kubernetes uses the APISIX Ingress Controller + ApisixRoute CRDs
-  # (see k8s/gateway/) — this compose service is just a runnable dev mirror.
   apisix:
     image: apache/apisix:3.9.1-debian
     container_name: apisix
@@ -183,7 +169,6 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/authservice
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      ZIPKIN_URL: http://zipkin:9411
     depends_on:
       postgres:
         condition: service_healthy
@@ -203,7 +188,6 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/productservice
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      ZIPKIN_URL: http://zipkin:9411
     depends_on:
       postgres:
         condition: service_healthy
@@ -222,7 +206,6 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       KAFKA_SERVERS: kafka:9092
-      ZIPKIN_URL: http://zipkin:9411
     depends_on:
       postgres:
         condition: service_healthy
@@ -243,7 +226,6 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       KAFKA_SERVERS: kafka:9092
-      ZIPKIN_URL: http://zipkin:9411
     depends_on:
       postgres:
         condition: service_healthy
@@ -263,7 +245,6 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/shippingservice
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      ZIPKIN_URL: http://zipkin:9411
     depends_on:
       postgres:
         condition: service_healthy
@@ -281,7 +262,6 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/inventoryservice
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      ZIPKIN_URL: http://zipkin:9411
     depends_on:
       postgres:
         condition: service_healthy
@@ -299,7 +279,6 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/favouriteservice
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      ZIPKIN_URL: http://zipkin:9411
     depends_on:
       postgres:
         condition: service_healthy
@@ -317,7 +296,6 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ratingservice
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      ZIPKIN_URL: http://zipkin:9411
     depends_on:
       postgres:
         condition: service_healthy
@@ -339,7 +317,6 @@ services:
       STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY}
       STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY}
       STORAGE_BUCKET: ${STORAGE_BUCKET}
-      ZIPKIN_URL: http://zipkin:9411
     depends_on:
       postgres:
         condition: service_healthy
@@ -359,7 +336,6 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/taxservice
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      ZIPKIN_URL: http://zipkin:9411
     depends_on:
       postgres:
         condition: service_healthy
@@ -377,7 +353,6 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/promotionservice
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      ZIPKIN_URL: http://zipkin:9411
     depends_on:
       postgres:
         condition: service_healthy
@@ -396,7 +371,6 @@ services:
       ELASTICSEARCH_USERNAME: ""
       ELASTICSEARCH_PASSWORD: ""
       KAFKA_SERVERS: kafka:9092
-      ZIPKIN_URL: http://zipkin:9411
     depends_on:
       elasticsearch:
         condition: service_healthy
@@ -421,7 +395,6 @@ services:
       KAFKA_SERVERS: kafka:9092
       MAIL_USERNAME: ${MAIL_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
-      ZIPKIN_URL: http://zipkin:9411
     depends_on:
       postgres:
         condition: service_healthy
@@ -433,7 +406,6 @@ services:
   # ============================================================
   # FRONTEND — Next.js
   # ============================================================
-
   frontend:
     image: ghcr.io/hoangtien2k3/frontend:latest
     pull_policy: always
@@ -452,7 +424,6 @@ services:
 networks:
   ecommerce-network:
     driver: bridge
-
 volumes:
   postgres_data:
   redis_data:

@@ -70,7 +70,7 @@ elapsed_fmt() {
 CLUSTER_NAME="ecommerce"
 NAMESPACE="ecommerce"
 REGISTRY="ghcr.io/hoangtien2k3"
-HOSTS_ENTRY="127.0.0.1 ecommerce.local api.ecommerce.local auth.ecommerce.local zipkin.ecommerce.local rustfs.ecommerce.local"
+HOSTS_ENTRY="127.0.0.1 ecommerce.local api.ecommerce.local auth.ecommerce.local rustfs.ecommerce.local"
 
 SERVICES=(
   auth-service product-service order-service
@@ -145,6 +145,16 @@ wait_for_pod() {
 deploy_and_wait() {
   local yaml="$1" label="$2" name="$3" timeout="${4:-300s}"
   kubectl apply -f "$yaml" > /dev/null
+  start_spinner "Waiting for ${name}..."
+  wait_for_pod "$label" "$name" "$timeout"
+  stop_spinner
+  success "${name} is ready"
+}
+
+# Wait for an already-applied workload (used when manifests are applied up front so
+# their image pulls / startup overlap, then awaited concurrently).
+wait_only() {
+  local label="$1" name="$2" timeout="${3:-300s}"
   start_spinner "Waiting for ${name}..."
   wait_for_pod "$label" "$name" "$timeout"
   stop_spinner
@@ -301,14 +311,22 @@ success "ConfigMaps applied"
 step_done
 
 # 8. Infrastructure
+# Apply every manifest up front so image pulls and pod startup overlap, then wait.
+# Ordering is enforced by the pods themselves (Keycloak and the backends carry
+# wait-for-postgres / wait-for-kafka initContainers), so awaiting concurrently is
+# safe and total time drops to ~the slowest component instead of the sum.
 step "Deploy infrastructure"
-deploy_and_wait k8s/infra/postgres.yaml       postgres       "PostgreSQL"    600s
-deploy_and_wait k8s/infra/redis.yaml          redis          "Redis"         300s
-deploy_and_wait k8s/infra/kafka.yaml          kafka          "Kafka"         300s
-deploy_and_wait k8s/infra/elasticsearch.yaml  elasticsearch  "Elasticsearch" 600s
-deploy_and_wait k8s/infra/rustfs.yaml         rustfs         "RustFS"        300s
-deploy_and_wait k8s/infra/keycloak.yaml       keycloak       "Keycloak"      600s
-deploy_and_wait k8s/infra/zipkin.yaml         zipkin         "Zipkin"        300s
+for f in postgres redis kafka elasticsearch rustfs keycloak; do
+  kubectl apply -f "k8s/infra/${f}.yaml" > /dev/null
+done
+info "Infrastructure manifests applied — pulling images in parallel"
+
+wait_only postgres       "PostgreSQL"    600s
+wait_only redis          "Redis"         300s
+wait_only kafka          "Kafka"         300s
+wait_only elasticsearch  "Elasticsearch" 600s
+wait_only rustfs         "RustFS"        300s
+wait_only keycloak       "Keycloak"      600s
 step_done
 
 # 9. API gateway + Backend + Frontend + Ingress
@@ -343,7 +361,6 @@ printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "Frontend"       "http://ecommerc
 printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "API Gateway"    "http://api.ecommerce.local:9090"
 printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "Keycloak"       "http://auth.ecommerce.local:9090"
 printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "RustFS (S3)"    "http://rustfs.ecommerce.local:9090"
-printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "Zipkin"         "http://zipkin.ecommerce.local:9090"
 printf "\n"
 printf "  ${DIM}Pods may take 1-2 min to pull images and become ready.${NC}\n"
 printf "  ${DIM}Monitor: kubectl get pods -n %s -w${NC}\n" "$NAMESPACE"

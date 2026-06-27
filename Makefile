@@ -17,7 +17,7 @@ SERVICES = discovery-service api-gateway auth-service \
 
 ## Start infrastructure only (postgres, kafka, redis, keycloak…)
 infra-up:
-	docker compose up -d postgres mongodb redis kafka elasticsearch minio keycloak zipkin
+	docker compose up -d postgres mongodb redis kafka elasticsearch minio keycloak
 
 ## Wait until infra is healthy, then start all backend + frontend
 up:
@@ -121,7 +121,6 @@ k8s-infra: k8s-config
 	kubectl apply -f k8s/infra/elasticsearch.yaml
 	kubectl apply -f k8s/infra/minio.yaml
 	kubectl apply -f k8s/infra/keycloak.yaml
-	kubectl apply -f k8s/infra/zipkin.yaml
 	@echo "Waiting 60s for infra to stabilise…"
 	sleep 60
 
@@ -159,7 +158,7 @@ k8s-all: k8s-infra k8s-backend k8s-frontend k8s-ingress
 	@echo "==> All services deployed to namespace '$(NAMESPACE)'"
 	@echo "==> Add these entries to /etc/hosts:"
 	@echo "    127.0.0.1  ecommerce.local api.ecommerce.local auth.ecommerce.local"
-	@echo "    127.0.0.1  discovery.ecommerce.local zipkin.ecommerce.local minio.ecommerce.local"
+	@echo "    127.0.0.1  discovery.ecommerce.local minio.ecommerce.local"
 
 ## Delete all K8S resources (keeps PVCs to preserve data)
 k8s-delete:
