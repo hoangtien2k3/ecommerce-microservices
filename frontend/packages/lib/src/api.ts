@@ -1,17 +1,19 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 
 // Origin of the API gateway (Apache APISIX). The browser talks to APISIX directly
-// — NOT through this Next.js server. By convention the API lives on the `api.`
-// sub-host of wherever the app is served, sharing the same scheme and port, so we
-// derive it from window.location: ONE image then works in every environment
-// (k3d: http://ecommerce.local -> http://api.ecommerce.local; prod:
-// https://ecommerce.local -> https://api.ecommerce.local). Set NEXT_PUBLIC_API_URL
-// at build time only if the API lives on an unrelated host.
+// — NOT through this Next.js server. The API always lives at api.<root-domain>,
+// so we strip any existing subdomain (admin., app., …) and prepend "api.":
+//   ecommerce.local       → api.ecommerce.local
+//   admin.ecommerce.local → api.ecommerce.local  (not api.admin.ecommerce.local)
+//   api.ecommerce.local   → api.ecommerce.local  (already correct)
+// Set NEXT_PUBLIC_API_URL at build time only if the API lives on an unrelated host.
 function resolveApiBaseUrl(): string {
   if (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL as string;
   if (typeof window !== "undefined") {
     const { protocol, hostname, port } = window.location;
-    const apiHost = hostname.startsWith("api.") ? hostname : `api.${hostname}`;
+    const parts = hostname.split(".");
+    const rootDomain = parts.length > 2 ? parts.slice(1).join(".") : hostname;
+    const apiHost = `api.${rootDomain}`;
     return `${protocol}//${apiHost}${port ? `:${port}` : ""}`;
   }
   return "";
