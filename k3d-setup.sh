@@ -70,7 +70,7 @@ elapsed_fmt() {
 CLUSTER_NAME="ecommerce"
 NAMESPACE="ecommerce"
 REGISTRY="ghcr.io/hoangtien2k3"
-HOSTS_ENTRY="127.0.0.1 ecommerce.local api.ecommerce.local keycloak.ecommerce.local rustfs.ecommerce.local"
+HOSTS_ENTRY="127.0.0.1 ecommerce.local admin.ecommerce.local api.ecommerce.local keycloak.ecommerce.local rustfs.ecommerce.local"
 
 SERVICES=(
   auth-service product-service order-service
@@ -358,6 +358,7 @@ printf "\n"
 printf "  ${BOLD}%-16s${NC}  %s\n" "Service" "URL"
 printf "  ${DIM}%-16s  %s${NC}\n"  "───────────────" "───────────────────────────────────────────"
 printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "Frontend"       "http://ecommerce.local"
+printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "Admin"          "http://admin.ecommerce.local"
 printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "API Gateway"    "http://api.ecommerce.local"
 printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "Keycloak"       "http://keycloak.ecommerce.local"
 printf "  ${BOLD}%-16s${NC}  ${CYAN}%s${NC}\n" "RustFS Console" "http://rustfs.ecommerce.local/rustfs/console/"

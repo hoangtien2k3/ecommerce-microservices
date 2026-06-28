@@ -23,7 +23,7 @@ spec:
   #       - keycloak.ecommerce.local
   #     secretName: ecommerce-tls
   rules:
-    # Frontend
+    # Frontend (storefront)
     - host: ecommerce.local
       http:
         paths:
@@ -34,6 +34,17 @@ spec:
                 name: frontend
                 port:
                   number: 3000
+    # Admin dashboard
+    - host: admin.ecommerce.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: admin
+                port:
+                  number: 3001
     # Keycloak
     - host: keycloak.ecommerce.local
       http:
