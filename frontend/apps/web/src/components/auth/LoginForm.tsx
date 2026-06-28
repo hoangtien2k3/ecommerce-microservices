@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { Button, Input } from "@ecommerce/ui";
 import { useLogin } from "@/hooks";
 import { Link } from "@/i18n/navigation";
+import { authStyles as s } from "./auth.styles";
 
 export default function LoginForm() {
   const t = useTranslations("Auth");
@@ -32,9 +33,9 @@ export default function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className={s.form}>
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-600 rounded-lg px-4 py-3 text-sm">
+        <div className={s.errorBox}>
           {error}
         </div>
       )}
@@ -50,7 +51,7 @@ export default function LoginForm() {
         required
       />
 
-      <div className="relative">
+      <div className={s.passwordWrap}>
         <Input
           name="password"
           type={showPassword ? "text" : "password"}
@@ -65,18 +66,18 @@ export default function LoginForm() {
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-3 top-8 text-gray-400 hover:text-gray-600"
+          className={s.passwordToggle}
         >
           {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
         </button>
       </div>
 
-      <div className="flex items-center justify-between text-sm">
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" className="rounded border-gray-300 text-orange-500" />
-          <span className="text-gray-600">{t("rememberMe")}</span>
+      <div className={s.optionsRow}>
+        <label className={s.rememberLabel}>
+          <input type="checkbox" className={s.rememberCheckbox} />
+          <span className={s.rememberText}>{t("rememberMe")}</span>
         </label>
-        <Link href="/forgot-password" className="text-orange-500 hover:text-orange-600">
+        <Link href="/forgot-password" className={s.link}>
           {t("forgotPassword")}
         </Link>
       </div>
@@ -85,9 +86,9 @@ export default function LoginForm() {
         {t("loginBtn")}
       </Button>
 
-      <p className="text-center text-sm text-gray-600">
+      <p className={s.switchText}>
         {t("noAccount")}{" "}
-        <Link href="/register" className="text-orange-500 font-medium hover:text-orange-600">
+        <Link href="/register" className={s.switchLink}>
           {t("registerNow")}
         </Link>
       </p>

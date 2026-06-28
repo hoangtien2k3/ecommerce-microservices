@@ -1,100 +1,61 @@
 import { getTranslations } from "next-intl/server";
-import { ArrowRight, Shield, Truck, RefreshCw, Headphones } from "lucide-react";
-import { Button, SectionHeader, Section, FeatureStrip, PromoBanner } from "@ecommerce/ui";
-import ProductGrid from "@/components/product/ProductGrid";
-import CategoryGrid from "@/components/ui/CategoryGrid";
-import { Link } from "@/i18n/navigation";
+import { ShieldCheck, Truck, RefreshCw, Headphones } from "lucide-react";
+import HeroSlider from "@/components/home/HeroSlider";
+import QuickDeals from "@/components/home/QuickDeals";
+import CategoryBar from "@/components/home/CategoryBar";
+import FlashSale from "@/components/home/FlashSale";
+import ProductRail from "@/components/home/ProductRail";
+import BrandStrip from "@/components/home/BrandStrip";
+import { hotProducts } from "@/data/homeMock";
+
+export async function generateMetadata() {
+  const t = await getTranslations("Home");
+  return { title: t("metaTitle"), description: t("metaDesc") };
+}
 
 export default async function HomePage() {
   const t = await getTranslations("Home");
 
-  const features = [
-    { icon: Truck,        title: t("freeShipping"),  description: t("freeShippingDesc") },
-    { icon: Shield,       title: t("securePay"),      description: t("securePayDesc") },
-    { icon: RefreshCw,    title: t("easyReturn"),     description: t("easyReturnDesc") },
-    { icon: Headphones,   title: t("support"),        description: t("supportDesc") },
-  ];
+  // The hot list is split into two rails to mirror CellphoneS's "hot trend" and
+  // "hàng mới về" sections. Backed by mock data until the product service is live.
+  const hotTrend = hotProducts.slice(0, 5);
+  const newArrivals = hotProducts.slice(5, 10);
 
-  const categories = [
-    { id: 1, name: t("cat1"), emoji: "📱", bgColor: "bg-blue-100", href: "/products?categoryId=1" },
-    { id: 2, name: t("cat2"), emoji: "👗", bgColor: "bg-pink-100", href: "/products?categoryId=2" },
-    { id: 3, name: t("cat3"), emoji: "🏠", bgColor: "bg-yellow-100", href: "/products?categoryId=3" },
-    { id: 4, name: t("cat4"), emoji: "💊", bgColor: "bg-green-100", href: "/products?categoryId=4" },
-    { id: 5, name: t("cat5"), emoji: "⚽", bgColor: "bg-orange-100", href: "/products?categoryId=5" },
-    { id: 6, name: t("cat6"), emoji: "🧸", bgColor: "bg-purple-100", href: "/products?categoryId=6" },
-    { id: 7, name: t("cat7"), emoji: "📚", bgColor: "bg-red-100", href: "/products?categoryId=7" },
-    { id: 8, name: t("cat8"), emoji: "🚗", bgColor: "bg-gray-100", href: "/products?categoryId=8" },
+  const usp = [
+    { icon: ShieldCheck, title: t("uspGenuine"), desc: t("uspGenuineDesc") },
+    { icon: Truck, title: t("uspShipping"), desc: t("uspShippingDesc") },
+    { icon: RefreshCw, title: t("uspReturn"), desc: t("uspReturnDesc") },
+    { icon: Headphones, title: t("uspSupport"), desc: t("uspSupportDesc") },
   ];
 
   return (
-    <div>
-      <section className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 py-16 md:py-20">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur rounded-full px-3 py-1 text-sm mb-4">
-              {t("flashSale")}
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
-              {t("heroTitle")}<br />
-              <span className="text-yellow-300">{t("heroHighlight")}</span>
-            </h1>
-            <p className="text-orange-100 text-lg mb-8 max-w-md">{t("heroSubtitle")}</p>
-            <div className="flex flex-wrap gap-3">
-              <Link href="/products">
-                <Button variant="secondary" size="lg" className="bg-white text-orange-500 hover:bg-orange-50 border-0 font-semibold">
-                  {t("shopNow")}
-                  <ArrowRight className="h-5 w-5" />
-                </Button>
-              </Link>
-              <Link href="/promotions">
-                <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/10">
-                  {t("viewPromos")}
-                </Button>
-              </Link>
-            </div>
+    <div className="bg-[#f4f4f4]">
+      <div className="max-w-7xl mx-auto px-3 md:px-4 py-4 space-y-5">
+        <HeroSlider />
+        <QuickDeals />
+        <CategoryBar />
+        <FlashSale />
+        <ProductRail title={t("hotProducts")} icon="🔥" products={hotTrend} viewAllLabel={t("viewAll")} />
+        <ProductRail title={t("newArrivals")} icon="🆕" products={newArrivals} viewAllLabel={t("viewAll")} />
+        <BrandStrip />
+
+        {/* USP strip */}
+        <section className="bg-white rounded-2xl p-4 md:p-5">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {usp.map(({ icon: Icon, title, desc }) => (
+              <div key={title} className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-full bg-primary-50 flex items-center justify-center shrink-0">
+                  <Icon className="h-5 w-5 text-primary-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-900 leading-tight">{title}</p>
+                  <p className="text-xs text-gray-500">{desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
-      </section>
-
-      <FeatureStrip items={features} />
-
-      <Section className="py-10" title={t("featuredCategories")} linkHref="/products" linkLabel={t("shopNow")}>
-        <CategoryGrid items={categories} />
-      </Section>
-
-      <Section className="pb-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <PromoBanner
-            className="md:col-span-2"
-            badge={t("promoTodayLabel")}
-            title={t("promoElectronics")}
-            gradient="bg-gradient-to-r from-purple-600 to-purple-700"
-            action={
-              <Link href="/products?categoryId=1">
-                <Button size="sm" className="bg-white text-purple-600 hover:bg-purple-50 border-0 font-semibold">
-                  {t("promoElectronicsBtn")}
-                </Button>
-              </Link>
-            }
-          />
-          <PromoBanner
-            badge={t("promoNewLabel")}
-            title={t("promoNew")}
-            gradient="bg-gradient-to-br from-green-500 to-emerald-600"
-            action={
-              <Link href="/register">
-                <Button size="sm" className="bg-white text-green-600 hover:bg-green-50 border-0 font-semibold">
-                  {t("promoNewBtn")}
-                </Button>
-              </Link>
-            }
-          />
-        </div>
-      </Section>
-
-      <Section className="pb-12" title={t("featuredProducts")} linkHref="/products" linkLabel={t("shopNow")}>
-        <ProductGrid size={8} />
-      </Section>
+        </section>
+      </div>
     </div>
   );
 }

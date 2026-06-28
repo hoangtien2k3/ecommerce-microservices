@@ -4,7 +4,7 @@
 @source "../../../../packages/ui/src";
 
 :root {
-  --background: #f9fafb;
+  --background: #f4f4f4;
   --foreground: #111827;
 }
 
@@ -12,6 +12,32 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist);
+
+  /* Brand palette — CellphoneS-style red. Exposed as `primary-*`. */
+  --color-primary-50: #fff1f2;
+  --color-primary-100: #ffe0e2;
+  --color-primary-200: #ffc7ca;
+  --color-primary-300: #ff9ca1;
+  --color-primary-400: #ff5b63;
+  --color-primary-500: #e30019;
+  --color-primary-600: #c70016;
+  --color-primary-700: #a30012;
+  --color-primary-800: #86000f;
+  --color-primary-900: #6e0010;
+
+  /* Rebrand: the app historically used `orange-*` as the brand color. Remap the
+     whole orange scale onto the red brand so every existing `bg-orange-*` /
+     `text-orange-*` class renders the new brand with zero refactoring. */
+  --color-orange-50: #fff1f2;
+  --color-orange-100: #ffe0e2;
+  --color-orange-200: #ffc7ca;
+  --color-orange-300: #ff9ca1;
+  --color-orange-400: #ff5b63;
+  --color-orange-500: #e30019;
+  --color-orange-600: #c70016;
+  --color-orange-700: #a30012;
+  --color-orange-800: #86000f;
+  --color-orange-900: #6e0010;
 }
 
 body {
@@ -40,4 +66,22 @@ html {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+}
+
+/* Horizontal scroll rows (flash sale, carousels) without a visible scrollbar. */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Subtle marquee for the top announcement bar. */
+@keyframes brand-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+.animate-brand-pulse {
+  animation: brand-pulse 1.4s ease-in-out infinite;
 }

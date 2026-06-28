@@ -1,16 +1,24 @@
 "use client";
 
-import { Heart, Bell } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Heart, Bell, Phone, MapPin, FileText } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 
 export function TopBar() {
+  const t = useTranslations("Header");
   return (
-    <div className="bg-orange-500 text-white text-xs py-1.5">
+    <div className="bg-primary-600 text-white text-xs py-1.5">
       <div className="max-w-7xl mx-auto px-4 flex justify-between items-center">
-        <span>Free shipping for orders over $50</span>
+        <span className="flex items-center gap-1.5 font-medium">
+          <Phone className="h-3.5 w-3.5" /> {t("hotline")}
+        </span>
         <div className="flex items-center gap-4">
-          <Link href="/about" className="hover:underline">About</Link>
-          <Link href="/contact" className="hover:underline">Contact</Link>
+          <Link href="/orders" className="hover:underline flex items-center gap-1">
+            <FileText className="h-3.5 w-3.5" /> {t("topTrackOrder")}
+          </Link>
+          <Link href="/stores" className="hover:underline items-center gap-1 hidden sm:flex">
+            <MapPin className="h-3.5 w-3.5" /> {t("storeSystem")}
+          </Link>
         </div>
       </div>
     </div>

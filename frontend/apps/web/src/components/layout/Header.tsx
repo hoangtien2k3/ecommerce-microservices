@@ -14,9 +14,11 @@ import { cn } from "@ecommerce/lib/utils";
 import { Link } from "@/i18n/navigation";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { TopBar, Logo } from "./HeaderParts";
+import CategoryMenu from "./CategoryMenu";
 
 export default function Header() {
   const t = useTranslations("Header");
+  const tCat = useTranslations("Category");
   const { totalItems } = useCartStore();
   const { user, isAuthenticated } = useAuthStore();
   const logoutMutation = useLogout();
@@ -47,6 +49,8 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center gap-4 h-16">
           <Logo />
+
+          <CategoryMenu />
 
           {/* Search form */}
           <form
@@ -131,13 +135,12 @@ export default function Header() {
           </div>
         </div>
 
-        <nav className="hidden md:flex items-center gap-6 pb-3 text-sm">
-          <Link href="/products" className="text-gray-600 hover:text-orange-500 font-medium transition-colors">{t("allProducts")}</Link>
-          <Link href="/products?categoryId=1" className="text-gray-600 hover:text-orange-500 transition-colors">{t("electronics")}</Link>
-          <Link href="/products?categoryId=2" className="text-gray-600 hover:text-orange-500 transition-colors">{t("fashion")}</Link>
-          <Link href="/products?categoryId=3" className="text-gray-600 hover:text-orange-500 transition-colors">{t("home")}</Link>
-          <Link href="/products?categoryId=4" className="text-gray-600 hover:text-orange-500 transition-colors">{t("healthBeauty")}</Link>
-          <Link href="/promotions" className="text-red-500 font-medium hover:text-red-600 transition-colors">{t("promotions")}</Link>
+        <nav className="hidden md:flex items-center gap-5 pb-3 text-sm overflow-x-auto no-scrollbar">
+          <Link href="/products" className="text-gray-600 hover:text-primary-600 font-medium transition-colors whitespace-nowrap">{t("allProducts")}</Link>
+          {(["c1", "c2", "c3", "c4", "c5", "c9"] as const).map((key, i) => (
+            <Link key={key} href={`/products?categoryId=${[1, 2, 3, 4, 5, 9][i]}`} className="text-gray-600 hover:text-primary-600 transition-colors whitespace-nowrap">{tCat(key)}</Link>
+          ))}
+          <Link href="/products?sort=priceUnit,asc" className="text-primary-600 font-semibold hover:text-primary-700 transition-colors whitespace-nowrap">{t("promo")}</Link>
         </nav>
       </div>
 

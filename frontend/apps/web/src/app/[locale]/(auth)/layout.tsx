@@ -2,28 +2,29 @@ import { getTranslations } from "next-intl/server";
 import { Package } from "lucide-react";
 import React from "react";
 import { Link } from "@/i18n/navigation";
+import { authStyles as s } from "@/components/auth/auth.styles";
 
 export default async function AuthLayout({ children }: { children: React.ReactNode }) {
   const t = await getTranslations("Auth");
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 flex flex-col">
-      <header className="p-4">
-        <Link href="/" className="inline-flex items-center gap-2">
-          <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-            <Package className="h-5 w-5 text-white" />
+    <div className={s.shell}>
+      <header className={s.shellHeader}>
+        <Link href="/" className={s.brand}>
+          <div className={s.brandLogo}>
+            <Package className={s.brandLogoIcon} />
           </div>
-          <span className="text-xl font-bold text-gray-900">
-            Ez<span className="text-orange-500">Buy</span>
+          <span className={s.brandText}>
+            Ez<span className={s.brandAccent}>Buy</span>
           </span>
         </Link>
       </header>
 
-      <main className="flex-1 flex items-center justify-center px-4 py-8">
+      <main className={s.shellMain}>
         {children}
       </main>
 
-      <footer className="p-4 text-center text-xs text-gray-400">
+      <footer className={s.shellFooter}>
         {t("copyright")}
       </footer>
     </div>
