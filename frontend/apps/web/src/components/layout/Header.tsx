@@ -13,12 +13,11 @@ import { Button } from "@ecommerce/ui";
 import { cn } from "@ecommerce/lib/utils";
 import { Link } from "@/i18n/navigation";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { TopBar, Logo } from "./HeaderParts";
+import { TopBar, Logo, LocationPill } from "./HeaderParts";
 import CategoryMenu from "./CategoryMenu";
 
 export default function Header() {
   const t = useTranslations("Header");
-  const tCat = useTranslations("Category");
   const { totalItems } = useCartStore();
   const { user, isAuthenticated } = useAuthStore();
   const logoutMutation = useLogout();
@@ -43,12 +42,12 @@ export default function Header() {
   const isAdmin = !!user?.roles?.some((r) => r.name === "ADMIN" || r.name === "ROLE_ADMIN");
 
   return (
-    <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200">
+    <header className="sticky top-0 z-50 bg-primary-600 shadow-md">
       <TopBar />
 
       <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center gap-4 h-16">
-          <Logo />
+        <div className="flex items-center gap-3 md:gap-4 h-16">
+          <Logo light />
 
           <CategoryMenu />
 
@@ -63,54 +62,59 @@ export default function Header() {
             }}
             className="flex-1 max-w-xl hidden md:flex"
           >
-            <div className="flex w-full border-2 border-orange-500 rounded-lg overflow-hidden">
+            <div className="flex w-full bg-white rounded-full overflow-hidden shadow-sm">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t("searchPlaceholder")}
-                className="flex-1 px-4 py-2 text-sm text-gray-900 outline-none"
+                className="flex-1 px-4 py-2 text-sm text-gray-900 outline-none bg-transparent"
               />
-              <button type="submit" className="bg-orange-500 px-4 text-white hover:bg-orange-600 transition-colors">
+              <button type="submit" className="px-4 text-primary-600 hover:text-primary-700 transition-colors">
                 <Search className="h-4 w-4" />
               </button>
             </div>
           </form>
 
-          <div className="flex items-center gap-2 ml-auto">
+          <div className="flex items-center gap-1 ml-auto">
             {isAuthenticated && (
-              <Link href="/favourites" className="p-2 text-gray-600 hover:text-orange-500 transition-colors hidden md:flex">
+              <Link href="/favourites" className="p-2 text-white/90 hover:text-white transition-colors hidden md:flex">
                 <Heart className="h-5 w-5" />
               </Link>
             )}
             {isAuthenticated && (
-              <button className="p-2 text-gray-600 hover:text-orange-500 transition-colors relative hidden md:flex">
+              <button className="p-2 text-white/90 hover:text-white transition-colors relative hidden md:flex">
                 <Bell className="h-5 w-5" />
               </button>
             )}
 
-            <Link href="/cart" className="relative p-2 text-gray-600 hover:text-orange-500 transition-colors">
-              <ShoppingCart className="h-5 w-5" />
-              {cartCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-orange-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-medium">
-                  {cartCount > 9 ? "9+" : cartCount}
-                </span>
-              )}
+            <Link href="/cart" className="relative flex items-center gap-1.5 text-white/90 hover:text-white transition-colors px-2 py-2">
+              <div className="relative">
+                <ShoppingCart className="h-5 w-5" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-amber-400 text-primary-700 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                    {cartCount > 9 ? "9+" : cartCount}
+                  </span>
+                )}
+              </div>
+              <span className="text-xs hidden lg:block">{t("cart")}</span>
             </Link>
+
+            <LocationPill />
 
             {isAuthenticated ? (
               <div className="relative" ref={profileRef}>
                 <button
                   onClick={() => setProfileOpen(!profileOpen)}
-                  className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                  className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-white/10 transition-colors"
                 >
-                  <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                  <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-primary-600 text-sm font-semibold">
                     {user?.fullName?.[0]?.toUpperCase() ?? "U"}
                   </div>
-                  <span className="text-sm font-medium text-gray-700 hidden md:block max-w-[100px] truncate">
+                  <span className="text-sm font-medium text-white hidden md:block max-w-[100px] truncate">
                     {user?.fullName}
                   </span>
-                  <ChevronDown className={cn("h-4 w-4 text-gray-500 hidden md:block transition-transform", profileOpen && "rotate-180")} />
+                  <ChevronDown className={cn("h-4 w-4 text-white/80 hidden md:block transition-transform", profileOpen && "rotate-180")} />
                 </button>
 
                 {profileOpen && (
@@ -123,25 +127,17 @@ export default function Header() {
                 )}
               </div>
             ) : (
-              <div className="hidden md:flex items-center gap-2">
-                <Link href="/login"><Button variant="ghost" size="sm">{t("login")}</Button></Link>
-                <Link href="/register"><Button size="sm">{t("register")}</Button></Link>
+              <div className="hidden md:flex items-center gap-1.5">
+                <Link href="/login" className="text-sm font-medium text-white/90 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors">{t("login")}</Link>
+                <Link href="/register" className="text-sm font-medium text-primary-600 bg-white px-3 py-1.5 rounded-lg hover:bg-white/90 transition-colors">{t("register")}</Link>
               </div>
             )}
 
-            <button onClick={() => setMobileOpen(!mobileOpen)} className="p-2 text-gray-600 md:hidden">
+            <button onClick={() => setMobileOpen(!mobileOpen)} className="p-2 text-white md:hidden">
               {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
         </div>
-
-        <nav className="hidden md:flex items-center gap-5 pb-3 text-sm overflow-x-auto no-scrollbar">
-          <Link href="/products" className="text-gray-600 hover:text-primary-600 font-medium transition-colors whitespace-nowrap">{t("allProducts")}</Link>
-          {(["c1", "c2", "c3", "c4", "c5", "c9"] as const).map((key, i) => (
-            <Link key={key} href={`/products?categoryId=${[1, 2, 3, 4, 5, 9][i]}`} className="text-gray-600 hover:text-primary-600 transition-colors whitespace-nowrap">{tCat(key)}</Link>
-          ))}
-          <Link href="/products?sort=priceUnit,asc" className="text-primary-600 font-semibold hover:text-primary-700 transition-colors whitespace-nowrap">{t("promo")}</Link>
-        </nav>
       </div>
 
       {mobileOpen && <MobileMenu

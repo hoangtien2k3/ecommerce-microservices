@@ -59,6 +59,7 @@ build/
 
 ### MacOs ###
 .DS_Store
+files
 
 ### Agents ###
 .claude

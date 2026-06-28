@@ -1,12 +1,15 @@
 import { getTranslations } from "next-intl/server";
 import { ShieldCheck, Truck, RefreshCw, Headphones } from "lucide-react";
-import HeroSlider from "@/components/home/HeroSlider";
+import HeroSection from "@/components/home/HeroSection";
 import QuickDeals from "@/components/home/QuickDeals";
-import CategoryBar from "@/components/home/CategoryBar";
 import FlashSale from "@/components/home/FlashSale";
 import ProductRail from "@/components/home/ProductRail";
+import CategorySection from "@/components/home/CategorySection";
 import BrandStrip from "@/components/home/BrandStrip";
-import { hotProducts } from "@/data/homeMock";
+import { homeStyles as s } from "@/components/home/home.styles";
+import {
+  hotProducts, phoneProducts, laptopProducts, phoneBrands, laptopBrands,
+} from "@/data/homeMock";
 
 export async function generateMetadata() {
   const t = await getTranslations("Home");
@@ -16,8 +19,6 @@ export async function generateMetadata() {
 export default async function HomePage() {
   const t = await getTranslations("Home");
 
-  // The hot list is split into two rails to mirror CellphoneS's "hot trend" and
-  // "hàng mới về" sections. Backed by mock data until the product service is live.
   const hotTrend = hotProducts.slice(0, 5);
   const newArrivals = hotProducts.slice(5, 10);
 
@@ -30,26 +31,52 @@ export default async function HomePage() {
 
   return (
     <div className="bg-[#f4f4f4]">
-      <div className="max-w-7xl mx-auto px-3 md:px-4 py-4 space-y-5">
-        <HeroSlider />
+      <div className="max-w-7xl mx-auto px-3 md:px-4 py-4 space-y-4">
+        <HeroSection />
         <QuickDeals />
-        <CategoryBar />
         <FlashSale />
+
         <ProductRail title={t("hotProducts")} icon="🔥" products={hotTrend} viewAllLabel={t("viewAll")} />
+
+        <CategorySection
+          title={t("catPhones")}
+          icon="📱"
+          viewAllLabel={t("viewAll")}
+          bannerTitle={t("phoneBannerTitle")}
+          bannerSub={t("phoneBannerSub")}
+          bannerCta={t("heroCta")}
+          bannerGradient="from-primary-600 to-primary-700"
+          brands={phoneBrands}
+          products={phoneProducts}
+        />
+
+        <CategorySection
+          title={t("catLaptops")}
+          icon="💻"
+          viewAllLabel={t("viewAll")}
+          bannerTitle={t("laptopBannerTitle")}
+          bannerSub={t("laptopBannerSub")}
+          bannerCta={t("heroCta")}
+          bannerGradient="from-indigo-600 to-blue-700"
+          brands={laptopBrands}
+          products={laptopProducts}
+        />
+
         <ProductRail title={t("newArrivals")} icon="🆕" products={newArrivals} viewAllLabel={t("viewAll")} />
+
         <BrandStrip />
 
         {/* USP strip */}
-        <section className="bg-white rounded-2xl p-4 md:p-5">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <section className={s.section}>
+          <div className={s.uspGrid}>
             {usp.map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-full bg-primary-50 flex items-center justify-center shrink-0">
+              <div key={title} className={s.uspItem}>
+                <div className={s.uspIcon}>
                   <Icon className="h-5 w-5 text-primary-600" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900 leading-tight">{title}</p>
-                  <p className="text-xs text-gray-500">{desc}</p>
+                  <p className={s.uspTitle}>{title}</p>
+                  <p className={s.uspDesc}>{desc}</p>
                 </div>
               </div>
             ))}
