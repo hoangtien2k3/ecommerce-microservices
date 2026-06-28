@@ -64,6 +64,8 @@ files
 ### Agents ###
 .claude
 .codegraph
+.codex
+.github/prompts
 
 ### Flatten-maven-plugin ###
 **/.flattened-pom.xml
