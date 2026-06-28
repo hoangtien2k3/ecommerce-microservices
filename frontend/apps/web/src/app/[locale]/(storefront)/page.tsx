@@ -1,33 +1,33 @@
 import { getTranslations } from "next-intl/server";
-import { ArrowRight, Shield, Truck, RefreshCw, Headphones, ChevronRight } from "lucide-react";
-import { Button } from "@ecommerce/ui";
+import { ArrowRight, Shield, Truck, RefreshCw, Headphones } from "lucide-react";
+import { Button, SectionHeader, Section, FeatureStrip, PromoBanner } from "@ecommerce/ui";
 import ProductGrid from "@/components/product/ProductGrid";
+import CategoryGrid from "@/components/ui/CategoryGrid";
 import { Link } from "@/i18n/navigation";
 
 export default async function HomePage() {
   const t = await getTranslations("Home");
 
   const features = [
-    { icon: Truck,        title: t("freeShipping"),  desc: t("freeShippingDesc") },
-    { icon: Shield,       title: t("securePay"),      desc: t("securePayDesc") },
-    { icon: RefreshCw,    title: t("easyReturn"),     desc: t("easyReturnDesc") },
-    { icon: Headphones,   title: t("support"),        desc: t("supportDesc") },
+    { icon: Truck,        title: t("freeShipping"),  description: t("freeShippingDesc") },
+    { icon: Shield,       title: t("securePay"),      description: t("securePayDesc") },
+    { icon: RefreshCw,    title: t("easyReturn"),     description: t("easyReturnDesc") },
+    { icon: Headphones,   title: t("support"),        description: t("supportDesc") },
   ];
 
   const categories = [
-    { id: 1, name: t("cat1"), emoji: "📱", color: "bg-blue-100" },
-    { id: 2, name: t("cat2"), emoji: "👗", color: "bg-pink-100" },
-    { id: 3, name: t("cat3"), emoji: "🏠", color: "bg-yellow-100" },
-    { id: 4, name: t("cat4"), emoji: "💊", color: "bg-green-100" },
-    { id: 5, name: t("cat5"), emoji: "⚽", color: "bg-orange-100" },
-    { id: 6, name: t("cat6"), emoji: "🧸", color: "bg-purple-100" },
-    { id: 7, name: t("cat7"), emoji: "📚", color: "bg-red-100" },
-    { id: 8, name: t("cat8"), emoji: "🚗", color: "bg-gray-100" },
+    { id: 1, name: t("cat1"), emoji: "📱", bgColor: "bg-blue-100", href: "/products?categoryId=1" },
+    { id: 2, name: t("cat2"), emoji: "👗", bgColor: "bg-pink-100", href: "/products?categoryId=2" },
+    { id: 3, name: t("cat3"), emoji: "🏠", bgColor: "bg-yellow-100", href: "/products?categoryId=3" },
+    { id: 4, name: t("cat4"), emoji: "💊", bgColor: "bg-green-100", href: "/products?categoryId=4" },
+    { id: 5, name: t("cat5"), emoji: "⚽", bgColor: "bg-orange-100", href: "/products?categoryId=5" },
+    { id: 6, name: t("cat6"), emoji: "🧸", bgColor: "bg-purple-100", href: "/products?categoryId=6" },
+    { id: 7, name: t("cat7"), emoji: "📚", bgColor: "bg-red-100", href: "/products?categoryId=7" },
+    { id: 8, name: t("cat8"), emoji: "🚗", bgColor: "bg-gray-100", href: "/products?categoryId=8" },
   ];
 
   return (
     <div>
-      {/* Hero Banner */}
       <section className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
         <div className="max-w-7xl mx-auto px-4 py-16 md:py-20">
           <div className="max-w-2xl">
@@ -56,83 +56,45 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Features */}
-      <section className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {features.map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="flex items-center gap-3 p-3 rounded-xl hover:bg-orange-50 transition-colors">
-                <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Icon className="h-5 w-5 text-orange-500" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-900">{title}</p>
-                  <p className="text-xs text-gray-500">{desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <FeatureStrip items={features} />
 
-      {/* Categories */}
-      <section className="max-w-7xl mx-auto px-4 py-10">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">{t("featuredCategories")}</h2>
-          <Link href="/products" className="flex items-center gap-1 text-sm text-orange-500 hover:text-orange-600 font-medium">
-            {t("shopNow")} <ChevronRight className="h-4 w-4" />
-          </Link>
-        </div>
-        <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
-          {categories.map((cat) => (
-            <Link
-              key={cat.id}
-              href={`/products?categoryId=${cat.id}`}
-              className="flex flex-col items-center gap-2 p-3 rounded-xl hover:shadow-md transition-all hover:-translate-y-1"
-            >
-              <div className={`w-12 h-12 ${cat.color} rounded-xl flex items-center justify-center text-2xl`}>
-                {cat.emoji}
-              </div>
-              <span className="text-xs text-center text-gray-700 font-medium">{cat.name}</span>
-            </Link>
-          ))}
-        </div>
-      </section>
+      <Section className="py-10" title={t("featuredCategories")} linkHref="/products" linkLabel={t("shopNow")}>
+        <CategoryGrid items={categories} />
+      </Section>
 
-      {/* Promo banners */}
-      <section className="max-w-7xl mx-auto px-4 pb-8">
+      <Section className="pb-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="md:col-span-2 bg-gradient-to-r from-purple-600 to-purple-700 rounded-2xl p-6 text-white">
-            <p className="text-sm font-medium text-purple-200 mb-1">{t("promoTodayLabel")}</p>
-            <h3 className="text-2xl font-bold mb-2">{t("promoElectronics")}</h3>
-            <Link href="/products?categoryId=1">
-              <Button size="sm" className="bg-white text-purple-600 hover:bg-purple-50 border-0 font-semibold">
-                {t("promoElectronicsBtn")}
-              </Button>
-            </Link>
-          </div>
-          <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-6 text-white">
-            <p className="text-sm font-medium text-green-200 mb-1">{t("promoNewLabel")}</p>
-            <h3 className="text-2xl font-bold mb-2">{t("promoNew")}</h3>
-            <Link href="/register">
-              <Button size="sm" className="bg-white text-green-600 hover:bg-green-50 border-0 font-semibold">
-                {t("promoNewBtn")}
-              </Button>
-            </Link>
-          </div>
+          <PromoBanner
+            className="md:col-span-2"
+            badge={t("promoTodayLabel")}
+            title={t("promoElectronics")}
+            gradient="bg-gradient-to-r from-purple-600 to-purple-700"
+            action={
+              <Link href="/products?categoryId=1">
+                <Button size="sm" className="bg-white text-purple-600 hover:bg-purple-50 border-0 font-semibold">
+                  {t("promoElectronicsBtn")}
+                </Button>
+              </Link>
+            }
+          />
+          <PromoBanner
+            badge={t("promoNewLabel")}
+            title={t("promoNew")}
+            gradient="bg-gradient-to-br from-green-500 to-emerald-600"
+            action={
+              <Link href="/register">
+                <Button size="sm" className="bg-white text-green-600 hover:bg-green-50 border-0 font-semibold">
+                  {t("promoNewBtn")}
+                </Button>
+              </Link>
+            }
+          />
         </div>
-      </section>
+      </Section>
 
-      {/* Featured Products */}
-      <section className="max-w-7xl mx-auto px-4 pb-12">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">{t("featuredProducts")}</h2>
-          <Link href="/products" className="flex items-center gap-1 text-sm text-orange-500 hover:text-orange-600 font-medium">
-            {t("shopNow")} <ChevronRight className="h-4 w-4" />
-          </Link>
-        </div>
+      <Section className="pb-12" title={t("featuredProducts")} linkHref="/products" linkLabel={t("shopNow")}>
         <ProductGrid size={8} />
-      </section>
+      </Section>
     </div>
   );
 }

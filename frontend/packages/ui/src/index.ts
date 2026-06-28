@@ -10,5 +10,5 @@ export { DataTable } from "./components/DataTable";
 export { StatCard, StatsGrid } from "./components/StatCard";
 export { SectionHeader, Section } from "./components/SectionHeader";
 export { FeatureStrip } from "./components/FeatureStrip";
-export { CategoryGrid } from "./components/CategoryGrid";
+
 export { PromoBanner } from "./components/PromoBanner";
