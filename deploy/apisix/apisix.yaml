@@ -381,3 +381,4 @@ routes:
       bearer_only: true
       use_jwks: true
       token_signing_alg_values_expected: RS256
+#END
