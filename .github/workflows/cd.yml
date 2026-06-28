@@ -101,7 +101,7 @@ jobs:
             auth-service product-service
             order-service payment-service shipping-service inventory-service
             favourite-service rating-service notification-service media-service
-            search-service promotion-service tax-service frontend
+            search-service promotion-service tax-service frontend admin
           )
           for svc in "${SERVICES[@]}"; do
             kubectl rollout restart deployment/$svc -n ecommerce || true
