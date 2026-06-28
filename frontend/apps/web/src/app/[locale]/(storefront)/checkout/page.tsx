@@ -10,6 +10,7 @@ import { orderApi, paymentApi } from "@ecommerce/lib/api";
 import { useRouter } from "@/i18n/navigation";
 import StepIndicator from "@/components/checkout/StepIndicator";
 import OrderSummary from "@/components/cart/OrderSummary";
+import { checkoutPageStyles as s } from "./checkout.styles";
 
 type Step = 1 | 2 | 3;
 
@@ -89,12 +90,12 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">{t("title")}</h1>
+    <div className={s.page}>
+      <h1 className={s.title}>{t("title")}</h1>
       <StepIndicator current={step} steps={STEPS} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
+      <div className={s.layout}>
+        <div className={s.main}>
           {step === 1 && (
             <ShippingStep shipping={shipping} onChange={setShipping} onNext={() => setStep(2)} />
           )}
@@ -111,7 +112,7 @@ export default function CheckoutPage() {
         </div>
 
         {step < 3 && (
-          <div className="lg:col-span-1">
+          <div className={s.side}>
             <OrderSummary
               items={items}
               subtotal={totalPrice()}
@@ -142,24 +143,24 @@ function ShippingStep({
     onChange((prev: ShippingData) => ({ ...prev, [key]: e.target.value }));
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <div className="flex items-center gap-2 mb-4">
-        <Truck className="h-5 w-5 text-orange-500" />
-        <h2 className="text-lg font-bold">{t("stepShipping")}</h2>
+    <div className={s.card}>
+      <div className={s.cardHead}>
+        <Truck className="h-5 w-5 text-primary-500" />
+        <h2 className={s.cardTitle}>{t("stepShipping")}</h2>
       </div>
-      <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
+      <div className={s.fields}>
+        <div className={s.grid2}>
           <Input label={t("fullName")} value={shipping.fullName} onChange={set("fullName")} />
           <Input label={t("phone")} value={shipping.phone} onChange={set("phone")} />
         </div>
         <Input label={t("address")} placeholder={t("addressPlaceholder")} value={shipping.address} onChange={set("address")} />
-        <div className="grid grid-cols-2 gap-4">
+        <div className={s.grid2}>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t("city")}</label>
+            <label className={s.fieldLabel}>{t("city")}</label>
             <select
               value={shipping.city}
               onChange={set("city")}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className={s.select}
             >
               <option value="">{t("selectCity")}</option>
               {["TP. H\u1ED3 Ch\u00ED Minh", "H\u00E0 N\u1ED9i", "\u0110\u00E0 N\u1EB5ng", "C\u1EA7n Th\u01A1", "H\u1EA3i Ph\u00F2ng"].map(c => (
@@ -170,13 +171,13 @@ function ShippingStep({
           <Input label={t("district")} value={shipping.district} onChange={set("district")} />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">{t("note")}</label>
+          <label className={s.fieldLabel}>{t("note")}</label>
           <textarea
             value={shipping.note}
             onChange={set("note")}
             placeholder={t("notePlaceholder")}
             rows={3}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className={s.textarea}
           />
         </div>
         <Button onClick={onNext} className="w-full" size="lg">{t("continueToPayment")}</Button>
@@ -196,31 +197,31 @@ function PaymentStep({
 }) {
   const t = useTranslations("Checkout");
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <div className="flex items-center gap-2 mb-4">
-        <CreditCard className="h-5 w-5 text-orange-500" />
-        <h2 className="text-lg font-bold">{t("paymentMethod")}</h2>
+    <div className={s.card}>
+      <div className={s.cardHead}>
+        <CreditCard className="h-5 w-5 text-primary-500" />
+        <h2 className={s.cardTitle}>{t("paymentMethod")}</h2>
       </div>
-      <div className="space-y-3">
+      <div className={s.payList}>
         {PAYMENT_OPTIONS.map(({ value, label, desc, emoji }) => (
           <label key={value} className={`flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-            paymentMethod === value ? "border-orange-500 bg-orange-50" : "border-gray-200 hover:border-orange-200"
+            paymentMethod === value ? "border-primary-500 bg-primary-50" : "border-gray-200 hover:border-primary-200"
           }`}>
             <input
               type="radio" name="payment" value={value}
               checked={paymentMethod === value}
               onChange={() => onPaymentChange(value as "COD" | "BANK_TRANSFER" | "PAYPAL")}
-              className="mt-0.5 accent-orange-500"
+              className="mt-0.5 accent-primary-500"
             />
-            <span className="text-2xl">{emoji}</span>
+            <span className={s.payEmoji}>{emoji}</span>
             <div>
-              <p className="font-medium text-gray-900 text-sm">{label}</p>
-              <p className="text-xs text-gray-500">{desc}</p>
+              <p className={s.payName}>{label}</p>
+              <p className={s.payDesc}>{desc}</p>
             </div>
           </label>
         ))}
       </div>
-      <div className="flex gap-3 mt-6">
+      <div className={s.payActions}>
         <Button variant="outline" onClick={onBack} className="flex-1">{t("back")}</Button>
         <Button onClick={onPlaceOrder} loading={loading} className="flex-1" size="lg">
           {t("placeOrder")}
@@ -234,16 +235,16 @@ function ConfirmationStep({ orderId }: { orderId: number | null }) {
   const t = useTranslations("Checkout");
   const router = useRouter();
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-      <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+    <div className={s.confirm}>
+      <div className={s.confirmIcon}>
         <CheckCircle className="h-10 w-10 text-green-500" />
       </div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-2">{t("successTitle")}</h2>
-      <p className="text-gray-500 mb-1">
-        {t("orderCode")} <strong className="text-orange-500">#{orderId}</strong>
+      <h2 className={s.confirmTitle}>{t("successTitle")}</h2>
+      <p className={s.confirmCode}>
+        {t("orderCode")} <strong className="text-primary-500">#{orderId}</strong>
       </p>
-      <p className="text-sm text-gray-500 mb-6">{t("successMsg")}</p>
-      <div className="flex gap-3 justify-center">
+      <p className={s.confirmMsg}>{t("successMsg")}</p>
+      <div className={s.confirmActions}>
         <Button variant="outline" onClick={() => router.push("/orders")}>{t("viewOrders")}</Button>
         <Button onClick={() => router.push("/products")}>{t("continueShopping")}</Button>
       </div>

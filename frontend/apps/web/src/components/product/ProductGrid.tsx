@@ -2,9 +2,10 @@
 
 import { useTranslations } from "next-intl";
 import { useProducts } from "@/hooks";
-import { EmptyState, LoadingSkeleton } from "@ecommerce/ui";
+import { EmptyState } from "@ecommerce/ui";
 import { ShoppingBag } from "lucide-react";
 import ProductCard from "./ProductCard";
+import { productStyles as s } from "./product.styles";
 
 interface ProductGridProps {
   categoryId?: number;
@@ -19,11 +20,11 @@ export default function ProductGrid({ categoryId, search, page = 0, size = 12 }:
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className={s.grid}>
         {[...Array(8)].map((_, i) => (
-          <div key={i} className="bg-white rounded-xl border border-gray-200 overflow-hidden animate-pulse">
-            <div className="aspect-square bg-gray-200" />
-            <div className="p-3 space-y-2">
+          <div key={i} className={s.skeletonCard}>
+            <div className={s.skeletonImage} />
+            <div className={s.skeletonBody}>
               <div className="h-3 bg-gray-200 rounded w-1/2" />
               <div className="h-4 bg-gray-200 rounded" />
               <div className="h-4 bg-gray-200 rounded w-3/4" />
@@ -37,7 +38,7 @@ export default function ProductGrid({ categoryId, search, page = 0, size = 12 }:
 
   if (isError) {
     return (
-      <div className="text-center py-12 text-gray-500">
+      <div className={s.gridError}>
         <p>{t("loadError")}</p>
       </div>
     );
@@ -56,7 +57,7 @@ export default function ProductGrid({ categoryId, search, page = 0, size = 12 }:
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div className={s.grid}>
       {items.map((product) => (
         <ProductCard key={product.productId} product={product} />
       ))}

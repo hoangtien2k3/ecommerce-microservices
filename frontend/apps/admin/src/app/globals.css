@@ -12,6 +12,31 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist);
+
+  /* Brand palette — shared with the storefront (CellphoneS-style red). */
+  --color-primary-50: #fff1f2;
+  --color-primary-100: #ffe0e2;
+  --color-primary-200: #ffc7ca;
+  --color-primary-300: #ff9ca1;
+  --color-primary-400: #ff5b63;
+  --color-primary-500: #e30019;
+  --color-primary-600: #c70016;
+  --color-primary-700: #a30012;
+  --color-primary-800: #86000f;
+  --color-primary-900: #6e0010;
+
+  /* Rebrand: remap the legacy `orange-*` brand scale onto red so existing
+     classes pick up the new brand with no refactoring. */
+  --color-orange-50: #fff1f2;
+  --color-orange-100: #ffe0e2;
+  --color-orange-200: #ffc7ca;
+  --color-orange-300: #ff9ca1;
+  --color-orange-400: #ff5b63;
+  --color-orange-500: #e30019;
+  --color-orange-600: #c70016;
+  --color-orange-700: #a30012;
+  --color-orange-800: #86000f;
+  --color-orange-900: #6e0010;
 }
 
 body {

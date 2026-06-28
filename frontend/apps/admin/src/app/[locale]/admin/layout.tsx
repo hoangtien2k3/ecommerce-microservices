@@ -10,6 +10,7 @@ import { useState } from "react";
 import { cn } from "@ecommerce/lib/utils";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { adminLayoutStyles as s } from "./adminLayout.styles";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const t = useTranslations("Sidebar");
@@ -35,25 +36,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
-      <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white flex flex-col transition-transform",
-        "md:relative md:translate-x-0",
-        sidebarOpen ? "translate-x-0" : "-translate-x-full"
-      )}>
-        <div className="p-5 border-b border-gray-800">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+    <div className={s.root}>
+      <aside className={cn(s.sidebarBase, sidebarOpen ? s.sidebarOpen : s.sidebarClosed)}>
+        <div className={s.brandBox}>
+          <Link href="/" className={s.brand}>
+            <div className={s.brandLogo}>
               <Package className="h-5 w-5 text-white" />
             </div>
             <div>
-              <p className="text-white font-bold leading-tight">{t("brand")}</p>
-              <p className="text-gray-400 text-xs">{t("brandSub")}</p>
+              <p className={s.brandName}>{t("brand")}</p>
+              <p className={s.brandSub}>{t("brandSub")}</p>
             </div>
           </Link>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+        <nav className={s.nav}>
           {navItems.map(({ href, label, icon: Icon }) => {
             const active = pathname === href || pathname.startsWith(href + "/");
             return (
@@ -61,12 +58,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 key={href}
                 href={href}
                 onClick={() => setSidebarOpen(false)}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all",
-                  active
-                    ? "bg-orange-500 text-white"
-                    : "text-gray-400 hover:bg-gray-800 hover:text-white"
-                )}
+                className={cn(s.navItemBase, active ? s.navItemActive : s.navItemIdle)}
               >
                 <Icon className="h-4 w-4 flex-shrink-0" />
                 {label}
@@ -76,20 +68,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           })}
         </nav>
 
-        <div className="p-4 border-t border-gray-800">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-9 h-9 bg-orange-500 rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
+        <div className={s.userBox}>
+          <div className={s.userRow}>
+            <div className={s.userAvatar}>
               {user?.fullName?.[0]?.toUpperCase() ?? "A"}
             </div>
-            <div className="min-w-0">
-              <p className="text-sm font-medium text-white truncate">{user?.fullName}</p>
-              <p className="text-xs text-gray-400 truncate">{user?.email}</p>
+            <div className={s.userInfo}>
+              <p className={s.userName}>{user?.fullName}</p>
+              <p className={s.userEmail}>{user?.email}</p>
             </div>
           </div>
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-2 text-sm text-red-400 hover:text-red-300 transition-colors"
-          >
+          <button onClick={handleLogout} className={s.logoutBtn}>
             <LogOut className="h-4 w-4" />
             {t("logout")}
           </button>
@@ -97,26 +86,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
+        <div className={s.overlay} onClick={() => setSidebarOpen(false)} />
       )}
 
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3 sticky top-0 z-30">
-          <button onClick={() => setSidebarOpen(!sidebarOpen)} className="md:hidden p-1.5 rounded-lg hover:bg-gray-100">
+      <div className={s.content}>
+        <header className={s.topbar}>
+          <button onClick={() => setSidebarOpen(!sidebarOpen)} className={s.topbarToggle}>
             {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
-          <div className="flex-1">
-            <p className="text-sm text-gray-500">
+          <div className={s.topbarTitle}>
+            <p className={s.topbarCrumb}>
               {navItems.find(n => pathname.startsWith(n.href))?.label ?? "Admin"}
             </p>
           </div>
           <LanguageSwitcher />
-          <Link href="/" className="text-sm text-orange-500 hover:text-orange-600">
+          <Link href="/" className={s.backLink}>
             {t("backToStore")}
           </Link>
         </header>
 
-        <main className="flex-1 p-6">
+        <main className={s.main}>
           {children}
         </main>
       </div>

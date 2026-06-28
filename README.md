@@ -131,7 +131,7 @@ ecommerce-microservices/
 ├── auth-service/                   # Port 8088
 ├── common-lib/                     # Shared library
 │   ├── common-core/                #   Contracts, exceptions, i18n
-│   ├── common-spring/              #   Auto-configurations (CORS, JPA, OpenAPI)
+│   ├── common-spring/              #   Auto-configurations
 │   ├── common-security/            #   JWT / OAuth2 security
 │   ├── common-keycloak/            #   Keycloak admin client
 │   ├── common-kafka/               #   Kafka / CDC helpers
@@ -188,21 +188,21 @@ Every service exposes:
 
 ## 📈 Stats
 
-<p align="center">
-  <a href="https://star-history.com/#hoangtien2k3/ecommerce-microservices&Date">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=hoangtien2k3/ecommerce-microservices&type=Date&theme=dark" />
-      <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=hoangtien2k3/ecommerce-microservices&type=Date" />
-      <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=hoangtien2k3/ecommerce-microservices&type=Date" />
-    </picture>
-  </a>
-</p>
+<a href="https://star-history.com/#hoangtien2k3/ecommerce-microservices&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=hoangtien2k3/ecommerce-microservices&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=hoangtien2k3/ecommerce-microservices&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=hoangtien2k3/ecommerce-microservices&type=Date" />
+  </picture>
+</a>
 
-<p align="center">
-  <a href="https://repobeats.axiom.co/api/embed/1897bc523b54b43aefb19c65195f32377f8aab85.svg">
-    <img src="https://repobeats.axiom.co/api/embed/1897bc523b54b43aefb19c65195f32377f8aab85.svg" alt="Repo analytics" width="600">
-  </a>
-</p>
+## Contributing
+
+If you would like to contribute to the development of this project, please follow our contribution guidelines.
+
+<a href="https://repobeats.axiom.co/api/embed/1897bc523b54b43aefb19c65195f32377f8aab85.svg">
+  <img src="https://repobeats.axiom.co/api/embed/1897bc523b54b43aefb19c65195f32377f8aab85.svg" alt="Repo analytics" width="600">
+</a>
 
 ---
 

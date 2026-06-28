@@ -10,6 +10,7 @@ import { Link } from "@/i18n/navigation";
 import CartItemRow from "@/components/cart/CartItemRow";
 import OrderSummary from "@/components/cart/OrderSummary";
 import { useRouter } from "@/i18n/navigation";
+import { cartPageStyles as s } from "./cart.styles";
 
 export default function CartPage() {
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-16">
+      <div className={s.emptyPage}>
         <EmptyState
           icon={<ShoppingBag className="h-24 w-24 text-gray-200" />}
           title={t("emptyTitle")}
@@ -50,16 +51,16 @@ export default function CartPage() {
   const total = subtotal + shipping;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="flex items-center gap-2 mb-6">
-        <ShoppingCart className="h-6 w-6 text-orange-500" />
-        <h1 className="text-2xl font-bold text-gray-900">
+    <div className={s.page}>
+      <div className={s.heading}>
+        <ShoppingCart className="h-6 w-6 text-primary-500" />
+        <h1 className={s.title}>
           {t("title", { count: totalItems() })}
         </h1>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-3">
+      <div className={s.layout}>
+        <div className={s.list}>
           {items.map((item) => (
             <CartItemRow
               key={item.product.productId}
@@ -69,7 +70,7 @@ export default function CartPage() {
             />
           ))}
 
-          <div className="flex justify-between items-center pt-2">
+          <div className={s.listActions}>
             <Link href="/products">
               <Button variant="ghost" size="sm">&larr; {t("continueShopping")}</Button>
             </Link>
@@ -80,7 +81,7 @@ export default function CartPage() {
           </div>
         </div>
 
-        <div className="lg:col-span-1">
+        <div className={s.side}>
           <OrderSummary
             items={items}
             subtotal={subtotal}
@@ -95,10 +96,10 @@ export default function CartPage() {
               {t("checkout")}
               <ArrowRight className="h-4 w-4" />
             </Button>
-            <div className="mt-4 flex items-center justify-center gap-4 text-xs text-gray-400">
-              <span>Secure checkout</span>
+            <div className={s.trust}>
+              <span>{t("securePayment")}</span>
               <span>|</span>
-              <span>Free returns</span>
+              <span>{t("returnPolicy")}</span>
             </div>
           </OrderSummary>
         </div>

@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useRouter, usePathname } from "@/i18n/navigation";
 import { useTransition } from "react";
 import { cn } from "@ecommerce/lib/utils";
+import { adminStyles as s } from "./admin.styles";
 
 export default function LanguageSwitcher() {
   const locale = useLocale();
@@ -19,18 +20,13 @@ export default function LanguageSwitcher() {
   };
 
   return (
-    <div className="flex items-center gap-0.5" title={t("switchLabel")}>
+    <div className={s.langWrap} title={t("switchLabel")}>
       {(["vi", "en"] as const).map((loc) => (
         <button
           key={loc}
           onClick={() => switchTo(loc)}
           disabled={isPending || locale === loc}
-          className={cn(
-            "px-2 py-1 text-xs font-semibold rounded transition-colors",
-            locale === loc
-              ? "bg-orange-500 text-white"
-              : "text-gray-400 hover:text-white"
-          )}
+          className={cn(s.langBtnBase, locale === loc ? s.langBtnActive : s.langBtnIdle)}
         >
           {t(loc)}
         </button>

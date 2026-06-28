@@ -8,6 +8,7 @@ import { categoryApi } from "@ecommerce/lib/api";
 import { useCategories } from "@/hooks";
 import { Button, Input, Modal, ModalBody, ModalFooter } from "@ecommerce/ui";
 import type { Category } from "@ecommerce/lib/types";
+import { categoriesStyles as s } from "./categories.styles";
 
 export default function AdminCategoriesPage() {
   const t = useTranslations("Categories");
@@ -54,16 +55,16 @@ export default function AdminCategoriesPage() {
   };
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">{t("title", { count: categories.length })}</h1>
+    <div className={s.root}>
+      <div className={s.header}>
+        <h1 className={s.title}>{t("title", { count: categories.length })}</h1>
         <Button onClick={openAdd}><Plus className="h-4 w-4" /> {t("addBtn")}</Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className={s.grid}>
         {isLoading
           ? [...Array(8)].map((_, i) => (
-              <div key={i} className="bg-white rounded-xl border animate-pulse h-24" />
+              <div key={i} className={s.skeleton} />
             ))
           : categories.map((cat) => (
               <CategoryCard
@@ -101,19 +102,19 @@ function CategoryCard({
   deleteConfirm: string;
 }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-3 group">
-      <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center shrink-0">
-        <Tag className="h-5 w-5 text-orange-500" />
+    <div className={s.card}>
+      <div className={s.cardIcon}>
+        <Tag className="h-5 w-5 text-primary-500" />
       </div>
-      <div className="flex-1 min-w-0">
-        <p className="font-medium text-gray-900 text-sm truncate">{category.categoryTitle}</p>
-        <p className="text-xs text-gray-400">ID: {category.categoryId}</p>
+      <div className={s.cardBody}>
+        <p className={s.cardName}>{category.categoryTitle}</p>
+        <p className={s.cardId}>ID: {category.categoryId}</p>
       </div>
-      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button onClick={onEdit} className="p-1 text-gray-400 hover:text-blue-600 rounded">
+      <div className={s.cardActions}>
+        <button onClick={onEdit} className={s.editBtn}>
           <Edit className="h-3.5 w-3.5" />
         </button>
-        <button onClick={() => { if (confirm(deleteConfirm)) onDelete(); }} className="p-1 text-gray-400 hover:text-red-600 rounded">
+        <button onClick={() => { if (confirm(deleteConfirm)) onDelete(); }} className={s.deleteBtn}>
           <Trash2 className="h-3.5 w-3.5" />
         </button>
       </div>

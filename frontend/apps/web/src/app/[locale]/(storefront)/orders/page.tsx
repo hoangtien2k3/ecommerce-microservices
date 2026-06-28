@@ -8,6 +8,7 @@ import { useAuthStore } from "@ecommerce/lib/store";
 import { Badge, Button, EmptyState, LoadingSkeleton } from "@ecommerce/ui";
 import { formatPrice, formatDate } from "@ecommerce/lib/utils";
 import { Link, useRouter } from "@/i18n/navigation";
+import { ordersStyles as s } from "./orders.styles";
 
 export default function OrdersPage() {
   const router = useRouter();
@@ -22,10 +23,10 @@ export default function OrdersPage() {
   const orders = data?.data?.content ?? [];
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="flex items-center gap-2 mb-6">
-        <Package className="h-6 w-6 text-orange-500" />
-        <h1 className="text-2xl font-bold text-gray-900">{t("title")}</h1>
+    <div className={s.page}>
+      <div className={s.heading}>
+        <Package className="h-6 w-6 text-primary-500" />
+        <h1 className={s.title}>{t("title")}</h1>
       </div>
 
       {isLoading ? (
@@ -42,7 +43,7 @@ export default function OrdersPage() {
           }
         />
       ) : (
-        <div className="space-y-4">
+        <div className={s.list}>
           {orders.map((order) => (
             <OrderCard key={order.orderId} order={order} />
           ))}
@@ -55,25 +56,25 @@ export default function OrdersPage() {
 function OrderCard({ order }: { order: { orderId: number; orderDate: string; orderFee: number; orderDesc?: string } }) {
   const t = useTranslations("Orders");
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-shadow">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <ShoppingBag className="h-5 w-5 text-orange-500" />
-          <span className="font-bold text-gray-900">{t("orderLabel", { id: order.orderId })}</span>
+    <div className={s.card}>
+      <div className={s.cardHeader}>
+        <div className={s.cardId}>
+          <ShoppingBag className="h-5 w-5 text-primary-500" />
+          <span className={s.cardIdText}>{t("orderLabel", { id: order.orderId })}</span>
         </div>
         <Badge variant="warning">{t("processing")}</Badge>
       </div>
-      <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
-        <div className="flex items-center gap-2">
+      <div className={s.cardMeta}>
+        <div className={s.cardDate}>
           <Clock className="h-4 w-4 text-gray-400" />
           <span>{order.orderDate ? formatDate(order.orderDate) : "\u2014"}</span>
         </div>
-        <div className="text-right">
-          <span className="font-bold text-orange-500 text-base">{formatPrice(order.orderFee ?? 0)}</span>
+        <div className={s.cardFee}>
+          <span className={s.cardFeeValue}>{formatPrice(order.orderFee ?? 0)}</span>
         </div>
       </div>
       {order.orderDesc && (
-        <p className="text-sm text-gray-500 mt-2">{order.orderDesc}</p>
+        <p className={s.cardDesc}>{order.orderDesc}</p>
       )}
     </div>
   );

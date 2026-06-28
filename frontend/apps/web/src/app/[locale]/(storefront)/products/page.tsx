@@ -10,6 +10,7 @@ import { cn } from "@ecommerce/lib/utils";
 import ProductCard from "@/components/product/ProductCard";
 import { SortSelect } from "@/components/ui/SortSelect";
 import { FilterSidebar, FilterGroup, FilterButton } from "@/components/ui/FilterSidebar";
+import { productsStyles as s } from "./products.styles";
 
 const SORT_OPTIONS = [
   { label: "Newest", value: "productId,desc" },
@@ -50,14 +51,14 @@ function ProductsContent() {
   useEffect(() => { setPage(0); }, [selectedCategory, sort, search]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-6">
+    <div className={s.page}>
+      <div className={s.header}>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className={s.title}>
             {search ? t("searchResults", { query: search }) : t("title")}
           </h1>
         </div>
-        <div className="flex items-center gap-3">
+        <div className={s.toolbar}>
           <SortSelect options={SORT_OPTIONS} value={sort} onChange={setSort} />
           <Button variant="outline" size="sm" onClick={() => setFiltersOpen(!filtersOpen)} className="md:hidden">
             <SlidersHorizontal className="h-4 w-4" />
@@ -66,7 +67,7 @@ function ProductsContent() {
         </div>
       </div>
 
-      <div className="flex gap-6">
+      <div className={s.body}>
         <FilterSidebar open={filtersOpen} onClose={() => setFiltersOpen(false)} title={t("filtersTitle")}>
           <FilterGroup title={t("categoriesTitle")}>
             <FilterButton active={!selectedCategory} onClick={() => setSelectedCategory(undefined)}>
@@ -96,13 +97,13 @@ function ProductsContent() {
           </FilterGroup>
         </FilterSidebar>
 
-        <div className="flex-1 min-w-0">
+        <div className={s.main}>
           {isLoading ? (
-            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className={s.grid}>
               {[...Array(12)].map((_, i) => (
-                <div key={i} className="bg-white rounded-xl border animate-pulse">
-                  <div className="aspect-square bg-gray-200 rounded-t-xl" />
-                  <div className="p-3 space-y-2">
+                <div key={i} className={s.skeletonCard}>
+                  <div className={s.skeletonImage} />
+                  <div className={s.skeletonBody}>
                     <div className="h-3 bg-gray-200 rounded w-1/2" />
                     <div className="h-4 bg-gray-200 rounded" />
                     <div className="h-5 bg-gray-200 rounded w-1/3" />
@@ -117,7 +118,7 @@ function ProductsContent() {
             />
           ) : (
             <>
-              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <div className={s.grid}>
                 {products.map((product) => (
                   <ProductCard key={product.productId} product={product} />
                 ))}
@@ -139,7 +140,7 @@ function ProductsContent() {
 export default function ProductsPage() {
   const t = useTranslations("Products");
   return (
-    <Suspense fallback={<div className="max-w-7xl mx-auto px-4 py-8 text-center text-gray-500">{t("loadingFallback")}</div>}>
+    <Suspense fallback={<div className={s.fallback}>{t("loadingFallback")}</div>}>
       <ProductsContent />
     </Suspense>
   );

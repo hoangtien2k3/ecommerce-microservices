@@ -9,6 +9,7 @@ import { productApi } from "@ecommerce/lib/api";
 import { Button, Badge, DataTable, Modal, ModalBody, ModalFooter, Input } from "@ecommerce/ui";
 import { formatPrice } from "@ecommerce/lib/utils";
 import type { Product } from "@ecommerce/lib/types";
+import { productsStyles as s } from "./products.styles";
 
 type ProductForm = {
   productTitle: string; imageUrl: string; sku: string;
@@ -90,29 +91,29 @@ export default function AdminProductsPage() {
       key: "product",
       header: t("colProduct"),
       render: (p: Product) => (
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+        <div className={s.cell}>
+          <div className={s.thumb}>
             {p.imageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={p.imageUrl} alt={p.productTitle} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center">
+              <div className={s.thumbEmpty}>
                 <Package className="h-5 w-5 text-gray-300" />
               </div>
             )}
           </div>
-          <span className="font-medium text-gray-900 line-clamp-1">{p.productTitle}</span>
+          <span className={s.cellName}>{p.productTitle}</span>
         </div>
       ),
     },
-    { key: "sku", header: t("colSku"), render: (p: Product) => <span className="text-gray-500">{p.sku ?? "\u2014"}</span> },
+    { key: "sku", header: t("colSku"), render: (p: Product) => <span className={s.muted}>{p.sku ?? "\u2014"}</span> },
     {
       key: "category", header: t("colCategory"), render: (p: Product) => (
         <Badge variant="info">{p.category?.categoryTitle ?? t("uncategorized")}</Badge>
       ),
     },
     {
-      key: "price", header: t("colPrice"), className: "text-right font-semibold text-orange-500",
+      key: "price", header: t("colPrice"), className: "text-right font-semibold text-primary-500",
       render: (p: Product) => formatPrice(p.priceUnit),
     },
     {
@@ -126,13 +127,13 @@ export default function AdminProductsPage() {
     {
       key: "actions", header: t("colActions"), className: "text-center",
       render: (p: Product) => (
-        <div className="flex items-center justify-center gap-2">
-          <button onClick={() => openEdit(p)} className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+        <div className={s.rowActions}>
+          <button onClick={() => openEdit(p)} className={s.editBtn}>
             <Edit className="h-4 w-4" />
           </button>
           <button
             onClick={() => { if (confirm(t("deleteConfirm"))) deleteMutation.mutate(p.productId); }}
-            className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            className={s.deleteBtn}
           >
             <Trash2 className="h-4 w-4" />
           </button>
@@ -142,11 +143,11 @@ export default function AdminProductsPage() {
   ];
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between">
+    <div className={s.root}>
+      <div className={s.header}>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t("title")}</h1>
-          <p className="text-sm text-gray-500 mt-0.5">{t("count", { count: data?.data?.totalElements ?? 0 })}</p>
+          <h1 className={s.title}>{t("title")}</h1>
+          <p className={s.count}>{t("count", { count: data?.data?.totalElements ?? 0 })}</p>
         </div>
         <Button onClick={openAdd}><Plus className="h-4 w-4" /> {t("addBtn")}</Button>
       </div>
@@ -166,17 +167,17 @@ export default function AdminProductsPage() {
         <ModalBody>
           <Input label={t("nameLabel")} value={form.productTitle} onChange={(e) => setForm(p => ({...p, productTitle: e.target.value}))} />
           <Input label={t("imageLabel")} value={form.imageUrl} onChange={(e) => setForm(p => ({...p, imageUrl: e.target.value}))} />
-          <div className="grid grid-cols-2 gap-3">
+          <div className={s.formGrid2}>
             <Input label={t("skuLabel")} value={form.sku} onChange={(e) => setForm(p => ({...p, sku: e.target.value}))} />
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t("categoryLabel")}</label>
-              <select value={form.categoryId} onChange={(e) => setForm(p => ({...p, categoryId: e.target.value}))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+              <label className={s.fieldLabel}>{t("categoryLabel")}</label>
+              <select value={form.categoryId} onChange={(e) => setForm(p => ({...p, categoryId: e.target.value}))} className={s.select}>
                 <option value="">{t("selectCategory")}</option>
                 {categories.map(c => <option key={c.categoryId} value={c.categoryId}>{c.categoryTitle}</option>)}
               </select>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className={s.formGrid2}>
             <Input label={t("priceLabel")} type="number" value={form.priceUnit} onChange={(e) => setForm(p => ({...p, priceUnit: e.target.value}))} />
             <Input label={t("quantityLabel")} type="number" value={form.quantity} onChange={(e) => setForm(p => ({...p, quantity: e.target.value}))} />
           </div>
