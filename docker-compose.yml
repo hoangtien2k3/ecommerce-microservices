@@ -141,7 +141,7 @@ services:
   # BACKEND — Spring Boot Microservices
   # ============================================================
   apisix:
-    image: apache/apisix:3.9.1-debian
+    image: apache/apisix:3.17.0-debian
     container_name: apisix
     ports:
       - "9080:9080"   # client-facing proxy
