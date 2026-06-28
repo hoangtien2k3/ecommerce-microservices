@@ -19,7 +19,7 @@ function resolveApiBaseUrl(): string {
   return "";
 }
 
-const API_BASE_URL = resolveApiBaseUrl();
+export const API_BASE_URL = resolveApiBaseUrl();
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -66,18 +66,32 @@ apiClient.interceptors.response.use(
   }
 );
 
+// Token bundle returned by the backend SSO `/session` exchange (Keycloak shape).
+export interface SsoTokenResponse {
+  access_token: string;
+  refresh_token: string;
+  token_type?: string;
+  expires_in?: number;
+  refresh_expires_in?: number;
+  scope?: string;
+}
+
+/**
+ * Builds the URL that kicks off backend-mediated Keycloak SSO. Navigating the
+ * browser here → backend `/auth/login` → Keycloak login page → backend `/auth/callback`
+ * → back to `callbackPath` on this origin carrying a single-use `ticket`.
+ */
+export function buildSsoLoginUrl(callbackPath = "/auth/callback"): string {
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const redirectUri = `${origin}${callbackPath}`;
+  return `${API_BASE_URL}/api/v1/auth/login?redirect_uri=${encodeURIComponent(redirectUri)}`;
+}
+
 // Auth API
 export const authApi = {
-  login: (username: string, password: string) =>
-    apiClient.post("/api/v1/auth/signin", { username, password }),
-  register: (data: {
-    fullName: string;
-    username: string;
-    email: string;
-    password: string;
-    gender: string;
-    phone?: string;
-  }) => apiClient.post("/api/v1/auth/signup", data),
+  // SSO: exchange the single-use ticket from the callback redirect for real tokens.
+  getSession: (ticket: string) =>
+    apiClient.get<{ data: SsoTokenResponse }>("/api/v1/auth/session", { params: { ticket } }),
   logout: (refreshToken: string) =>
     apiClient.post("/api/v1/auth/logout", { refreshToken }),
   refreshToken: (refreshToken: string) =>

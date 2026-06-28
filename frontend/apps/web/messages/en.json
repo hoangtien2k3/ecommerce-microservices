@@ -127,7 +127,22 @@
     "errPasswordLen": "Password must be at least 8 characters",
     "errPasswordMatch": "Passwords do not match",
     "errEmail": "Invalid email address",
-    "errRegister": "Registration failed. Please try again."
+    "errRegister": "Registration failed. Please try again.",
+    "ssoLoginBtn": "Sign in with SSO",
+    "ssoRedirectNote": "You'll be redirected to the secure Keycloak login page",
+    "ssoWhy": "Why SSO?",
+    "ssoFeature1": "One sign-in across every service",
+    "ssoFeature2": "Two-factor authentication (2FA) supported",
+    "ssoFeature3": "Your password never touches this website",
+    "registerSsoBtn": "Create an account",
+    "registerSsoNote": "You'll be redirected to the Keycloak sign-up page",
+    "registerFeature1": "One account across all of EzBuy",
+    "registerFeature2": "Secure password recovery via email",
+    "registerFeature3": "Get member perks the moment you join",
+    "callbackLoading": "Finishing sign-in...",
+    "callbackErrorTitle": "Sign-in failed",
+    "callbackErrorText": "Your login session expired or was invalid. Please try again.",
+    "callbackRetry": "Try signing in again"
   },
   "ProductCard": {
     "outOfStock": "Out of stock",

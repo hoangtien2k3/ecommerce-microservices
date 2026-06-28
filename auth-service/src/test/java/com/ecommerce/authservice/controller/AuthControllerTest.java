@@ -1,8 +1,9 @@
 package com.ecommerce.authservice.controller;
 
-import com.ecommerce.authservice.dto.request.LoginRequest;
+import com.ecommerce.authservice.config.SsoProperties;
 import com.ecommerce.authservice.dto.request.RefreshTokenRequest;
 import com.ecommerce.authservice.dto.request.RegisterRequest;
+import com.ecommerce.authservice.service.SsoSessionStore;
 import com.ecommerce.authservice.service.UserService;
 import com.ecommerce.commonlib.keycloak.KeycloakAuthClient;
 import com.ecommerce.commonlib.keycloak.KeycloakClientProperties;
@@ -12,7 +13,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
+
+import java.net.URI;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -28,19 +33,26 @@ class AuthControllerTest {
     @Mock
     private UserService userService;
 
+    private KeycloakClientProperties keycloakProperties;
+    private SsoProperties ssoProperties;
     private KeycloakAuthClient keycloakAuthClient;
+    private SsoSessionStore ssoSessionStore;
     private AuthController authController;
 
     @BeforeEach
     void setUp() {
-        KeycloakClientProperties properties = new KeycloakClientProperties();
-        properties.setServerUrl("http://localhost:8080");
-        properties.setRealm("test");
-        properties.setClientId("test-client");
-        properties.setAdminUsername("admin");
-        properties.setAdminPassword("admin");
-        keycloakAuthClient = new KeycloakAuthClient(RestClient.builder(), properties);
-        authController = new AuthController(userService, keycloakAuthClient);
+        keycloakProperties = new KeycloakClientProperties();
+        keycloakProperties.setServerUrl("http://localhost:8080");
+        keycloakProperties.setRealm("test");
+        keycloakProperties.setClientId("test-client");
+        keycloakProperties.setAdminUsername("admin");
+        keycloakProperties.setAdminPassword("admin");
+
+        ssoProperties = new SsoProperties();
+        ssoSessionStore = new SsoSessionStore(ssoProperties);
+        keycloakAuthClient = new KeycloakAuthClient(RestClient.builder(), keycloakProperties);
+        authController = new AuthController(
+                userService, keycloakAuthClient, keycloakProperties, ssoProperties, ssoSessionStore);
     }
 
     @Test
@@ -61,12 +73,21 @@ class AuthControllerTest {
     }
 
     @Test
-    void loginShouldUseKeycloakAuthClient() {
-        LoginRequest request = new LoginRequest();
-        request.setUsername("testuser");
-        request.setPassword("testpass");
+    void ssoLoginShouldRedirectToKeycloak() {
+        ResponseEntity<Void> response = authController.ssoLogin(null);
 
-        assertThrows(Exception.class, () -> authController.login(request));
+        assertEquals(HttpStatus.FOUND, response.getStatusCode());
+        URI location = response.getHeaders().getLocation();
+        assertNotNull(location);
+        assertTrue(location.toString().startsWith(
+                "http://localhost:8080/realms/test/protocol/openid-connect/auth"));
+        assertTrue(location.toString().contains("client_id=test-client"));
+        assertTrue(location.toString().contains("response_type=code"));
+    }
+
+    @Test
+    void ssoSessionShouldRejectUnknownTicket() {
+        assertThrows(Exception.class, () -> authController.ssoSession("bogus-ticket"));
     }
 
     @Test

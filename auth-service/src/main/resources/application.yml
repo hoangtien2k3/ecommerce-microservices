@@ -40,6 +40,7 @@ spring:
 keycloak:
   client:
     server-url: ${KEYCLOAK_SERVER_URL:http://localhost:8080}
+    public-server-url: ${KEYCLOAK_PUBLIC_SERVER_URL:http://keycloak.ecommerce.local}
     realm: ${KEYCLOAK_REALM:ecommerce}
     client-id: ${KEYCLOAK_CLIENT_ID:ecommerce-client}
     client-secret: ${KEYCLOAK_CLIENT_SECRET:}
@@ -47,6 +48,12 @@ keycloak:
     admin-client-id: ${KEYCLOAK_ADMIN_CLIENT_ID:admin-cli}
     admin-username: ${KEYCLOAK_ADMIN_USERNAME:admin}
     admin-password: ${KEYCLOAK_ADMIN_PASSWORD:admin}
+  # Backend-mediated SSO (Authorization Code flow)
+  sso:
+    backend-callback-url: ${SSO_BACKEND_CALLBACK_URL:http://api.ecommerce.local/api/v1/auth/callback}
+    default-frontend-redirect: ${SSO_DEFAULT_FRONTEND_REDIRECT:http://ecommerce.local/auth/callback}
+    allowed-redirect-uris: ${SSO_ALLOWED_REDIRECT_URIS:http://ecommerce.local/auth/callback,http://admin.ecommerce.local/auth/callback,http://localhost:3000/auth/callback,http://localhost:3001/auth/callback}
+    scope: ${SSO_SCOPE:openid profile email}
 ---
 management:
   server:

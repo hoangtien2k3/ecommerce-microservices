@@ -1,4 +1,11 @@
 {
+  "Auth": {
+    "redirecting": "Đang chuyển đến trang đăng nhập...",
+    "callbackLoading": "Đang hoàn tất đăng nhập...",
+    "callbackErrorTitle": "Đăng nhập không thành công",
+    "callbackErrorText": "Phiên đăng nhập đã hết hạn hoặc không hợp lệ. Vui lòng thử lại.",
+    "callbackRetry": "Thử đăng nhập lại"
+  },
   "Common": {
     "loading": "Đang tải...",
     "noData": "Chưa có dữ liệu",

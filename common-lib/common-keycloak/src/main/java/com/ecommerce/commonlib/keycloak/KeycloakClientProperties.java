@@ -17,6 +17,14 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class KeycloakClientProperties {
 
     private String serverUrl = "http://localhost:8080";
+    /**
+     * Browser-facing Keycloak origin used to build the authorization redirect
+     * (the user's browser must be able to resolve this host). Defaults to
+     * {@link #serverUrl} when blank — override in clustered setups where the
+     * backend reaches Keycloak via an internal service name but the browser uses
+     * a public ingress host (e.g. {@code http://keycloak.ecommerce.local}).
+     */
+    private String publicServerUrl;
     private String realm = "ecommerce";
     private String clientId = "ecommerce-client";
     private String clientSecret;
@@ -32,6 +40,26 @@ public class KeycloakClientProperties {
 
     public String logoutEndpoint() {
         return serverUrl + "/realms/" + realm + "/protocol/openid-connect/logout";
+    }
+
+    /** Browser-facing origin for the OIDC authorization redirect. */
+    public String publicServerUrlOrDefault() {
+        return (publicServerUrl == null || publicServerUrl.isBlank()) ? serverUrl : publicServerUrl;
+    }
+
+    /** Authorization endpoint the BROWSER is redirected to (login page). */
+    public String authorizationEndpoint() {
+        return publicServerUrlOrDefault() + "/realms/" + realm + "/protocol/openid-connect/auth";
+    }
+
+    /** Browser-facing end-session endpoint for RP-Initiated Logout. */
+    public String endSessionEndpoint() {
+        return publicServerUrlOrDefault() + "/realms/" + realm + "/protocol/openid-connect/logout";
+    }
+
+    /** Registration page (browser-facing) for self-service signup. */
+    public String registrationEndpoint() {
+        return publicServerUrlOrDefault() + "/realms/" + realm + "/protocol/openid-connect/registrations";
     }
 
     public String adminTokenEndpoint() {

@@ -1,4 +1,11 @@
 {
+  "Auth": {
+    "redirecting": "Redirecting to sign-in...",
+    "callbackLoading": "Finishing sign-in...",
+    "callbackErrorTitle": "Sign-in failed",
+    "callbackErrorText": "Your login session expired or was invalid. Please try again.",
+    "callbackRetry": "Try signing in again"
+  },
   "Common": {
     "loading": "Loading...",
     "noData": "No data yet",

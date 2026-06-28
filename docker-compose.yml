@@ -166,6 +166,10 @@ services:
     environment:
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
       KEYCLOAK_SERVER_URL: http://keycloak:8080
+      KEYCLOAK_PUBLIC_SERVER_URL: ${KEYCLOAK_PUBLIC_SERVER_URL:-http://localhost:8080}
+      SSO_BACKEND_CALLBACK_URL: http://localhost:8088/api/v1/auth/callback
+      SSO_DEFAULT_FRONTEND_REDIRECT: http://localhost:3000/auth/callback
+      SSO_ALLOWED_REDIRECT_URIS: http://localhost:3000/auth/callback,http://localhost:3001/auth/callback
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/authservice
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}

@@ -46,4 +46,22 @@ export const authStyles = {
   link: "text-primary-500 hover:text-primary-600",
   switchText: "text-center text-sm text-gray-600",
   switchLink: "text-primary-500 font-medium hover:text-primary-600",
+
+  // SSO
+  ssoBtn: "w-full gap-2",
+  divider: "flex items-center gap-3 py-1",
+  dividerLine: "h-px flex-1 bg-gray-200",
+  dividerText: "text-xs text-gray-400",
+  ssoFeatures: "space-y-2 text-sm text-gray-600",
+  ssoFeatureItem: "flex items-center gap-2",
+  ssoFeatureIcon: "h-4 w-4 text-green-500 flex-shrink-0",
+  ssoHint: "text-center text-xs text-gray-400 mt-1",
+
+  // SSO callback page
+  callbackWrap: "min-h-screen flex flex-col items-center justify-center gap-4 px-4 text-center",
+  callbackSpinner: "h-10 w-10 animate-spin rounded-full border-4 border-primary-100 border-t-primary-500",
+  callbackText: "text-gray-600 text-sm",
+  callbackErrorIcon: "w-14 h-14 bg-red-50 rounded-full flex items-center justify-center",
+  callbackErrorTitle: "text-lg font-semibold text-gray-900",
+  callbackErrorText: "text-gray-500 text-sm",
 } as const;

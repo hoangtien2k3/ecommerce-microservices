@@ -127,7 +127,22 @@
     "errPasswordLen": "Mật khẩu phải có ít nhất 8 ký tự",
     "errPasswordMatch": "Mật khẩu xác nhận không khớp",
     "errEmail": "Email không hợp lệ",
-    "errRegister": "Đăng ký thất bại. Vui lòng thử lại."
+    "errRegister": "Đăng ký thất bại. Vui lòng thử lại.",
+    "ssoLoginBtn": "Đăng nhập bằng SSO",
+    "ssoRedirectNote": "Bạn sẽ được chuyển đến trang đăng nhập bảo mật của Keycloak",
+    "ssoWhy": "Vì sao dùng SSO?",
+    "ssoFeature1": "Đăng nhập một lần, dùng chung mọi dịch vụ",
+    "ssoFeature2": "Hỗ trợ xác thực 2 lớp (2FA)",
+    "ssoFeature3": "Mật khẩu không bao giờ đi qua website này",
+    "registerSsoBtn": "Tạo tài khoản",
+    "registerSsoNote": "Bạn sẽ được chuyển đến trang đăng ký của Keycloak",
+    "registerFeature1": "Tài khoản dùng chung toàn hệ thống EzBuy",
+    "registerFeature2": "Khôi phục mật khẩu an toàn qua email",
+    "registerFeature3": "Nhận ưu đãi thành viên ngay khi đăng ký",
+    "callbackLoading": "Đang hoàn tất đăng nhập...",
+    "callbackErrorTitle": "Đăng nhập không thành công",
+    "callbackErrorText": "Phiên đăng nhập đã hết hạn hoặc không hợp lệ. Vui lòng thử lại.",
+    "callbackRetry": "Thử đăng nhập lại"
   },
   "ProductCard": {
     "outOfStock": "Hết hàng",

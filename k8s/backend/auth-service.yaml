@@ -60,6 +60,14 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: POSTGRES_PASSWORD
+            # ── SSO (backend-mediated Authorization Code flow) ──
+            # KEYCLOAK_PUBLIC_SERVER_URL comes from the ecommerce-config ConfigMap above.
+            - name: SSO_BACKEND_CALLBACK_URL
+              value: http://api.ecommerce.local/api/v1/auth/callback
+            - name: SSO_DEFAULT_FRONTEND_REDIRECT
+              value: http://ecommerce.local/auth/callback
+            - name: SSO_ALLOWED_REDIRECT_URIS
+              value: http://ecommerce.local/auth/callback,http://admin.ecommerce.local/auth/callback,http://localhost:3000/auth/callback,http://localhost:3001/auth/callback
           startupProbe:
             httpGet:
               path: /actuator/health

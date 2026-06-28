@@ -22,8 +22,10 @@ import java.util.function.Supplier;
 
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.CLIENT_ID;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.CLIENT_SECRET;
+import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.CODE;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.GRANT_TYPE;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.PASSWORD;
+import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.REDIRECT_URI;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.REFRESH_TOKEN;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.USERNAME;
 
@@ -45,6 +47,7 @@ public class KeycloakAuthClient {
     private static final Logger log = LoggerFactory.getLogger(KeycloakAuthClient.class);
 
     private static final String BEARER_SCHEME = "Bearer ";
+    private static final String GRANT_AUTHORIZATION_CODE = "authorization_code";
     private static final ParameterizedTypeReference<Map<String, Object>> MAP_TYPE =
             new ParameterizedTypeReference<>() {};
 
@@ -65,6 +68,23 @@ public class KeycloakAuthClient {
         form.add(GRANT_TYPE, PASSWORD);
         form.add(USERNAME, Objects.requireNonNull(username, "username"));
         form.add(PASSWORD, Objects.requireNonNull(password, "password"));
+        return postToken(form);
+    }
+
+    /**
+     * Exchanges an OIDC {@code authorization_code} for tokens. Used by the
+     * backend-mediated SSO flow: the browser logs in at Keycloak, Keycloak
+     * redirects back to our callback with a {@code code}, and we swap it here.
+     *
+     * @param code        the authorization code returned by Keycloak
+     * @param redirectUri MUST be byte-for-byte identical to the {@code redirect_uri}
+     *                    used in the original authorization request
+     */
+    public KeycloakTokenResponse exchangeAuthorizationCode(String code, String redirectUri) {
+        MultiValueMap<String, String> form = baseClientForm();
+        form.add(GRANT_TYPE, GRANT_AUTHORIZATION_CODE);
+        form.add(CODE, Objects.requireNonNull(code, "code"));
+        form.add(REDIRECT_URI, Objects.requireNonNull(redirectUri, "redirectUri"));
         return postToken(form);
     }
 

@@ -8,15 +8,17 @@ import {
 import { useAuthStore } from "@ecommerce/lib/store";
 import { useState } from "react";
 import { cn } from "@ecommerce/lib/utils";
-import { Link, usePathname, useRouter } from "@/i18n/navigation";
+import { Link, usePathname } from "@/i18n/navigation";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import AdminAuthGuard from "@/components/AdminAuthGuard";
+import { useLogout } from "@/hooks";
 import { adminLayoutStyles as s } from "./adminLayout.styles";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const t = useTranslations("Sidebar");
   const pathname = usePathname();
-  const { user, logout } = useAuthStore();
-  const router = useRouter();
+  const { user } = useAuthStore();
+  const logoutMutation = useLogout();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navItems = [
@@ -30,12 +32,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: "/admin/settings",  label: t("settings"),  icon: Settings },
   ];
 
-  const handleLogout = () => {
-    logout();
-    router.push("/");
-  };
+  const handleLogout = () => logoutMutation.mutate();
 
   return (
+    <AdminAuthGuard>
     <div className={s.root}>
       <aside className={cn(s.sidebarBase, sidebarOpen ? s.sidebarOpen : s.sidebarClosed)}>
         <div className={s.brandBox}>
@@ -110,5 +110,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </main>
       </div>
     </div>
+    </AdminAuthGuard>
   );
 }

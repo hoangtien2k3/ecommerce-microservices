@@ -14,6 +14,7 @@ data:
   KEYCLOAK_JWK_SET_URI: "http://keycloak:8080/realms/ecommerce/protocol/openid-connect/certs"
   JWT_ISSUER_URI: "http://keycloak:8080/realms/ecommerce"
   KEYCLOAK_SERVER_URL: "http://keycloak:8080"
+  KEYCLOAK_PUBLIC_SERVER_URL: "http://keycloak.ecommerce.local"
 
   # Kafka
   KAFKA_SERVERS: "kafka:9092"

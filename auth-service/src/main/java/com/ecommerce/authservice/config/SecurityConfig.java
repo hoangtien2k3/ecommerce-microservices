@@ -18,7 +18,10 @@ public class SecurityConfig {
             "/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**",
             "/actuator/**",
             ApiPaths.AUTH + "/signup",
-            ApiPaths.AUTH + "/signin",
+            // SSO (backend-mediated Authorization Code flow)
+            ApiPaths.AUTH + "/login",
+            ApiPaths.AUTH + "/callback",
+            ApiPaths.AUTH + "/session",
             ApiPaths.AUTH + "/refresh",
             ApiPaths.AUTH + "/logout"
     };
