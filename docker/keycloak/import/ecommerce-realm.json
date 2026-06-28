@@ -41,7 +41,10 @@
       ],
       "webOrigins": [
         "*"
-      ]
+      ],
+      "attributes": {
+        "post.logout.redirect.uris": "http://localhost:*##http://127.0.0.1:*##http://ecommerce.local/*##http://admin.ecommerce.local/*"
+      }
     }
   ],
   "users": [
