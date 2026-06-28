@@ -1,0 +1,130 @@
+{
+  "Common": {
+    "loading": "Đang tải...",
+    "noData": "Chưa có dữ liệu",
+    "developing": "Tính năng đang phát triển",
+    "prev": "Trước",
+    "next": "Sau",
+    "page": "Trang {current}/{total}",
+    "cancel": "Hủy",
+    "add": "Thêm mới",
+    "update": "Cập nhật",
+    "delete": "Xóa",
+    "edit": "Chỉnh sửa",
+    "save": "Lưu",
+    "close": "Đóng",
+    "confirm": "Xác nhận",
+    "search": "Tìm kiếm",
+    "viewAll": "Xem tất cả →",
+    "actions": "Thao tác"
+  },
+  "Lang": {
+    "vi": "VI",
+    "en": "EN",
+    "switchLabel": "Chuyển ngôn ngữ"
+  },
+  "Meta": {
+    "title": "EzBuy Admin",
+    "template": "{page} | EzBuy Admin",
+    "description": "Bảng điều khiển quản trị EzBuy"
+  },
+  "Sidebar": {
+    "brand": "EzBuy Admin",
+    "brandSub": "Quản trị hệ thống",
+    "backToStore": "Về trang chủ →",
+    "logout": "Đăng xuất",
+    "dashboard": "Dashboard",
+    "products": "Sản phẩm",
+    "orders": "Đơn hàng",
+    "users": "Người dùng",
+    "categories": "Danh mục",
+    "inventory": "Kho hàng",
+    "shipping": "Vận chuyển",
+    "settings": "Cài đặt"
+  },
+  "Dashboard": {
+    "metaTitle": "Dashboard",
+    "title": "Dashboard",
+    "subtitle": "Tổng quan hệ thống",
+    "revenue": "Tổng doanh thu",
+    "orders": "Đơn hàng",
+    "products": "Sản phẩm",
+    "users": "Người dùng",
+    "recentOrders": "Đơn hàng gần đây",
+    "recentProducts": "Sản phẩm",
+    "noOrders": "Chưa có đơn hàng",
+    "noProducts": "Chưa có sản phẩm",
+    "order": "Đơn #{id}",
+    "uncategorized": "Chưa phân loại",
+    "outOfStock": "Hết hàng",
+    "inStock": "{count} sp"
+  },
+  "Products": {
+    "metaTitle": "Sản phẩm",
+    "title": "Sản phẩm",
+    "count": "{count} sản phẩm",
+    "addBtn": "Thêm sản phẩm",
+    "searchPlaceholder": "Tìm kiếm sản phẩm...",
+    "colProduct": "Sản phẩm",
+    "colSku": "SKU",
+    "colCategory": "Danh mục",
+    "colPrice": "Giá",
+    "colStock": "Kho",
+    "colActions": "Thao tác",
+    "noProducts": "Chưa có sản phẩm nào",
+    "outOfStock": "Hết hàng",
+    "uncategorized": "Chưa phân loại",
+    "modalAddTitle": "Thêm sản phẩm",
+    "modalEditTitle": "Chỉnh sửa sản phẩm",
+    "nameLabel": "Tên sản phẩm *",
+    "imageLabel": "URL hình ảnh",
+    "skuLabel": "SKU",
+    "categoryLabel": "Danh mục",
+    "selectCategory": "Chọn danh mục",
+    "priceLabel": "Giá (VND) *",
+    "quantityLabel": "Số lượng *",
+    "deleteConfirm": "Xóa sản phẩm này?"
+  },
+  "Orders": {
+    "metaTitle": "Đơn hàng",
+    "title": "Đơn hàng",
+    "count": "{count} đơn hàng",
+    "searchPlaceholder": "Tìm theo mã đơn hàng...",
+    "colId": "Mã đơn",
+    "colDate": "Ngày đặt",
+    "colDesc": "Mô tả",
+    "colTotal": "Tổng tiền",
+    "colStatus": "Trạng thái",
+    "colActions": "Thao tác",
+    "noOrders": "Chưa có đơn hàng nào",
+    "processing": "Đang xử lý",
+    "order": "#{id}"
+  },
+  "Users": {
+    "metaTitle": "Người dùng",
+    "title": "Người dùng"
+  },
+  "Categories": {
+    "metaTitle": "Danh mục",
+    "title": "Danh mục ({count})",
+    "addBtn": "Thêm danh mục",
+    "modalAddTitle": "Thêm danh mục",
+    "modalEditTitle": "Chỉnh sửa",
+    "nameLabel": "Tên danh mục *",
+    "imageLabel": "URL hình ảnh",
+    "deleteConfirm": "Xóa danh mục này?",
+    "idLabel": "ID: {id}"
+  },
+  "Inventory": {
+    "metaTitle": "Kho hàng",
+    "title": "Kho hàng"
+  },
+  "Shipping": {
+    "metaTitle": "Vận chuyển",
+    "title": "Vận chuyển"
+  },
+  "Settings": {
+    "metaTitle": "Cài đặt",
+    "title": "Cài đặt"
+  }
+}

@@ -5,9 +5,11 @@
   "type": "module",
   "exports": {
     "./api": "./src/api.ts",
+
     "./utils": "./src/utils.ts",
     "./types": "./src/types.ts",
-    "./store": "./src/store/index.ts"
+    "./store": "./src/store/index.ts",
+    "./i18n": "./src/i18n.ts"
   },
   "scripts": {
     "lint": "eslint src",
@@ -21,6 +23,7 @@
   },
   "devDependencies": {
     "@ecommerce/config": "workspace:*",
+    "@types/node": "^20",
     "typescript": "^5"
   }
 }

@@ -1,0 +1,130 @@
+{
+  "Common": {
+    "loading": "Loading...",
+    "noData": "No data yet",
+    "developing": "Feature under development",
+    "prev": "Previous",
+    "next": "Next",
+    "page": "Page {current}/{total}",
+    "cancel": "Cancel",
+    "add": "Add new",
+    "update": "Update",
+    "delete": "Delete",
+    "edit": "Edit",
+    "save": "Save",
+    "close": "Close",
+    "confirm": "Confirm",
+    "search": "Search",
+    "viewAll": "View all →",
+    "actions": "Actions"
+  },
+  "Lang": {
+    "vi": "VI",
+    "en": "EN",
+    "switchLabel": "Switch language"
+  },
+  "Meta": {
+    "title": "EzBuy Admin",
+    "template": "{page} | EzBuy Admin",
+    "description": "EzBuy admin dashboard"
+  },
+  "Sidebar": {
+    "brand": "EzBuy Admin",
+    "brandSub": "System management",
+    "backToStore": "Back to store →",
+    "logout": "Log out",
+    "dashboard": "Dashboard",
+    "products": "Products",
+    "orders": "Orders",
+    "users": "Users",
+    "categories": "Categories",
+    "inventory": "Inventory",
+    "shipping": "Shipping",
+    "settings": "Settings"
+  },
+  "Dashboard": {
+    "metaTitle": "Dashboard",
+    "title": "Dashboard",
+    "subtitle": "System overview",
+    "revenue": "Total revenue",
+    "orders": "Orders",
+    "products": "Products",
+    "users": "Users",
+    "recentOrders": "Recent orders",
+    "recentProducts": "Products",
+    "noOrders": "No orders yet",
+    "noProducts": "No products yet",
+    "order": "Order #{id}",
+    "uncategorized": "Uncategorized",
+    "outOfStock": "Out of stock",
+    "inStock": "{count} pcs"
+  },
+  "Products": {
+    "metaTitle": "Products",
+    "title": "Products",
+    "count": "{count} products",
+    "addBtn": "Add product",
+    "searchPlaceholder": "Search products...",
+    "colProduct": "Product",
+    "colSku": "SKU",
+    "colCategory": "Category",
+    "colPrice": "Price",
+    "colStock": "Stock",
+    "colActions": "Actions",
+    "noProducts": "No products yet",
+    "outOfStock": "Out of stock",
+    "uncategorized": "Uncategorized",
+    "modalAddTitle": "Add product",
+    "modalEditTitle": "Edit product",
+    "nameLabel": "Product name *",
+    "imageLabel": "Image URL",
+    "skuLabel": "SKU",
+    "categoryLabel": "Category",
+    "selectCategory": "Select category",
+    "priceLabel": "Price (VND) *",
+    "quantityLabel": "Quantity *",
+    "deleteConfirm": "Delete this product?"
+  },
+  "Orders": {
+    "metaTitle": "Orders",
+    "title": "Orders",
+    "count": "{count} orders",
+    "searchPlaceholder": "Search by order ID...",
+    "colId": "Order ID",
+    "colDate": "Date",
+    "colDesc": "Description",
+    "colTotal": "Total",
+    "colStatus": "Status",
+    "colActions": "Actions",
+    "noOrders": "No orders yet",
+    "processing": "Processing",
+    "order": "#{id}"
+  },
+  "Users": {
+    "metaTitle": "Users",
+    "title": "Users"
+  },
+  "Categories": {
+    "metaTitle": "Categories",
+    "title": "Categories ({count})",
+    "addBtn": "Add category",
+    "modalAddTitle": "Add category",
+    "modalEditTitle": "Edit",
+    "nameLabel": "Category name *",
+    "imageLabel": "Image URL",
+    "deleteConfirm": "Delete this category?",
+    "idLabel": "ID: {id}"
+  },
+  "Inventory": {
+    "metaTitle": "Inventory",
+    "title": "Inventory"
+  },
+  "Shipping": {
+    "metaTitle": "Shipping",
+    "title": "Shipping"
+  },
+  "Settings": {
+    "metaTitle": "Settings",
+    "title": "Settings"
+  }
+}

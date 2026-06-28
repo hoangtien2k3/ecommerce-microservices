@@ -1,10 +1,10 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { productApi } from "@ecommerce/lib/api";
-import ProductCard from "./ProductCard";
-import type { Product, ApiResponse, PaginatedResponse } from "@ecommerce/lib/types";
+import { useTranslations } from "next-intl";
+import { useProducts } from "@/hooks";
+import { EmptyState, LoadingSkeleton } from "@ecommerce/ui";
 import { ShoppingBag } from "lucide-react";
+import ProductCard from "./ProductCard";
 
 interface ProductGridProps {
   categoryId?: number;
@@ -13,25 +13,9 @@ interface ProductGridProps {
   size?: number;
 }
 
-export default function ProductGrid({
-  categoryId,
-  search,
-  page = 0,
-  size = 12,
-}: ProductGridProps) {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["products", { categoryId, search, page, size }],
-    queryFn: async (): Promise<Product[]> => {
-      const res = await productApi.getAll({ page, size, categoryId });
-      // product-service returns Flux<List<ProductDto>> which serializes as [[...]]
-      const raw = res.data;
-      if (Array.isArray(raw) && Array.isArray(raw[0])) return raw[0] as Product[];
-      if (Array.isArray(raw)) return raw as Product[];
-      // ApiResponse wrapper format
-      const wrapped = raw as ApiResponse<PaginatedResponse<Product>>;
-      return wrapped?.data?.content ?? [];
-    },
-  });
+export default function ProductGrid({ categoryId, search, page = 0, size = 12 }: ProductGridProps) {
+  const t = useTranslations("ProductGrid");
+  const { data: products, isLoading, isError } = useProducts({ categoryId, search, page, size });
 
   if (isLoading) {
     return (
@@ -54,26 +38,26 @@ export default function ProductGrid({
   if (isError) {
     return (
       <div className="text-center py-12 text-gray-500">
-        <p>Không thể tải sản phẩm. Vui lòng thử lại.</p>
+        <p>{t("loadError")}</p>
       </div>
     );
   }
 
-  const products = data ?? [];
+  const items = products ?? [];
 
-  if (products.length === 0) {
+  if (items.length === 0) {
     return (
-      <div className="text-center py-16 text-gray-500">
-        <ShoppingBag className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-        <p className="text-lg font-medium">Không tìm thấy sản phẩm nào</p>
-        <p className="text-sm mt-1">Thử thay đổi bộ lọc hoặc tìm kiếm từ khóa khác</p>
-      </div>
+      <EmptyState
+        icon={<ShoppingBag className="h-16 w-16 text-gray-300" />}
+        title={t("notFound")}
+        description={t("notFoundHint")}
+      />
     );
   }
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {products.map((product) => (
+      {items.map((product) => (
         <ProductCard key={product.productId} product={product} />
       ))}
     </div>

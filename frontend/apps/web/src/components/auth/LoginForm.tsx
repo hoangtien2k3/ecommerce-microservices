@@ -1,71 +1,34 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import React, { useState } from "react";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
-import { Button } from "@ecommerce/ui";
-import { Input } from "@ecommerce/ui";
-import { authApi } from "@ecommerce/lib/api";
-import { useAuthStore } from "@ecommerce/lib/store";
+import { useTranslations } from "next-intl";
+import { Button, Input } from "@ecommerce/ui";
+import { useLogin } from "@/hooks";
+import { Link } from "@/i18n/navigation";
 
 export default function LoginForm() {
-  const router = useRouter();
-  const { setAuth } = useAuthStore();
+  const t = useTranslations("Auth");
+  const loginMutation = useLogin();
   const [form, setForm] = useState({ username: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+
+  const error = loginMutation.isError
+    ? (() => {
+        const status = (loginMutation.error as { response?: { status: number } })?.response?.status;
+        if (status === 401 || status === 400) return t("errCredentials");
+        return t("errServer");
+      })()
+    : "";
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-    setError("");
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.username || !form.password) {
-      setError("Vui lòng điền đầy đủ thông tin");
-      return;
-    }
-
-    setLoading(true);
-    setError("");
-
-    try {
-      const res = await authApi.login(form.username, form.password);
-      const tokenData = res.data?.data;
-
-      if (tokenData?.access_token) {
-        // Get user profile
-        localStorage.setItem("access_token", tokenData.access_token);
-        try {
-          const profileRes = await authApi.getProfile();
-          const user = profileRes.data?.data;
-          if (user) {
-            setAuth(user, tokenData.access_token, tokenData.refresh_token);
-          }
-        } catch {
-          // If profile fetch fails, still log in with minimal info
-          setAuth(
-            { id: 0, fullName: form.username, username: form.username, email: "", gender: "", roles: [] },
-            tokenData.access_token,
-            tokenData.refresh_token
-          );
-        }
-        router.push("/");
-        router.refresh();
-      }
-    } catch (err: unknown) {
-      const status = (err as { response?: { status: number } })?.response?.status;
-      if (status === 401 || status === 400) {
-        setError("Tên đăng nhập hoặc mật khẩu không đúng");
-      } else {
-        setError("Có lỗi xảy ra. Vui lòng thử lại sau.");
-      }
-    } finally {
-      setLoading(false);
-    }
+    if (!form.username || !form.password) return;
+    loginMutation.mutate(form);
   };
 
   return (
@@ -78,8 +41,8 @@ export default function LoginForm() {
 
       <Input
         name="username"
-        label="Tên đăng nhập"
-        placeholder="Nhập tên đăng nhập"
+        label={t("usernameLabel")}
+        placeholder={t("usernamePlaceholder")}
         value={form.username}
         onChange={handleChange}
         autoComplete="username"
@@ -91,8 +54,8 @@ export default function LoginForm() {
         <Input
           name="password"
           type={showPassword ? "text" : "password"}
-          label="Mật khẩu"
-          placeholder="Nhập mật khẩu"
+          label={t("passwordLabel")}
+          placeholder={t("passwordPlaceholder")}
           value={form.password}
           onChange={handleChange}
           autoComplete="current-password"
@@ -111,21 +74,21 @@ export default function LoginForm() {
       <div className="flex items-center justify-between text-sm">
         <label className="flex items-center gap-2 cursor-pointer">
           <input type="checkbox" className="rounded border-gray-300 text-orange-500" />
-          <span className="text-gray-600">Ghi nhớ đăng nhập</span>
+          <span className="text-gray-600">{t("rememberMe")}</span>
         </label>
         <Link href="/forgot-password" className="text-orange-500 hover:text-orange-600">
-          Quên mật khẩu?
+          {t("forgotPassword")}
         </Link>
       </div>
 
-      <Button type="submit" loading={loading} className="w-full" size="lg">
-        Đăng nhập
+      <Button type="submit" loading={loginMutation.isPending} className="w-full" size="lg">
+        {t("loginBtn")}
       </Button>
 
       <p className="text-center text-sm text-gray-600">
-        Chưa có tài khoản?{" "}
+        {t("noAccount")}{" "}
         <Link href="/register" className="text-orange-500 font-medium hover:text-orange-600">
-          Đăng ký ngay
+          {t("registerNow")}
         </Link>
       </p>
     </form>
