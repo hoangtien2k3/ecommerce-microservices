@@ -1,0 +1,8 @@
+{
+  "extends": "@ecommerce/config/tsconfig/base.json",
+  "compilerOptions": {
+    "jsx": "preserve"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}

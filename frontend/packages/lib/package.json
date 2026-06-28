@@ -1,0 +1,26 @@
+{
+  "name": "@ecommerce/lib",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./api": "./src/api.ts",
+    "./utils": "./src/utils.ts",
+    "./types": "./src/types.ts",
+    "./store": "./src/store/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "axios": "^1.17.0",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.6.0",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@ecommerce/config": "workspace:*",
+    "typescript": "^5"
+  }
+}

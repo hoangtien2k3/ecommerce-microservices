@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EzBuy Frontend — Monorepo
 
-## Getting Started
+Turborepo + pnpm workspaces. Two Next.js apps share UI and data-access code
+through internal packages (shipped as raw TypeScript, transpiled by Next via
+`transpilePackages` — no build step for packages).
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+frontend/
+├── apps/
+│   ├── web/      @ecommerce/web    — storefront + auth (port 3000)
+│   └── admin/    @ecommerce/admin  — admin dashboard, mounted at /admin/* (port 3001)
+└── packages/
+    ├── lib/      @ecommerce/lib    — api client, types, utils, zustand stores
+    ├── ui/       @ecommerce/ui     — shared UI primitives (Button, Input, Badge)
+    └── config/   @ecommerce/config — shared tsconfig presets
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Dependency graph
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+apps/web ──┬─► @ecommerce/ui ──► @ecommerce/lib
+apps/admin ┘─► @ecommerce/lib
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Getting started
 
-## Learn More
+```bash
+pnpm install          # install all workspaces
+pnpm dev              # run every app (turbo)
+pnpm dev:web          # storefront only      → http://localhost:3000
+pnpm dev:admin        # admin only           → http://localhost:3001/admin/dashboard
+pnpm build            # build everything
+pnpm lint             # lint everything
+pnpm typecheck        # type-check everything
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Import conventions
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| What | Import from |
+| --- | --- |
+| API client (`authApi`, `productApi`, …) | `@ecommerce/lib/api` |
+| Domain types (`Product`, `ApiResponse`, …) | `@ecommerce/lib/types` |
+| Helpers (`cn`, `formatPrice`, …) | `@ecommerce/lib/utils` |
+| Stores (`useAuthStore`, `useCartStore`) | `@ecommerce/lib/store` |
+| UI primitives (`Button`, `Input`, `Badge`) | `@ecommerce/ui` |
+| App-local code | `@/...` (resolves to that app's `src/`) |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Docker
 
-## Deploy on Vercel
+Each app builds from the **frontend root** as context (uses `turbo prune`):
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+docker build -f apps/web/Dockerfile   -t ecommerce-web   .
+docker build -f apps/admin/Dockerfile -t ecommerce-admin .
+```
