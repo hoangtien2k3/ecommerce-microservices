@@ -60,7 +60,6 @@ spec:
     - host: rustfs.ecommerce.local
       http:
         paths:
-          # Web console UI → http://rustfs.ecommerce.local/rustfs/console/
           - path: /rustfs/console
             pathType: Prefix
             backend:
@@ -68,7 +67,6 @@ spec:
                 name: rustfs
                 port:
                   number: 9001
-          # S3 API (everything else; used by services for media storage)
           - path: /
             pathType: Prefix
             backend:
