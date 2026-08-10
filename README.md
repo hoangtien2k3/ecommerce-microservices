@@ -188,11 +188,11 @@ Every service exposes:
 
 ## 📈 Stats
 
-<a href="https://star-history.com/#hoangtien2k3/ecommerce-microservices&Date">
+<a href="https://star-history.dera.page/#hoangtien2k3/ecommerce-microservices&Date">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=hoangtien2k3/ecommerce-microservices&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=hoangtien2k3/ecommerce-microservices&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=hoangtien2k3/ecommerce-microservices&type=Date" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://star-history.dera.page/svg?repos=hoangtien2k3/ecommerce-microservices&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://star-history.dera.page/svg?repos=hoangtien2k3/ecommerce-microservices&type=Date" />
+    <img alt="Star History Chart" src="https://star-history.dera.page/svg?repos=hoangtien2k3/ecommerce-microservices&type=Date" />
   </picture>
 </a>
 
