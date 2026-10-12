@@ -15,7 +15,7 @@
       5. Creates/starts the k3d cluster (k3d-config.yaml)
       6. Installs NGINX Ingress Controller
       7. Applies Namespace, Secrets (from .env or defaults) & ConfigMaps
-      8. Deploys Infrastructure (PostgreSQL, Redis, Kafka, Elasticsearch, RustFS, Keycloak)
+      8. Deploys Infrastructure (PostgreSQL, Redis, Kafka, OpenSearch, RustFS, Keycloak)
       9. Deploys APISIX API Gateway, 11 backend microservices & Frontend/Admin webapps
      10. Updates the Windows hosts file (or prints the elevated command)
 
@@ -340,10 +340,10 @@ function Initialize-PodmanRuntime {
     $dockerHostUri = "npipe://" + ($pipePath -replace '\\', '/')
     $env:DOCKER_HOST = $dockerHostUri
 
-    # Prepare inside-VM settings required by k3d and Elasticsearch:
+    # Prepare inside-VM settings required by k3d and OpenSearch:
     #   - service_timeout=0 so Podman socket does not close mid-cluster creation
     #   - /var/run/docker.sock symlink to /run/podman/podman.sock
-    #   - vm.max_map_count=262144 for Elasticsearch 8
+    #   - vm.max_map_count=262144 for OpenSearch 3
     Write-Info "Configuring Podman VM socket & kernel parameters..."
     podman machine ssh $machineName "sudo mkdir -p /etc/containers/containers.conf.d && printf '[engine]\nservice_timeout=0\n' | sudo tee /etc/containers/containers.conf.d/timeout.conf >/dev/null && sudo systemctl enable --now podman.socket >/dev/null 2>&1 || true; sudo ln -sf /run/podman/podman.sock /var/run/docker.sock 2>/dev/null || true; sudo sysctl -w vm.max_map_count=262144 >/dev/null 2>&1 || true" 2>$null
 
@@ -567,15 +567,15 @@ if (Test-Path ".env") {
     $redisPass   = Get-EnvOrDefault $envMap "REDIS_PASSWORD"         "admin"
     $storageKey  = Get-EnvOrDefault $envMap "STORAGE_ACCESS_KEY"     "admin"
     $storageSec  = Get-EnvOrDefault $envMap "STORAGE_SECRET_KEY"     "admin"
-    $elasticPass = Get-EnvOrDefault $envMap "ELASTIC_PASSWORD"       "admin"
-    $mailUser    = Get-EnvOrDefault $envMap "MAIL_USERNAME"          ""
-    $mailPass    = Get-EnvOrDefault $envMap "MAIL_PASSWORD"          ""
+    $opensearchPass = Get-EnvOrDefault $envMap "OPENSEARCH_PASSWORD" (Get-EnvOrDefault $envMap "ELASTIC_PASSWORD" "admin")
+    $mailUser       = Get-EnvOrDefault $envMap "MAIL_USERNAME"       ""
+    $mailPass       = Get-EnvOrDefault $envMap "MAIL_PASSWORD"       ""
 
     Invoke-KubectlPipeApply "create secret generic postgres-secret -n $Namespace --from-literal=POSTGRES_USER=""$pgUser"" --from-literal=POSTGRES_PASSWORD=""$pgPass"""
     Invoke-KubectlPipeApply "create secret generic keycloak-secret -n $Namespace --from-literal=KEYCLOAK_ADMIN=""$kcAdmin"" --from-literal=KEYCLOAK_ADMIN_PASSWORD=""$kcPass"""
     Invoke-KubectlPipeApply "create secret generic redis-secret -n $Namespace --from-literal=REDIS_PASSWORD=""$redisPass"""
     Invoke-KubectlPipeApply "create secret generic storage-secret -n $Namespace --from-literal=STORAGE_ACCESS_KEY=""$storageKey"" --from-literal=STORAGE_SECRET_KEY=""$storageSec"""
-    Invoke-KubectlPipeApply "create secret generic elasticsearch-secret -n $Namespace --from-literal=ELASTIC_PASSWORD=""$elasticPass"""
+    Invoke-KubectlPipeApply "create secret generic opensearch-secret -n $Namespace --from-literal=OPENSEARCH_INITIAL_ADMIN_PASSWORD=""$opensearchPass"""
     Invoke-KubectlPipeApply "create secret generic mail-secret -n $Namespace --from-literal=MAIL_USERNAME=""$mailUser"" --from-literal=MAIL_PASSWORD=""$mailPass"""
 } else {
     Write-Info "No .env found — applying deploy/k8s/secrets.yaml (default dev values)"
@@ -596,7 +596,7 @@ Complete-Step
 # =============================================================================
 Start-Step "Deploy infrastructure"
 
-$infraManifests = @("postgres", "redis", "kafka", "elasticsearch", "rustfs", "keycloak")
+$infraManifests = @("postgres", "redis", "kafka", "opensearch", "rustfs", "keycloak")
 foreach ($infra in $infraManifests) {
     kubectl apply -f "deploy/k8s/infra/$infra.yaml" | Out-Null
 }

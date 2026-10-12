@@ -23,8 +23,8 @@ data:
   REDIS_HOST: "redis"
   REDIS_PORT: "6379"
 
-  # Elasticsearch
-  ELASTICSEARCH_URL: "http://elasticsearch:9200"
+  # OpenSearch
+  OPENSEARCH_URL: "http://opensearch:9200"
 
   # Object storage (RustFS - S3-compatible)
   STORAGE_ENDPOINT: "http://rustfs:9000"

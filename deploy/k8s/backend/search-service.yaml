@@ -21,9 +21,9 @@ spec:
         app: search-service
     spec:
       initContainers:
-        - name: wait-for-elasticsearch
+        - name: wait-for-opensearch
           image: busybox
-          command: ["sh", "-c", "until nc -z elasticsearch 9200; do sleep 5; done"]
+          command: ["sh", "-c", "until nc -z opensearch 9200; do sleep 5; done"]
           securityContext:
             runAsUser: 65534
             allowPrivilegeEscalation: false
@@ -56,9 +56,9 @@ spec:
             - configMapRef:
                 name: ecommerce-config
           env:
-            - name: ELASTICSEARCH_USERNAME
+            - name: OPENSEARCH_USERNAME
               value: ""
-            - name: ELASTICSEARCH_PASSWORD
+            - name: OPENSEARCH_PASSWORD
               value: ""
           startupProbe:
             httpGet:

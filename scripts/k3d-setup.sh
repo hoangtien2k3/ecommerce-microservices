@@ -215,7 +215,7 @@ setup_podman() {
       [ -n "$pipe" ] || pipe='\\.\pipe\podman-machine-default'
       export DOCKER_HOST="npipe://$(printf '%s' "$pipe" | tr '\\' '/')"
 
-      # Prepare the VM for k3d + Elasticsearch: keep the API socket alive,
+      # Prepare the VM for k3d + OpenSearch: keep the API socket alive,
       # expose docker.sock and raise vm.max_map_count.
       podman machine ssh "$machine" "sudo mkdir -p /etc/containers/containers.conf.d && printf '[engine]\nservice_timeout=0\n' | sudo tee /etc/containers/containers.conf.d/timeout.conf >/dev/null; sudo systemctl enable --now podman.socket >/dev/null 2>&1 || true; sudo ln -sf /run/podman/podman.sock /var/run/docker.sock 2>/dev/null || true; sudo sysctl -w vm.max_map_count=262144 >/dev/null 2>&1 || true" &>/dev/null || true
       ;;
@@ -381,7 +381,7 @@ if [ -f .env ]; then
   mk_secret keycloak-secret      --from-literal=KEYCLOAK_ADMIN="${KEYCLOAK_ADMIN:-admin}"           --from-literal=KEYCLOAK_ADMIN_PASSWORD="${KEYCLOAK_ADMIN_PASSWORD:-admin}"
   mk_secret redis-secret         --from-literal=REDIS_PASSWORD="${REDIS_PASSWORD:-admin}"
   mk_secret storage-secret       --from-literal=STORAGE_ACCESS_KEY="${STORAGE_ACCESS_KEY:-admin}"     --from-literal=STORAGE_SECRET_KEY="${STORAGE_SECRET_KEY:-admin}"
-  mk_secret elasticsearch-secret --from-literal=ELASTIC_PASSWORD="${ELASTIC_PASSWORD:-admin}"
+  mk_secret opensearch-secret    --from-literal=OPENSEARCH_INITIAL_ADMIN_PASSWORD="${OPENSEARCH_PASSWORD:-${ELASTIC_PASSWORD:-admin}}"
   mk_secret mail-secret          --from-literal=MAIL_USERNAME="${MAIL_USERNAME:-}"                  --from-literal=MAIL_PASSWORD="${MAIL_PASSWORD:-}"
 else
   info "No .env found — applying deploy/k8s/secrets.yaml (default dev values)"
@@ -410,7 +410,7 @@ step_done
 # its own. Pod ordering is handled by the pods (Keycloak + backends carry
 # wait-for-postgres / wait-for-kafka initContainers), so we do NOT block on readiness.
 step "Deploy infrastructure"
-for f in postgres redis kafka elasticsearch rustfs keycloak; do
+for f in postgres redis kafka opensearch rustfs keycloak; do
   kubectl apply -f "deploy/k8s/infra/${f}.yaml" > /dev/null
 done
 success "Infrastructure manifests applied (pods start in the background)"

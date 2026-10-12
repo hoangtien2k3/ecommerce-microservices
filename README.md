@@ -30,7 +30,7 @@ A cloud-native e-commerce platform built around 11 backend microservices and 2 S
 - **Backend (Go)**: 7 services using Go 1.27, `chi/v5` (routing), and `bob/pgx` (PostgreSQL).
 - **Backend (Bun)**: 4 services using Bun 1.4+, Hono, and Drizzle ORM v1 (`Bun.sql` / `Bun.S3Client`).
 - **Frontend**: 2 applications using SvelteKit 3, Svelte 5 (runes), and Tailwind CSS 4.
-- **Infrastructure**: Apache APISIX (API Gateway), Keycloak (OIDC), PostgreSQL 16, Redis 7.4, Kafka 3.9, Elasticsearch 8, and RustFS (S3-compatible).
+- **Infrastructure**: Apache APISIX (API Gateway), Keycloak (OIDC), PostgreSQL 16, Redis 7.4, Kafka 3.9, OpenSearch 3.9, and RustFS (S3-compatible).
 
 ### Services and Applications
 
@@ -42,7 +42,7 @@ A cloud-native e-commerce platform built around 11 backend microservices and 2 S
 | **Payment** | `services/payment-service/` | Go | Transactions, payment status webhooks, Kafka publisher |
 | **Inventory** | `services/inventory-service/` | Go | Stock queries, reservations, warehouse ledger |
 | **Shipping** | `services/shipping-service/` | Go | Fee calculation, carrier management, shipment tracking |
-| **Search** | `services/search-service/` | Go | Elasticsearch full-text search, autocomplete, Kafka sync |
+| **Search** | `services/search-service/` | Go | OpenSearch full-text search, autocomplete, Kafka sync |
 | **Promotion** | `services/promotion-service/` | Bun / TS | Coupons, discount rules, tax rate calculation |
 | **Rating** | `services/rating-service/` | Bun / TS | Product reviews, verified purchase checks, star aggregates |
 | **Media** | `services/media-service/` | Bun / TS | S3 multipart uploads, streaming, presigned URLs |

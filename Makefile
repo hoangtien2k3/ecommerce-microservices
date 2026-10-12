@@ -16,7 +16,7 @@ GO_MODULES     = services/shared services/auth-service services/product-service 
                  services/shipping-service services/search-service
 GO_PATTERNS    = $(addsuffix /...,$(addprefix ./,$(GO_MODULES)))
 BUN_SERVICES   = promotion-service rating-service media-service notification-service
-INFRA_SERVICES = postgres redis kafka elasticsearch rustfs keycloak apisix
+INFRA_SERVICES = postgres redis kafka opensearch rustfs keycloak apisix
 
 .DEFAULT_GOAL := help
 
@@ -131,7 +131,7 @@ check: go-fmt-check go-vet go-test bun-test ## gofmt check + go vet + all tests
 up: ## Build & start the full stack (infra + 11 services + frontend)
 	docker compose up -d --build
 
-infra-up: ## Start only the infra containers (postgres, redis, kafka, ES, rustfs, keycloak, apisix)
+infra-up: ## Start only the infra containers (postgres, redis, kafka, opensearch, rustfs, keycloak, apisix)
 	docker compose up -d $(INFRA_SERVICES)
 
 down: ## Stop and remove containers

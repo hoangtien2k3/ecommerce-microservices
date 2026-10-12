@@ -53,7 +53,7 @@ $infraServices = @(
     "postgres",
     "redis",
     "kafka",
-    "elasticsearch",
+    "opensearch",
     "rustfs",
     "keycloak",
     "apisix"
