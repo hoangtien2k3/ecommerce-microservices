@@ -4,7 +4,7 @@ go 1.27.0
 
 require (
 	com.ecommerce/shared v0.0.0
-	github.com/elastic/go-elasticsearch/v8 v8.17.0
+	github.com/opensearch-project/opensearch-go/v4 v4.7.3
 	github.com/go-chi/chi/v5 v5.3.2
 	github.com/go-chi/cors v1.2.2
 	github.com/segmentio/kafka-go v0.4.47
@@ -13,7 +13,6 @@ require (
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/elastic/elastic-transport-go/v8 v8.6.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/golang-jwt/jwt/v5 v5.3.1 // indirect

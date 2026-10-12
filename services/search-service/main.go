@@ -16,7 +16,8 @@ import (
 	"com.ecommerce/search-service/internal/service"
 	"com.ecommerce/shared/config"
 	commonmw "com.ecommerce/shared/middleware"
-	"github.com/elastic/go-elasticsearch/v8"
+	opensearch "github.com/opensearch-project/opensearch-go/v4"
+	"github.com/opensearch-project/opensearch-go/v4/opensearchapi"
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
@@ -24,28 +25,28 @@ import (
 
 func main() {
 	port := config.GetEnv("PORT", "8094")
-	esURL := config.GetEnv("ELASTICSEARCH_URL", "http://localhost:9200")
-	esUser := config.GetEnv("ELASTICSEARCH_USERNAME", "")
-	esPass := config.GetEnv("ELASTICSEARCH_PASSWORD", "")
+	osURL := config.GetEnv("OPENSEARCH_URL", "http://localhost:9200")
+	osUser := config.GetEnv("OPENSEARCH_USERNAME", "")
+	osPass := config.GetEnv("OPENSEARCH_PASSWORD", "")
 	kafkaServers := config.GetEnv("KAFKA_SERVERS", "localhost:9092")
 	topicName := config.GetEnv("PRODUCT_TOPIC_NAME", "dbproduct.public.product")
 
 	log.Printf("[Search Service] Starting service on port %s...", port)
 
-	esCfg := elasticsearch.Config{
-		Addresses: []string{esURL},
-		Username:  esUser,
-		Password:  esPass,
-	}
-
-	esClient, err := elasticsearch.NewClient(esCfg)
+	osClient, err := opensearchapi.NewClient(opensearchapi.Config{
+		Client: opensearch.Config{
+			Addresses: []string{osURL},
+			Username:  osUser,
+			Password:  osPass,
+		},
+	})
 	if err != nil {
-		log.Printf("[Search Service] Warning: Failed to initialize Elasticsearch client: %v", err)
+		log.Printf("[Search Service] Warning: Failed to initialize OpenSearch client: %v", err)
 	} else {
-		log.Println("[Search Service] Elasticsearch client initialized successfully.")
+		log.Println("[Search Service] OpenSearch client initialized successfully.")
 	}
 
-	svc := service.NewSearchService(esClient)
+	svc := service.NewSearchService(osClient)
 	h := handler.NewSearchHandler(svc)
 
 	// Start Kafka sync consumer in background
@@ -93,3 +94,4 @@ func main() {
 	}
 	log.Println("[Search Service] Server exited successfully.")
 }
+

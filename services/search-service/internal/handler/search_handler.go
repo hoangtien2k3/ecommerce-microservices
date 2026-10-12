@@ -33,7 +33,7 @@ func (h *SearchHandler) registerEndpoints(r chi.Router, prefix string) {
 }
 
 func (h *SearchHandler) HealthCheck(w http.ResponseWriter, r *http.Request) {
-	response.Health(w, "elasticsearch")
+	response.Health(w, "opensearch")
 }
 
 func intQueryDefault(value string, fallback int) int {

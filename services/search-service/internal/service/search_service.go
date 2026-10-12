@@ -10,15 +10,15 @@ import (
 	"strings"
 
 	"com.ecommerce/search-service/internal/model"
-	"github.com/elastic/go-elasticsearch/v8"
+	"github.com/opensearch-project/opensearch-go/v4/opensearchapi"
 )
 
 type SearchService struct {
-	es *elasticsearch.Client
+	os *opensearchapi.Client
 }
 
-func NewSearchService(es *elasticsearch.Client) *SearchService {
-	return &SearchService{es: es}
+func NewSearchService(os *opensearchapi.Client) *SearchService {
+	return &SearchService{os: os}
 }
 
 func (s *SearchService) FindProductAdvance(
@@ -29,7 +29,7 @@ func (s *SearchService) FindProductAdvance(
 	minPrice, maxPrice *float64,
 	sortType string,
 ) (*model.ProductListGetVm, error) {
-	if s.es == nil {
+	if s.os == nil {
 		return &model.ProductListGetVm{
 			Products:      []model.ProductGetVm{},
 			PageNo:        page,
@@ -108,14 +108,17 @@ func (s *SearchService) FindProductAdvance(
 		return nil, err
 	}
 
-	res, err := s.es.Search(
-		s.es.Search.WithContext(ctx),
-		s.es.Search.WithIndex("product"),
-		s.es.Search.WithBody(&buf),
-		s.es.Search.WithTrackTotalHits(true),
-	)
+	searchReq := opensearchapi.SearchReq{
+		Indices: []string{"product"},
+		Body:    &buf,
+		Params: opensearchapi.SearchParams{
+			TrackTotalHits: json.RawMessage(`true`),
+		},
+	}
+
+	searchResp, err := s.os.Search(ctx, &searchReq)
 	if err != nil {
-		log.Printf("[Search Service] Warning: ES Search failed: %v", err)
+		log.Printf("[Search Service] Warning: OpenSearch Search failed: %v", err)
 		return &model.ProductListGetVm{
 			Products:      []model.ProductGetVm{},
 			PageNo:        page,
@@ -126,29 +129,13 @@ func (s *SearchService) FindProductAdvance(
 			Aggregations:  map[string]map[string]int{},
 		}, nil
 	}
-	defer res.Body.Close()
 
-	var r map[string]any
-	if err := json.NewDecoder(res.Body).Decode(&r); err != nil {
-		return nil, err
-	}
-
-	hitsObj, _ := r["hits"].(map[string]any)
-	hitsList, _ := hitsObj["hits"].([]any)
-	totalObj, _ := hitsObj["total"].(map[string]any)
-	totalHits := int64(0)
-	if totalVal, ok := totalObj["value"].(float64); ok {
-		totalHits = int64(totalVal)
-	}
+	totalHits := int64(searchResp.Hits.Total.Value)
 
 	products := []model.ProductGetVm{}
-	for _, hitItem := range hitsList {
-		hMap, ok := hitItem.(map[string]any)
-		if !ok {
-			continue
-		}
-		src, ok := hMap["_source"].(map[string]any)
-		if !ok {
+	for _, hit := range searchResp.Hits.Hits {
+		var src map[string]any
+		if err := json.Unmarshal(hit.Source, &src); err != nil {
 			continue
 		}
 
@@ -198,7 +185,7 @@ func (s *SearchService) FindProductAdvance(
 }
 
 func (s *SearchService) AutoComplete(ctx context.Context, keyword string) (*model.ProductNameListVm, error) {
-	if s.es == nil || strings.TrimSpace(keyword) == "" {
+	if s.os == nil || strings.TrimSpace(keyword) == "" {
 		return &model.ProductNameListVm{ProductNames: []model.ProductNameGetVm{}}, nil
 	}
 
@@ -217,32 +204,20 @@ func (s *SearchService) AutoComplete(ctx context.Context, keyword string) (*mode
 		return nil, err
 	}
 
-	res, err := s.es.Search(
-		s.es.Search.WithContext(ctx),
-		s.es.Search.WithIndex("product"),
-		s.es.Search.WithBody(&buf),
-	)
+	searchReq := opensearchapi.SearchReq{
+		Indices: []string{"product"},
+		Body:    &buf,
+	}
+
+	searchResp, err := s.os.Search(ctx, &searchReq)
 	if err != nil {
 		return &model.ProductNameListVm{ProductNames: []model.ProductNameGetVm{}}, nil
 	}
-	defer res.Body.Close()
-
-	var r map[string]any
-	if err := json.NewDecoder(res.Body).Decode(&r); err != nil {
-		return nil, err
-	}
-
-	hitsObj, _ := r["hits"].(map[string]any)
-	hitsList, _ := hitsObj["hits"].([]any)
 
 	list := []model.ProductNameGetVm{}
-	for _, hitItem := range hitsList {
-		hMap, ok := hitItem.(map[string]any)
-		if !ok {
-			continue
-		}
-		src, ok := hMap["_source"].(map[string]any)
-		if !ok {
+	for _, hit := range searchResp.Hits.Hits {
+		var src map[string]any
+		if err := json.Unmarshal(hit.Source, &src); err != nil {
 			continue
 		}
 		idVal, _ := src["id"].(float64)
@@ -257,34 +232,36 @@ func (s *SearchService) AutoComplete(ctx context.Context, keyword string) (*mode
 }
 
 func (s *SearchService) IndexProduct(ctx context.Context, p model.ProductDoc) error {
-	if s.es == nil {
+	if s.os == nil {
 		return nil
 	}
 	data, err := json.Marshal(p)
 	if err != nil {
 		return err
 	}
-	res, err := s.es.Index(
-		"product",
-		bytes.NewReader(data),
-		s.es.Index.WithDocumentID(fmt.Sprintf("%d", p.ID)),
-		s.es.Index.WithContext(ctx),
-	)
-	if err != nil {
-		return err
+
+	docID := fmt.Sprintf("%d", p.ID)
+	indexReq := opensearchapi.IndexReq{
+		Index:      "product",
+		DocumentID: docID,
+		Body:       bytes.NewReader(data),
 	}
-	defer res.Body.Close()
-	return nil
+
+	_, err = s.os.Index(ctx, indexReq)
+	return err
 }
 
 func (s *SearchService) DeleteProduct(ctx context.Context, id int64) error {
-	if s.es == nil {
+	if s.os == nil {
 		return nil
 	}
-	res, err := s.es.Delete("product", fmt.Sprintf("%d", id), s.es.Delete.WithContext(ctx))
-	if err != nil {
-		return err
+
+	docID := fmt.Sprintf("%d", id)
+	deleteReq := opensearchapi.DocumentDeleteReq{
+		Index:      "product",
+		DocumentID: docID,
 	}
-	defer res.Body.Close()
-	return nil
+
+	_, err := s.os.Document.Delete(ctx, deleteReq)
+	return err
 }
