@@ -18,6 +18,8 @@ COPY --from=pruner /app/out/full/ .
 # browser location at runtime (api.<host>), so one image works everywhere.
 ARG NEXT_PUBLIC_API_URL=
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+ARG APP_VERSION=unknown
+ENV NEXT_PUBLIC_APP_VERSION=${APP_VERSION}
 RUN pnpm --filter @ecommerce/web build
 
 # 3. Minimal runtime from the Next.js standalone output.
