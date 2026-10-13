@@ -20,15 +20,6 @@ spec:
       labels:
         app: notification-service
     spec:
-      initContainers:
-        - name: wait-for-kafka
-          image: busybox
-          command: ["sh", "-c", "until nc -z kafka 9092; do sleep 5; done"]
-          securityContext:
-            runAsUser: 65534
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop: ["ALL"]
       securityContext:
         seccompProfile:
           type: RuntimeDefault

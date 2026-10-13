@@ -19,7 +19,7 @@ Set tối thiểu các biến môi trường sau trước khi chạy:
 - `KEYCLOAK_CLIENT_SECRET` (để trống với public client)
 - `POSTGRES_USER` (vd: `postgres`)
 - `POSTGRES_PASSWORD` (vd: `postgres`)
-- `KAFKA_SERVERS`, `EUREKA_URI` theo môi trường hiện tại của bạn.
+- `EUREKA_URI` theo môi trường hiện tại của bạn.
 
 ## 2.1) Boot Keycloak with preloaded realm
 

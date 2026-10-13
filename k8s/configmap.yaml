@@ -16,9 +16,6 @@ data:
   KEYCLOAK_SERVER_URL: "http://keycloak:8080"
   KEYCLOAK_PUBLIC_SERVER_URL: "http://keycloak.ecommerce.local"
 
-  # Kafka
-  KAFKA_SERVERS: "kafka:9092"
-
   # Redis
   REDIS_HOST: "redis"
   REDIS_PORT: "6379"

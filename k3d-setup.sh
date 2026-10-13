@@ -319,9 +319,9 @@ step_done
 
 # 8. Infrastructure — fire-and-forget: apply everything, let Kubernetes converge on
 # its own. Pod ordering is handled by the pods (Keycloak + backends carry
-# wait-for-postgres / wait-for-kafka initContainers), so we do NOT block on readiness.
+# wait-for-postgres initContainers), so we do NOT block on readiness.
 step "Deploy infrastructure"
-for f in postgres redis kafka elasticsearch rustfs keycloak; do
+for f in postgres redis elasticsearch rustfs keycloak; do
   kubectl apply -f "k8s/infra/${f}.yaml" > /dev/null
 done
 success "Infrastructure manifests applied (pods start in the background)"

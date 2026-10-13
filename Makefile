@@ -15,9 +15,9 @@ SERVICES = discovery-service api-gateway auth-service \
 
 .PHONY: up down logs ps restart build-all
 
-## Start infrastructure only (postgres, kafka, redis, keycloak…)
+## Start infrastructure only (postgres, redis, keycloak…)
 infra-up:
-	docker compose up -d postgres mongodb redis kafka elasticsearch minio keycloak
+	docker compose up -d postgres mongodb redis elasticsearch minio keycloak
 
 ## Wait until infra is healthy, then start all backend + frontend
 up:
@@ -112,12 +112,11 @@ k8s-config:
 	kubectl apply -f k8s/secrets.yaml
 	kubectl apply -f k8s/configmap.yaml
 
-## Deploy infrastructure (databases, kafka, etc.)
+## Deploy infrastructure (databases, etc.)
 k8s-infra: k8s-config
 	kubectl apply -f k8s/infra/postgres.yaml
 	kubectl apply -f k8s/infra/mongodb.yaml
 	kubectl apply -f k8s/infra/redis.yaml
-	kubectl apply -f k8s/infra/kafka.yaml
 	kubectl apply -f k8s/infra/elasticsearch.yaml
 	kubectl apply -f k8s/infra/minio.yaml
 	kubectl apply -f k8s/infra/keycloak.yaml

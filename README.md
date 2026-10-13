@@ -37,7 +37,6 @@ frontend, and a full suite of infrastructure — all deployable on **Kubernetes 
 | ⚡ **Backend**     | 13 microservices · Java 21 · Spring Boot 3.3.5     |
 | 🚪 **Gateway**    | Apache APISIX 3.9 · Rate limiting · JWT validation |
 | 🗄️ **Databases** | PostgreSQL 16 · Redis 7 · Elasticsearch 8          |
-| 📨 **Messaging**  | Apache Kafka 3.9 (KRaft mode, no Zookeeper)        |
 | 🔐 **Auth**       | Keycloak 26 · OAuth2 / OIDC · JWT                  |
 | ☁️ **Storage**    | RustFS (S3-compatible)                             |
 | 🐳 **Deploy**     | Docker Compose · k3d / Kubernetes · ArgoCD         |
@@ -54,7 +53,6 @@ frontend, and a full suite of infrastructure — all deployable on **Kubernetes 
 | **Framework**     | Spring Boot 3.3.5, Spring Security 6, Spring Data JPA            |
 | **Database**      | PostgreSQL 16, Liquibase migrations                              |
 | **Search**        | Elasticsearch 8, Spring Data Elasticsearch                       |
-| **Messaging**     | Apache Kafka 3.9 (KRaft), Spring Kafka                           |
 | **Security**      | Keycloak 26, OAuth2 / OIDC, JWT, Spring Security Resource Server |
 | **Gateway**       | Apache APISIX 3.9 (OpenID Connect, rate limiting, CORS)          |
 | **Storage**       | RustFS (S3-compatible), AWS SDK v2                               |
@@ -103,7 +101,7 @@ The script automatically:
 1. Installs k3d and kubectl (if missing)
 2. Creates a local Kubernetes cluster
 3. Deploys NGINX Ingress Controller
-4. Applies secrets, config maps, and infrastructure (PostgreSQL, Redis, Kafka, Elasticsearch, RustFS, Keycloak)
+4. Applies secrets, config maps, and infrastructure (PostgreSQL, Redis, Elasticsearch, RustFS, Keycloak)
 5. Deploys APISIX gateway + all 13 backend services + frontend
 6. Updates `/etc/hosts`
 
@@ -134,7 +132,6 @@ ecommerce-microservices/
 │   ├── common-spring/              #   Auto-configurations
 │   ├── common-security/            #   JWT / OAuth2 security
 │   ├── common-keycloak/            #   Keycloak admin client
-│   ├── common-kafka/               #   Kafka / CDC helpers
 │   ├── common-logging/             #   AOP performance logging
 │   └── common-storage/             #   S3 object storage abstraction
 ├── deploy/
