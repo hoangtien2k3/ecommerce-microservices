@@ -29,11 +29,6 @@
             <artifactId>common-keycloak</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.ecommerce.microservices</groupId>
-            <artifactId>common-kafka</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
         </dependency>

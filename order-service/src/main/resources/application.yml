@@ -33,8 +33,6 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${JWT_ISSUER_URI:http://localhost:8080/realms/ecommerce}
-  kafka:
-    bootstrap-servers: ${KAFKA_SERVERS:localhost:9092}
 ---
 management:
   server:

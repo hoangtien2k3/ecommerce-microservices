@@ -20,7 +20,6 @@
         <module>common-security</module>
         <module>common-logging</module>
         <module>common-keycloak</module>
-        <module>common-kafka</module>
         <module>common-spring</module>
         <module>common-storage</module>
     </modules>

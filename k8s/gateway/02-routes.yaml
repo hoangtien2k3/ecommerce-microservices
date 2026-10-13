@@ -184,13 +184,6 @@ spec:
         - serviceName: notification-service
           servicePort: 8090
       plugin_config_name: jwt-auth
-    - name: payment-notifications
-      match:
-        paths: [ /notification/api/payment-notifications/* ]
-      backends:
-        - serviceName: notification-service
-          servicePort: 8090
-      plugin_config_name: jwt-auth
     - name: docs
       match:
         paths: [ /notification/v3/api-docs/* ]

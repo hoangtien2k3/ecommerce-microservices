@@ -34,16 +34,6 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${JWT_ISSUER_URI:http://localhost:8080/realms/ecommerce}
-  kafka:
-    bootstrap-servers: ${KAFKA_SERVERS:localhost:9092}
-    producer:
-      retries: 3
-      batch-size: 16384
-      buffer-memory: 33554432
----
-notification:
-  kafka:
-    consumer-group-id: notification-groupId
 ---
 management:
   server:
