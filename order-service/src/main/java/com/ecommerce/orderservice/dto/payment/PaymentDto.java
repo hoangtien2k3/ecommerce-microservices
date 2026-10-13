@@ -1,10 +1,15 @@
-package com.ecommerce.paymentservice.dto;
+package com.ecommerce.orderservice.dto.payment;
 
+import com.ecommerce.orderservice.dto.order.OrderDto;
+import com.ecommerce.orderservice.dto.user.UserDto;
+import com.ecommerce.orderservice.entity.PaymentStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ecommerce.paymentservice.entity.PaymentStatus;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -12,8 +17,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Setter
-@Getter
 @Builder
 public class PaymentDto implements Serializable {
 

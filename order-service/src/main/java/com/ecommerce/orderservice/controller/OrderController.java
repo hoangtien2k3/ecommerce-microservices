@@ -1,5 +1,6 @@
 package com.ecommerce.orderservice.controller;
 
+import com.ecommerce.commonlib.viewmodel.ApiResponse;
 import com.ecommerce.orderservice.dto.order.OrderDto;
 import com.ecommerce.orderservice.service.OrderService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -53,11 +54,11 @@ public class OrderController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('USER')")
-    public ResponseEntity<OrderDto> save(@RequestBody
-                                          @NotNull(message = "Input must not be NULL")
-                                          @Valid final OrderDto orderDto) {
+    public ResponseEntity<ApiResponse<OrderDto>> save(@RequestBody
+                                                       @NotNull(message = "Input must not be NULL")
+                                                       @Valid final OrderDto orderDto) {
         log.info("*** OrderDto, resource; save order *");
-        return ResponseEntity.ok(orderService.save(orderDto));
+        return ResponseEntity.ok(ApiResponse.ok(orderService.save(orderDto)));
     }
 
     @PutMapping

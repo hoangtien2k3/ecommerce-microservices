@@ -74,7 +74,7 @@ HOSTS_ENTRY="127.0.0.1 ecommerce.local admin.ecommerce.local api.ecommerce.local
 
 SERVICES=(
   auth-service product-service order-service
-  payment-service shipping-service inventory-service favourite-service
+  shipping-service inventory-service favourite-service
   rating-service media-service tax-service promotion-service
   search-service notification-service
 )

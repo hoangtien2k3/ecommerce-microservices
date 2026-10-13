@@ -1,4 +1,4 @@
-package com.ecommerce.paymentservice.entity;
+package com.ecommerce.orderservice.entity;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -218,26 +218,6 @@ services:
     networks:
       - ecommerce-network
 
-  payment-service:
-    image: ghcr.io/hoangtien2k3/payment-service:latest
-    pull_policy: always
-    container_name: payment-service
-    ports:
-      - "8085:8085"
-    environment:
-      JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/paymentservice
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      KAFKA_SERVERS: kafka:9092
-    depends_on:
-      postgres:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
-    networks:
-      - ecommerce-network
-
   shipping-service:
     image: ghcr.io/hoangtien2k3/shipping-service:latest
     pull_policy: always

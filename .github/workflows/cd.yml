@@ -99,7 +99,7 @@ jobs:
         run: |
           SERVICES=(
             auth-service product-service
-            order-service payment-service shipping-service inventory-service
+            order-service shipping-service inventory-service
             favourite-service rating-service notification-service media-service
             search-service promotion-service tax-service frontend admin
           )
@@ -110,7 +110,7 @@ jobs:
       - name: Wait for rollout
         run: |
           for svc in auth-service product-service \
-                     order-service payment-service; do
+                     order-service shipping-service; do
             kubectl rollout status deployment/$svc -n ecommerce --timeout=300s || true
           done
 

@@ -109,20 +109,14 @@ spec:
       match:
         paths: [ /api/payments, /api/payments/* ]
       backends:
-        - serviceName: payment-service
-          servicePort: 8085
+        - serviceName: order-service
+          servicePort: 8084
       plugin_config_name: jwt-auth
       plugins:
         - name: proxy-rewrite
           enable: true
           config:
-            regex_uri: [ "^/(.*)", "/payment/$1" ]
-    - name: docs
-      match:
-        paths: [ /payment/v3/api-docs/* ]
-      backends:
-        - serviceName: payment-service
-          servicePort: 8085
+            regex_uri: [ "^/(.*)", "/order/$1" ]
 ---
 apiVersion: apisix.apache.org/v2
 kind: ApisixRoute

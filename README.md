@@ -162,7 +162,6 @@ ecommerce-microservices/
 ├── media-service/                  # Port 8083
 ├── notification-service/           # Port 8090
 ├── order-service/                  # Port 8084
-├── payment-service/                # Port 8085
 ├── pom.xml                         # Parent POM
 ├── product-service/                # Port 8086
 ├── promotion-service/              # Port 8093

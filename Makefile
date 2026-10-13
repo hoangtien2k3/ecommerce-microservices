@@ -4,7 +4,7 @@ NAMESPACE ?= ecommerce
 SHA       := $(shell git rev-parse --short HEAD 2>/dev/null || echo "local")
 
 SERVICES = discovery-service api-gateway auth-service \
-           product-service order-service payment-service \
+           product-service order-service \
            shipping-service inventory-service favourite-service \
            rating-service media-service tax-service \
            promotion-service search-service notification-service
@@ -133,7 +133,6 @@ k8s-backend:
 	kubectl apply -f k8s/backend/auth-service.yaml
 	kubectl apply -f k8s/backend/product-service.yaml
 	kubectl apply -f k8s/backend/order-service.yaml
-	kubectl apply -f k8s/backend/payment-service.yaml
 	kubectl apply -f k8s/backend/shipping-service.yaml
 	kubectl apply -f k8s/backend/inventory-service.yaml
 	kubectl apply -f k8s/backend/favourite-service.yaml

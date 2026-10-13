@@ -6,3 +6,6 @@ databaseChangeLog:
       changes:
         - sql:
             sql: SELECT 1;
+  - include:
+      file: ddl/changelog-payments-0001.sql
+      relativeToChangelogFile: true

@@ -14,7 +14,7 @@ upstreams:
 - id: 4
   type: roundrobin
   nodes:
-    payment-service:8085: 1
+    order-service:8084: 1
 - id: 5
   type: roundrobin
   nodes:
@@ -117,9 +117,6 @@ routes:
 - id: openapi-order
   upstream_id: 3
   uri: /order/v3/api-docs/*
-- id: openapi-payment
-  upstream_id: 4
-  uri: /payment/v3/api-docs/*
 - id: openapi-inventory
   upstream_id: 5
   uri: /inventory/v3/api-docs/*
@@ -236,7 +233,7 @@ routes:
     proxy-rewrite:
       regex_uri:
       - ^/(.*)
-      - /payment/$1
+      - /order/$1
 - id: inventory
   upstream_id: 5
   uris:

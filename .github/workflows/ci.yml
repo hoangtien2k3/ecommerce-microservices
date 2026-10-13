@@ -24,7 +24,6 @@ jobs:
       auth-service:         ${{ steps.filter.outputs.auth-service }}
       product-service:      ${{ steps.filter.outputs.product-service }}
       order-service:        ${{ steps.filter.outputs.order-service }}
-      payment-service:      ${{ steps.filter.outputs.payment-service }}
       shipping-service:     ${{ steps.filter.outputs.shipping-service }}
       inventory-service:    ${{ steps.filter.outputs.inventory-service }}
       favourite-service:    ${{ steps.filter.outputs.favourite-service }}
@@ -55,10 +54,6 @@ jobs:
               - 'pom.xml'
             order-service:
               - 'order-service/**'
-              - 'common-lib/**'
-              - 'pom.xml'
-            payment-service:
-              - 'payment-service/**'
               - 'common-lib/**'
               - 'pom.xml'
             shipping-service:
@@ -151,18 +146,6 @@ jobs:
     with:
       service: order-service
       port: 8084
-    secrets:
-      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  build-payment-service:
-    needs: [detect-changes, test]
-    if: |
-      (needs.detect-changes.outputs.payment-service == 'true' || github.event_name == 'workflow_dispatch') &&
-      (needs.test.result == 'success' || needs.test.result == 'skipped')
-    uses: ./.github/workflows/_build-service.yml
-    with:
-      service: payment-service
-      port: 8085
     secrets:
       GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -345,7 +328,6 @@ jobs:
       - build-auth-service
       - build-product-service
       - build-order-service
-      - build-payment-service
       - build-shipping-service
       - build-inventory-service
       - build-favourite-service

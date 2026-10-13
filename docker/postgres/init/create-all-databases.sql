@@ -2,7 +2,6 @@ CREATE DATABASE keycloak;
 CREATE DATABASE authservice;
 CREATE DATABASE productservice;
 CREATE DATABASE orderservice;
-CREATE DATABASE paymentservice;
 CREATE DATABASE shippingservice;
 CREATE DATABASE inventoryservice;
 CREATE DATABASE favouriteservice;
