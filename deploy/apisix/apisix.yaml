@@ -282,18 +282,6 @@ routes:
       bearer_only: true
       use_jwks: true
       token_signing_alg_values_expected: RS256
-- id: notif-email
-  upstream_id: 8
-  uri: /notification/api/email/*
-  plugins:
-    openid-connect:
-      client_id: ecommerce-client
-      client_secret: $env://KEYCLOAK_CLIENT_SECRET
-      discovery: http://keycloak:8080/realms/ecommerce/.well-known/openid-configuration
-      realm: ecommerce
-      bearer_only: true
-      use_jwks: true
-      token_signing_alg_values_expected: RS256
 - id: notif-notifications
   upstream_id: 8
   uri: /notification/api/notifications/*

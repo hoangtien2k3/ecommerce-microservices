@@ -294,7 +294,6 @@ if [ -f .env ]; then
   mk_secret redis-secret         --from-literal=REDIS_PASSWORD="${REDIS_PASSWORD:-admin}"
   mk_secret storage-secret       --from-literal=STORAGE_ACCESS_KEY="${STORAGE_ACCESS_KEY:-admin}"     --from-literal=STORAGE_SECRET_KEY="${STORAGE_SECRET_KEY:-admin}"
   mk_secret elasticsearch-secret --from-literal=ELASTIC_PASSWORD="${ELASTIC_PASSWORD:-admin}"
-  mk_secret mail-secret          --from-literal=MAIL_USERNAME="${MAIL_USERNAME:-}"                  --from-literal=MAIL_PASSWORD="${MAIL_PASSWORD:-}"
 else
   info "No .env found — applying k8s/secrets.yaml (default dev values)"
   kubectl apply -f k8s/secrets.yaml > /dev/null
