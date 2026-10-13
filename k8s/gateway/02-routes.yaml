@@ -177,13 +177,6 @@ metadata:
   namespace: ecommerce
 spec:
   http:
-    - name: email
-      match:
-        paths: [ /notification/api/email/* ]
-      backends:
-        - serviceName: notification-service
-          servicePort: 8090
-      plugin_config_name: jwt-auth
     - name: notifications
       match:
         paths: [ /notification/api/notifications/* ]

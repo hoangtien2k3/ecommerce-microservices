@@ -16,17 +16,6 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/ecommerce}
     username: ${POSTGRES_USER:admin}
@@ -137,4 +126,4 @@ ecommerce:
   openapi:
     title: Notification Service API
     version: ${APP_VERSION:v1}
-    description: Email and push notification delivery
+    description: In-app notification delivery

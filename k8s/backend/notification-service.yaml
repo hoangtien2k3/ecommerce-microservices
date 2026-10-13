@@ -48,16 +48,6 @@ spec:
             - configMapRef:
                 name: ecommerce-config
           env:
-            - name: MAIL_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: mail-secret
-                  key: MAIL_USERNAME
-            - name: MAIL_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mail-secret
-                  key: MAIL_PASSWORD
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:

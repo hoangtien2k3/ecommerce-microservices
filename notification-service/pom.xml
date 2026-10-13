@@ -10,7 +10,7 @@
     </parent>
     <artifactId>notification-service</artifactId>
     <name>notification-service</name>
-    <description>Email + push + in-app notifications. Consumes domain events from Kafka.</description>
+    <description>In-app notifications. Consumes domain events from Kafka.</description>
     <dependencies>
         <dependency>
             <groupId>com.ecommerce.microservices</groupId>
@@ -24,10 +24,6 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.kafka</groupId>
