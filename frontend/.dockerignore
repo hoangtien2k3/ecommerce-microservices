@@ -1,0 +1,12 @@
+# 프론트 이미지는 frontend/ 에서 빌드하므로(빌드 컨텍스트 = frontend/),
+# 레포 최상위(app/.dockerignore)가 아니라 이 파일이 적용된다
+**/node_modules
+**/.next
+**/.turbo
+**/*.tsbuildinfo
+**/.env
+**/.env.*
+!**/.env.example
+**/npm-debug.log*
+**/.pnpm-debug.log*
+.DS_Store
