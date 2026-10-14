@@ -30,20 +30,32 @@ public class PaymentServiceImpl implements PaymentService {
         if (paymentRepository.existsByOrderIdAndIsPayed(paymentDto.getOrderId())) {
             throw BusinessException.conflict("Order has already been paid.");
         }
-        if (isSoldOut(paymentDto.getOrderId())) {
+        Order order = findOrder(paymentDto.getOrderId());
+        if (isSoldOut(order)) {
             paymentStore.saveUnpaid(paymentDto);
             throw BusinessException.of(ErrorCode.STOCK_INSUFFICIENT);
         }
-        return paymentStore.saveCompleted(paymentDto);
+        boolean couponUsed = useCoupon(order);
+        try {
+            return paymentStore.saveCompleted(paymentDto);
+        } catch (RuntimeException ex) {
+            if (couponUsed) {
+                releaseCoupon(order, ex);
+            }
+            throw ex;
+        }
     }
 
-    private boolean isSoldOut(Integer orderId) {
+    private Order findOrder(Integer orderId) {
         if (orderId == null) {
-            return false;
+            return null;
         }
-        Order order = orderRepository.findById(orderId)
+        return orderRepository.findById(orderId)
                 .orElseThrow(() -> BusinessException.notFound("order.not.found"));
-        if (order.getProductId() == null) {
+    }
+
+    private boolean isSoldOut(Order order) {
+        if (order == null || order.getProductId() == null) {
             return false;
         }
         String authorization = JwtTokenFilter.getTokenFromRequest();
@@ -53,6 +65,29 @@ public class PaymentServiceImpl implements PaymentService {
         }
         List<InventoryStockDto> stocks = callAPI.receiverInventory(product.getProductTitle(), authorization);
         return stocks.stream().anyMatch(stock -> !stock.isInStock());
+    }
+
+    private boolean useCoupon(Order order) {
+        if (order == null || order.getPromotionId() == null) {
+            return false;
+        }
+        callAPI.usePromotion(
+                order.getPromotionId(),
+                order.getOrderId().longValue(),
+                order.getProductId() == null ? null : order.getProductId().longValue(),
+                JwtTokenFilter.getTokenFromRequest());
+        return true;
+    }
+
+    private void releaseCoupon(Order order, RuntimeException paymentFailure) {
+        try {
+            callAPI.releasePromotion(
+                    order.getPromotionId(),
+                    order.getOrderId().longValue(),
+                    JwtTokenFilter.getTokenFromRequest());
+        } catch (RuntimeException releaseFailure) {
+            paymentFailure.addSuppressed(releaseFailure);
+        }
     }
 
 }

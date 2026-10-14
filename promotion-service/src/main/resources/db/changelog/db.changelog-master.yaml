@@ -31,3 +31,11 @@ databaseChangeLog:
             path: db/changelog-mysql/ddl/changelog-0004.sql
             relativeToChangelogFile: false
             splitStatements: true
+  - changeSet:
+      id: promotion-mysql-ddl-0005
+      author: ecommerce
+      changes:
+        - sqlFile:
+            path: db/changelog-mysql/ddl/changelog-0005.sql
+            relativeToChangelogFile: false
+            splitStatements: true

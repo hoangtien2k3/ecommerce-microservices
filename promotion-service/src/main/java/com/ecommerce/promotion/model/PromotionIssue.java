@@ -1,5 +1,6 @@
 package com.ecommerce.promotion.model;
 
+import com.ecommerce.promotion.model.enumeration.PromotionIssueStatus;
 import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,8 @@ import lombok.Setter;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -45,4 +48,13 @@ public class PromotionIssue {
 
     @Column(nullable = false)
     private Instant issuedAt;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 25)
+    private PromotionIssueStatus status = PromotionIssueStatus.ISSUED;
+
+    private Instant usedAt;
+
+    private Long orderId;
 }

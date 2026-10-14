@@ -25,6 +25,8 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers("/backoffice/**")
                         .hasRole("ADMIN")
+                        .requestMatchers("/internal/**")
+                        .authenticated()
                         .anyRequest()
                         .authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverterForKeycloak())))
