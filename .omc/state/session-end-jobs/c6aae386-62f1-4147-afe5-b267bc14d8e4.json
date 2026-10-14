@@ -1,0 +1,264 @@
+{
+  "version": 1,
+  "jobId": "1213230e-203b-4c8e-a106-6064f0894b36",
+  "sessionId": "c6aae386-62f1-4147-afe5-b267bc14d8e4",
+  "scopeKey": "4e4f75ca4b8a00fe88c0b227c6a51fdf8eff73922bbe6013ee48fff98b86155f",
+  "revision": 11,
+  "createdAt": "2026-10-14T03:51:05.554Z",
+  "updatedAt": "2026-10-14T04:09:30.530Z",
+  "producerGraceExpiresAt": "2026-10-14T03:51:35.556Z",
+  "bestEffortDeadlineAt": "2026-10-14T03:52:26.556Z",
+  "producers": {
+    "core": {
+      "state": "no-op",
+      "intentKey": "2f490e15850a6c2206a49b49ee5589ab66fbcbea72df601ac1e7edbd0015be30",
+      "payloadDigest": "2f490e15850a6c2206a49b49ee5589ab66fbcbea72df601ac1e7edbd0015be30",
+      "sealedAt": "2026-10-14T04:09:30.530Z",
+      "sealedBy": "recovery"
+    },
+    "wiki": {
+      "state": "no-op",
+      "sealedAt": "2026-10-14T03:51:05.624Z",
+      "sealedBy": "wiki-producer"
+    }
+  },
+  "actions": {
+    "foreground-cleanup": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "expired",
+      "attempts": 0,
+      "idempotencyKey": "989149a7a50b1db6abb79d93d697172c3030bd8e867eff0f6ac4ac68e0f2b8d5",
+      "payload": {
+        "transcriptPath": "/Users/najieun/.claude/projects/-Users-najieun-Desktop-sessac-app/c6aae386-62f1-4147-afe5-b267bc14d8e4.jsonl",
+        "cwd": "/Users/najieun/Desktop/sessac/app",
+        "reason": "other",
+        "input": {
+          "session_id": "c6aae386-62f1-4147-afe5-b267bc14d8e4",
+          "transcript_path": "/Users/najieun/.claude/projects/-Users-najieun-Desktop-sessac-app/c6aae386-62f1-4147-afe5-b267bc14d8e4.jsonl",
+          "cwd": "/Users/najieun/Desktop/sessac/app",
+          "scratchpad_dir": "/private/tmp/claude-501/-Users-najieun-Desktop-sessac-app/c6aae386-62f1-4147-afe5-b267bc14d8e4/scratchpad",
+          "prompt_id": "ac7a6f26-afbc-40fb-8939-a6baf5d54b8b",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {}
+      },
+      "budgetMs": 9000,
+      "lastOutcomeCode": "required-deadline-expired"
+    },
+    "wiki-capture": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "completed",
+      "attempts": 0,
+      "idempotencyKey": "f87eb27fb4636853b380a6e257d1546eee081a3232fc7fb20f1351f1426d6de4",
+      "payload": {
+        "transcriptPath": "/Users/najieun/.claude/projects/-Users-najieun-Desktop-sessac-app/c6aae386-62f1-4147-afe5-b267bc14d8e4.jsonl",
+        "cwd": "/Users/najieun/Desktop/sessac/app",
+        "reason": "other",
+        "input": {
+          "session_id": "c6aae386-62f1-4147-afe5-b267bc14d8e4",
+          "transcript_path": "/Users/najieun/.claude/projects/-Users-najieun-Desktop-sessac-app/c6aae386-62f1-4147-afe5-b267bc14d8e4.jsonl",
+          "cwd": "/Users/najieun/Desktop/sessac/app",
+          "scratchpad_dir": "/private/tmp/claude-501/-Users-najieun-Desktop-sessac-app/c6aae386-62f1-4147-afe5-b267bc14d8e4/scratchpad",
+          "prompt_id": "ac7a6f26-afbc-40fb-8939-a6baf5d54b8b",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {}
+      },
+      "budgetMs": 9000,
+      "completedAt": "2026-10-14T03:51:05.624Z"
+    },
+    "team-cleanup": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "expired",
+      "attempts": 0,
+      "idempotencyKey": "fb4d7ebb3e3d16a2c6b24b97de0b842be82a7b903c171ea01a6ed9ba1bde3db9",
+      "payload": {
+        "transcriptPath": "/Users/najieun/.claude/projects/-Users-najieun-Desktop-sessac-app/c6aae386-62f1-4147-afe5-b267bc14d8e4.jsonl",
+        "cwd": "/Users/najieun/Desktop/sessac/app",
+        "reason": "other",
+        "input": {
+          "session_id": "c6aae386-62f1-4147-afe5-b267bc14d8e4",
+          "transcript_path": "/Users/najieun/.claude/projects/-Users-najieun-Desktop-sessac-app/c6aae386-62f1-4147-afe5-b267bc14d8e4.jsonl",
+          "cwd": "/Users/najieun/Desktop/sessac/app",
+          "scratchpad_dir": "/private/tmp/claude-501/-Users-najieun-Desktop-sessac-app/c6aae386-62f1-4147-afe5-b267bc14d8e4/scratchpad",
+          "prompt_id": "ac7a6f26-afbc-40fb-8939-a6baf5d54b8b",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {},
+        "terminalization": {
+          "reason": "foreground-cleanup-exhausted",
+          "attempts": 0,
+          "outcomeCode": "required-deadline-expired"
+        }
+      },
+      "budgetMs": 9000,
+      "lastOutcomeCode": "required-core-producer-unavailable"
+    },
+    "python-cleanup": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "expired",
+      "attempts": 0,
+      "idempotencyKey": "797cf4107a1ca69a6a19655539f2d11d2dcec648f1b71b0186e884fe3ab0274b",
+      "payload": {
+        "transcriptPath": "/Users/najieun/.claude/projects/-Users-najieun-Desktop-sessac-app/c6aae386-62f1-4147-afe5-b267bc14d8e4.jsonl",
+        "cwd": "/Users/najieun/Desktop/sessac/app",
+        "reason": "other",
+        "input": {
+          "session_id": "c6aae386-62f1-4147-afe5-b267bc14d8e4",
+          "transcript_path": "/Users/najieun/.claude/projects/-Users-najieun-Desktop-sessac-app/c6aae386-62f1-4147-afe5-b267bc14d8e4.jsonl",
+          "cwd": "/Users/najieun/Desktop/sessac/app",
+          "scratchpad_dir": "/private/tmp/claude-501/-Users-najieun-Desktop-sessac-app/c6aae386-62f1-4147-afe5-b267bc14d8e4/scratchpad",
+          "prompt_id": "ac7a6f26-afbc-40fb-8939-a6baf5d54b8b",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {},
+        "terminalization": {
+          "reason": "foreground-cleanup-exhausted",
+          "attempts": 0,
+          "outcomeCode": "required-deadline-expired"
+        }
+      },
+      "budgetMs": 9000,
+      "lastOutcomeCode": "required-core-producer-unavailable"
+    },
+    "reply-cleanup": {
+      "class": "required",
+      "phase": "deferred-required",
+      "status": "expired",
+      "attempts": 0,
+      "idempotencyKey": "6e439029ef87ed3bcdd9993677504dc5a3bd3ac8f4bc305b52ed7b2fa0195124",
+      "payload": {
+        "transcriptPath": "/Users/najieun/.claude/projects/-Users-najieun-Desktop-sessac-app/c6aae386-62f1-4147-afe5-b267bc14d8e4.jsonl",
+        "cwd": "/Users/najieun/Desktop/sessac/app",
+        "reason": "other",
+        "input": {
+          "session_id": "c6aae386-62f1-4147-afe5-b267bc14d8e4",
+          "transcript_path": "/Users/najieun/.claude/projects/-Users-najieun-Desktop-sessac-app/c6aae386-62f1-4147-afe5-b267bc14d8e4.jsonl",
+          "cwd": "/Users/najieun/Desktop/sessac/app",
+          "scratchpad_dir": "/private/tmp/claude-501/-Users-najieun-Desktop-sessac-app/c6aae386-62f1-4147-afe5-b267bc14d8e4/scratchpad",
+          "prompt_id": "ac7a6f26-afbc-40fb-8939-a6baf5d54b8b",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {},
+        "terminalization": {
+          "reason": "foreground-cleanup-exhausted",
+          "attempts": 0,
+          "outcomeCode": "required-deadline-expired"
+        }
+      },
+      "budgetMs": 9000,
+      "lastOutcomeCode": "required-core-producer-unavailable"
+    },
+    "callback": {
+      "class": "best-effort",
+      "phase": "deferred-best-effort",
+      "status": "expired",
+      "attempts": 0,
+      "idempotencyKey": "6d384620d5d7cb31648fa51f2eb67e98b4cb6941899753d046db6302aac62cec",
+      "payload": {
+        "transcriptPath": "/Users/najieun/.claude/projects/-Users-najieun-Desktop-sessac-app/c6aae386-62f1-4147-afe5-b267bc14d8e4.jsonl",
+        "cwd": "/Users/najieun/Desktop/sessac/app",
+        "reason": "other",
+        "input": {
+          "session_id": "c6aae386-62f1-4147-afe5-b267bc14d8e4",
+          "transcript_path": "/Users/najieun/.claude/projects/-Users-najieun-Desktop-sessac-app/c6aae386-62f1-4147-afe5-b267bc14d8e4.jsonl",
+          "cwd": "/Users/najieun/Desktop/sessac/app",
+          "scratchpad_dir": "/private/tmp/claude-501/-Users-najieun-Desktop-sessac-app/c6aae386-62f1-4147-afe5-b267bc14d8e4/scratchpad",
+          "prompt_id": "ac7a6f26-afbc-40fb-8939-a6baf5d54b8b",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {},
+        "terminalization": {
+          "reason": "foreground-cleanup-exhausted",
+          "attempts": 0,
+          "outcomeCode": "required-deadline-expired"
+        }
+      },
+      "budgetMs": 2000,
+      "lastOutcomeCode": "best-effort-core-producer-unavailable"
+    },
+    "notification": {
+      "class": "best-effort",
+      "phase": "deferred-best-effort",
+      "status": "expired",
+      "attempts": 0,
+      "idempotencyKey": "78bf64b053b186037b0d05df5a8673cbf52b7146c289dcf6e7fe4ccd7d41b013",
+      "payload": {
+        "transcriptPath": "/Users/najieun/.claude/projects/-Users-najieun-Desktop-sessac-app/c6aae386-62f1-4147-afe5-b267bc14d8e4.jsonl",
+        "cwd": "/Users/najieun/Desktop/sessac/app",
+        "reason": "other",
+        "input": {
+          "session_id": "c6aae386-62f1-4147-afe5-b267bc14d8e4",
+          "transcript_path": "/Users/najieun/.claude/projects/-Users-najieun-Desktop-sessac-app/c6aae386-62f1-4147-afe5-b267bc14d8e4.jsonl",
+          "cwd": "/Users/najieun/Desktop/sessac/app",
+          "scratchpad_dir": "/private/tmp/claude-501/-Users-najieun-Desktop-sessac-app/c6aae386-62f1-4147-afe5-b267bc14d8e4/scratchpad",
+          "prompt_id": "ac7a6f26-afbc-40fb-8939-a6baf5d54b8b",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {},
+        "terminalization": {
+          "reason": "foreground-cleanup-exhausted",
+          "attempts": 0,
+          "outcomeCode": "required-deadline-expired"
+        }
+      },
+      "budgetMs": 2000,
+      "lastOutcomeCode": "best-effort-core-producer-unavailable"
+    },
+    "openclaw": {
+      "class": "best-effort",
+      "phase": "deferred-best-effort",
+      "status": "expired",
+      "attempts": 0,
+      "idempotencyKey": "09e10d514948a52b2a9b223331aabde17fe32b04f5e86fd68fc4b658c9bf70fe",
+      "payload": {
+        "transcriptPath": "/Users/najieun/.claude/projects/-Users-najieun-Desktop-sessac-app/c6aae386-62f1-4147-afe5-b267bc14d8e4.jsonl",
+        "cwd": "/Users/najieun/Desktop/sessac/app",
+        "reason": "other",
+        "input": {
+          "session_id": "c6aae386-62f1-4147-afe5-b267bc14d8e4",
+          "transcript_path": "/Users/najieun/.claude/projects/-Users-najieun-Desktop-sessac-app/c6aae386-62f1-4147-afe5-b267bc14d8e4.jsonl",
+          "cwd": "/Users/najieun/Desktop/sessac/app",
+          "scratchpad_dir": "/private/tmp/claude-501/-Users-najieun-Desktop-sessac-app/c6aae386-62f1-4147-afe5-b267bc14d8e4/scratchpad",
+          "prompt_id": "ac7a6f26-afbc-40fb-8939-a6baf5d54b8b",
+          "hook_event_name": "SessionEnd",
+          "reason": "other"
+        },
+        "initialTeamNames": [],
+        "openClawRouting": {},
+        "terminalization": {
+          "reason": "foreground-cleanup-exhausted",
+          "attempts": 0,
+          "outcomeCode": "required-deadline-expired"
+        }
+      },
+      "budgetMs": 2000,
+      "lastOutcomeCode": "best-effort-core-producer-unavailable"
+    }
+  },
+  "owner": null,
+  "phase": "complete",
+  "completion": {
+    "completedAt": "2026-10-14T04:09:30.530Z",
+    "terminalDigest": "1163074bc4312f9697a5afd4834c5c49030c9f777a9335ec836e08b48838a284",
+    "terminalRevision": 11
+  }
+}
