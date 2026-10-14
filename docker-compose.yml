@@ -2,26 +2,6 @@ services:
   # ============================================================
   # INFRASTRUCTURE
   # ============================================================
-  postgres:
-    image: postgres:16
-    container_name: postgres
-    environment:
-      POSTGRES_DB: ecommerce
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d ecommerce"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
-    networks:
-      - ecommerce-network
-
   mysql:
     image: mysql:8.0
     container_name: mysql
@@ -111,18 +91,18 @@ services:
     environment:
       KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
-      KC_DB: postgres
-      KC_DB_URL_HOST: postgres
-      KC_DB_URL_PORT: 5432
+      KC_DB: mysql
+      KC_DB_URL_HOST: mysql
+      KC_DB_URL_PORT: 3306
       KC_DB_URL_DATABASE: keycloak
-      KC_DB_USERNAME: ${POSTGRES_USER}
-      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      KC_DB_USERNAME: ${MYSQL_USER}
+      KC_DB_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - ./docker/keycloak/import:/opt/keycloak/data/import:ro
     ports:
       - "8080:8080"
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "bash", "-c", "echo > /dev/tcp/localhost/8080"]
@@ -166,11 +146,11 @@ services:
       SSO_BACKEND_CALLBACK_URL: http://localhost:8088/api/v1/auth/callback
       SSO_DEFAULT_FRONTEND_REDIRECT: http://localhost:3000/auth/callback
       SSO_ALLOWED_REDIRECT_URIS: http://localhost:3000/auth/callback,http://localhost:3001/auth/callback
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/authservice
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/authservice
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
       keycloak:
         condition: service_healthy
@@ -185,11 +165,11 @@ services:
       - "8086:8086"
     environment:
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/productservice
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/productservice
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
     networks:
       - ecommerce-network
@@ -202,11 +182,11 @@ services:
       - "8084:8084"
     environment:
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/orderservice
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/orderservice
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
     networks:
       - ecommerce-network
@@ -219,11 +199,11 @@ services:
       - "8087:8087"
     environment:
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/shippingservice
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/shippingservice
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
     networks:
       - ecommerce-network
@@ -236,11 +216,11 @@ services:
       - "8082:8082"
     environment:
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/inventoryservice
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/inventoryservice
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
     networks:
       - ecommerce-network
@@ -253,11 +233,11 @@ services:
       - "8081:8081"
     environment:
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/favouriteservice
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/favouriteservice
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
     networks:
       - ecommerce-network
@@ -270,11 +250,11 @@ services:
       - "8089:8089"
     environment:
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ratingservice
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ratingservice
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
     networks:
       - ecommerce-network
@@ -287,15 +267,15 @@ services:
       - "8083:8083"
     environment:
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/mediaservice
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/mediaservice
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       STORAGE_ENDPOINT: http://rustfs:9000
       STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY}
       STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY}
       STORAGE_BUCKET: ${STORAGE_BUCKET}
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
       rustfs:
         condition: service_healthy
@@ -310,11 +290,11 @@ services:
       - "8091:8091"
     environment:
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/taxservice
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/taxservice
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
     networks:
       - ecommerce-network
@@ -327,11 +307,11 @@ services:
       - "8093:8093"
     environment:
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/promotionservice
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/promotionservice
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
     networks:
       - ecommerce-network
@@ -361,13 +341,11 @@ services:
       - "8090:8090"
     environment:
       JWT_ISSUER_URI: http://keycloak:8080/realms/ecommerce
-      POSTGRES_HOST: postgres
-      POSTGRES_PORT: 5432
-      POSTGRES_DB: ecommerce
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ecommerce
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
     networks:
       - ecommerce-network
@@ -394,7 +372,6 @@ networks:
   ecommerce-network:
     driver: bridge
 volumes:
-  postgres_data:
   mysql_data:
   redis_data:
   elasticsearch_data:

@@ -4,11 +4,6 @@ metadata:
   name: ecommerce-config
   namespace: ecommerce
 data:
-  # PostgresSQL
-  POSTGRES_HOST: "postgres"
-  POSTGRES_PORT: "5432"
-  POSTGRES_DB: "ecommerce"
-
   # MySQL
   MYSQL_HOST: "mysql"
   MYSQL_PORT: "3306"

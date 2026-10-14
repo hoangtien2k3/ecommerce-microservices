@@ -1,3 +1,9 @@
 databaseChangeLog:
-  - includeAll:
-      path: db/changelog/ddl/
+  - changeSet:
+      id: media-mysql-ddl-0001
+      author: ecommerce
+      changes:
+        - sqlFile:
+            path: db/changelog-mysql/ddl/changelog-0001.sql
+            relativeToChangelogFile: false
+            splitStatements: true

@@ -1,4 +1,4 @@
-# PostgreSQL + Keycloak Rollout Guide
+# MySQL + Keycloak Rollout Guide
 
 ## 1) Architecture baseline
 
@@ -6,7 +6,7 @@
 - Mọi service backend chạy chế độ `oauth2-resource-server`.
 - Bearer token được lấy từ Keycloak và gửi qua API Gateway.
 - Gateway relay header `Authorization` xuống các service phía sau.
-- Các service JPA chuyển sang PostgreSQL.
+- Các service JPA và Keycloak dùng MySQL 8.0 (`utf8mb4`). Keycloak dùng database `keycloak` riêng, tạo schema trên database trống rồi import file realm.
 
 ## 2) Required environment variables
 
@@ -17,19 +17,22 @@ Set tối thiểu các biến môi trường sau trước khi chạy:
 - `KEYCLOAK_REALM` (mặc định: `ecommerce`)
 - `KEYCLOAK_CLIENT_ID` (mặc định: `ecommerce-client`)
 - `KEYCLOAK_CLIENT_SECRET` (để trống với public client)
-- `POSTGRES_USER` (vd: `postgres`)
-- `POSTGRES_PASSWORD` (vd: `postgres`)
+- `MYSQL_USER` (vd: `admin`)
+- `MYSQL_PASSWORD` (vd: `admin`)
+- `MYSQL_ROOT_PASSWORD` (vd: `admin`)
 - `EUREKA_URI` theo môi trường hiện tại của bạn.
 
 ## 2.1) Boot Keycloak with preloaded realm
 
 Repo đã có sẵn realm import mẫu tại `docker/keycloak/import/ecommerce-realm.json`.
 
-Chạy Keycloak local:
+Chạy Keycloak local (MySQL được kéo theo `depends_on`):
 
 ```bash
 docker compose -f docker-compose.yml up -d keycloak
 ```
+
+Lần khởi động đầu trên database `keycloak` trống sẽ import realm từ file trên. Tài khoản tạo sau lần import đó không có trong file, nên không được mang sang.
 
 Tài khoản quản trị Keycloak:
 
@@ -69,7 +72,7 @@ Converter hiện tại chấp nhận cả `ROLE_ADMIN` và `ADMIN` để tương
 - [ ] User test đã được gán role đúng.
 - [ ] Token từ Keycloak gọi được endpoint qua gateway.
 - [ ] Endpoint role-protected trả `403` nếu role không phù hợp.
-- [ ] Service kết nối PostgreSQL thành công, Liquibase chạy sạch.
+- [ ] Service và Keycloak kết nối MySQL thành công, Liquibase chạy sạch.
 
 ## 5.1) Smoke test command
 

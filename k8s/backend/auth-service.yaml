@@ -21,6 +21,14 @@ spec:
         app: auth-service
     spec:
       initContainers:
+        - name: wait-for-mysql
+          image: busybox
+          command: ["sh", "-c", "until nc -z mysql 3306; do sleep 3; done"]
+          securityContext:
+            runAsUser: 65534
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
         - name: wait-for-keycloak
           image: busybox
           command: ["sh", "-c", "until nc -z keycloak 8080; do sleep 5; done"]
@@ -49,17 +57,17 @@ spec:
                 name: ecommerce-config
           env:
             - name: SPRING_DATASOURCE_URL
-              value: jdbc:postgresql://postgres:5432/authservice
-            - name: POSTGRES_USER
+              value: jdbc:mysql://mysql:3306/authservice
+            - name: MYSQL_USER
               valueFrom:
                 secretKeyRef:
-                  name: postgres-secret
-                  key: POSTGRES_USER
-            - name: POSTGRES_PASSWORD
+                  name: mysql-secret
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: postgres-secret
-                  key: POSTGRES_PASSWORD
+                  name: mysql-secret
+                  key: MYSQL_PASSWORD
             # ── SSO (backend-mediated Authorization Code flow) ──
             # KEYCLOAK_PUBLIC_SERVER_URL comes from the ecommerce-config ConfigMap above.
             - name: SSO_BACKEND_CALLBACK_URL

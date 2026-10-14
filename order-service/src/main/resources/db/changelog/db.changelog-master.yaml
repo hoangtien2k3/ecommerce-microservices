@@ -1,11 +1,9 @@
 databaseChangeLog:
   - changeSet:
-      id: order-service-0001-bootstrap
-      author: codex
-      comment: Bootstrap Liquibase for order-service.
+      id: order-mysql-ddl-0001
+      author: ecommerce
       changes:
-        - sql:
-            sql: SELECT 1;
-  - include:
-      file: ddl/changelog-payments-0001.sql
-      relativeToChangelogFile: true
+        - sqlFile:
+            path: db/changelog-mysql/ddl/changelog-0001.sql
+            relativeToChangelogFile: false
+            splitStatements: true

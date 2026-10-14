@@ -1,5 +1,9 @@
 databaseChangeLog:
-  - includeAll:
-      path: db/changelog/ddl/
-  - includeAll:
-      path: db/changelog/data/
+  - changeSet:
+      id: promotion-mysql-ddl-0001
+      author: ecommerce
+      changes:
+        - sqlFile:
+            path: db/changelog-mysql/ddl/changelog-0001.sql
+            relativeToChangelogFile: false
+            splitStatements: true

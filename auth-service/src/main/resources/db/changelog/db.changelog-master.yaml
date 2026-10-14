@@ -1,4 +1,17 @@
 databaseChangeLog:
-  - includeAll:
-      path: ddl
-      relativeToChangelogFile: true
+  - changeSet:
+      id: auth-mysql-ddl-0001
+      author: ecommerce
+      changes:
+        - sqlFile:
+            path: db/changelog-mysql/ddl/changelog-0001.sql
+            relativeToChangelogFile: false
+            splitStatements: true
+  - changeSet:
+      id: auth-mysql-data-0001
+      author: ecommerce
+      changes:
+        - sqlFile:
+            path: db/changelog-mysql/data/changelog-0001.sql
+            relativeToChangelogFile: false
+            splitStatements: true

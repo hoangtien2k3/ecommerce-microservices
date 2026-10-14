@@ -20,6 +20,15 @@ spec:
       labels:
         app: notification-service
     spec:
+      initContainers:
+        - name: wait-for-mysql
+          image: busybox
+          command: ["sh", "-c", "until nc -z mysql 3306; do sleep 3; done"]
+          securityContext:
+            runAsUser: 65534
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
       securityContext:
         seccompProfile:
           type: RuntimeDefault
@@ -39,16 +48,18 @@ spec:
             - configMapRef:
                 name: ecommerce-config
           env:
-            - name: POSTGRES_USER
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://mysql:3306/ecommerce
+            - name: MYSQL_USER
               valueFrom:
                 secretKeyRef:
-                  name: postgres-secret
-                  key: POSTGRES_USER
-            - name: POSTGRES_PASSWORD
+                  name: mysql-secret
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: postgres-secret
-                  key: POSTGRES_PASSWORD
+                  name: mysql-secret
+                  key: MYSQL_PASSWORD
           startupProbe:
             httpGet:
               path: /actuator/health
