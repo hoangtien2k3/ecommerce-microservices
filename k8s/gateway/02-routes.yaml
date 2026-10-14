@@ -283,6 +283,13 @@ spec:
         - serviceName: promotion-service
           servicePort: 8093
       plugin_config_name: jwt-auth
+    - name: issue
+      match:
+        paths: [ /promotion/storefront/promotions/*/issue ]
+      backends:
+        - serviceName: promotion-service
+          servicePort: 8093
+      plugin_config_name: jwt-auth
     - name: docs
       match:
         paths: [ /promotion/v3/api-docs/* ]

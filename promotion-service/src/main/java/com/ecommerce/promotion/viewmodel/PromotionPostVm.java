@@ -41,6 +41,7 @@ public class PromotionPostVm extends PromotionDto {
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     Date endDate;
+    private Integer issueLimit;
 
     public static List<PromotionApply> createPromotionApplies(PromotionPostVm promotionPostVm, Promotion promotion) {
         return switch (promotion.getApplyTo()) {

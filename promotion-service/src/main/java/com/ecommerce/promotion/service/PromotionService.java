@@ -5,6 +5,7 @@ import com.ecommerce.promotion.exception.DuplicatedException;
 import com.ecommerce.promotion.exception.NotFoundException;
 import com.ecommerce.promotion.model.Promotion;
 import com.ecommerce.promotion.model.PromotionApply;
+import com.ecommerce.promotion.model.enumeration.DiscountType;
 import com.ecommerce.promotion.repository.PromotionRepository;
 import com.ecommerce.promotion.repository.PromotionUsageRepository;
 import com.ecommerce.promotion.utils.Constants;
@@ -54,7 +55,9 @@ public class PromotionService {
                 .startDate(promotionPostVm.getStartDate().toInstant())
                 .endDate(promotionPostVm.getEndDate().toInstant())
                 .minimumOrderPurchaseAmount(promotionPostVm.getMinimumOrderPurchaseAmount())
+                .issueLimit(promotionPostVm.getIssueLimit())
                 .build();
+        keepMatchingDiscount(promotion);
 
         List<PromotionApply> promotionApplies =
                 PromotionPostVm.createPromotionApplies(promotionPostVm, promotion);
@@ -86,6 +89,7 @@ public class PromotionService {
         promotion.setStartDate(promotionPutVm.getStartDate().toInstant());
         promotion.setEndDate(promotionPutVm.getEndDate().toInstant());
         promotion.setMinimumOrderPurchaseAmount(promotionPutVm.getMinimumOrderPurchaseAmount());
+        keepMatchingDiscount(promotion);
 
         promotion.setPromotionApplies(PromotionPutVm.createPromotionApplies(promotionPutVm, promotion));
 
@@ -148,6 +152,14 @@ public class PromotionService {
             }
         }
         return PromotionDetailVm.fromModel(promotion, brandVms, categoryGetVms, productVms);
+    }
+
+    private void keepMatchingDiscount(Promotion promotion) {
+        if (DiscountType.FIXED.equals(promotion.getDiscountType())) {
+            promotion.setDiscountPercentage(null);
+        } else if (DiscountType.PERCENTAGE.equals(promotion.getDiscountType())) {
+            promotion.setDiscountAmount(null);
+        }
     }
 
     private void validateIfPromotionExistedSlug(String slug) {

@@ -49,6 +49,10 @@ public class Promotion extends AbstractAuditEntity {
 
     private int usageCount;
 
+    private Integer issueLimit;
+
+    private int issuedCount;
+
     private Long discountPercentage;
 
     private Long discountAmount;

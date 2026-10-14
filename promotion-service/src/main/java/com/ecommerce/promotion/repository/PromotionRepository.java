@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -24,5 +25,18 @@ public interface PromotionRepository extends JpaRepository<Promotion, Long> {
                                    @Param("startDate") Instant startDate,
                                    @Param("endDate") Instant endDate,
                                    Pageable pageable);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+            UPDATE Promotion p
+            SET p.issuedCount = p.issuedCount + 1
+            WHERE p.id = :id
+              AND p.issueLimit IS NOT NULL
+              AND p.issuedCount < p.issueLimit
+              AND p.isActive = true
+              AND (p.startDate IS NULL OR p.startDate <= :now)
+              AND (p.endDate IS NULL OR p.endDate >= :now)
+            """)
+    int claimIssueSlot(@Param("id") Long id, @Param("now") Instant now);
 
 }

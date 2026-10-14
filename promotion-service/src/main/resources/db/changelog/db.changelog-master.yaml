@@ -7,3 +7,27 @@ databaseChangeLog:
             path: db/changelog-mysql/ddl/changelog-0001.sql
             relativeToChangelogFile: false
             splitStatements: true
+  - changeSet:
+      id: promotion-mysql-ddl-0002
+      author: ecommerce
+      changes:
+        - sqlFile:
+            path: db/changelog-mysql/ddl/changelog-0002.sql
+            relativeToChangelogFile: false
+            splitStatements: true
+  - changeSet:
+      id: promotion-mysql-ddl-0003
+      author: ecommerce
+      changes:
+        - sqlFile:
+            path: db/changelog-mysql/ddl/changelog-0003.sql
+            relativeToChangelogFile: false
+            splitStatements: true
+  - changeSet:
+      id: promotion-mysql-ddl-0004
+      author: ecommerce
+      changes:
+        - sqlFile:
+            path: db/changelog-mysql/ddl/changelog-0004.sql
+            relativeToChangelogFile: false
+            splitStatements: true

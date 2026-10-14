@@ -330,6 +330,18 @@ routes:
       bearer_only: true
       use_jwks: true
       token_signing_alg_values_expected: RS256
+- id: promotion-issue
+  upstream_id: 12
+  uri: /promotion/storefront/promotions/*/issue
+  plugins:
+    openid-connect:
+      client_id: ecommerce-client
+      client_secret: $env://KEYCLOAK_CLIENT_SECRET
+      discovery: http://keycloak:8080/realms/ecommerce/.well-known/openid-configuration
+      realm: ecommerce
+      bearer_only: true
+      use_jwks: true
+      token_signing_alg_values_expected: RS256
 - id: tax-classes
   upstream_id: 13
   uri: /tax/backoffice/tax-classes/*
