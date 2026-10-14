@@ -9,6 +9,10 @@ data:
   POSTGRES_PORT: "5432"
   POSTGRES_DB: "ecommerce"
 
+  # MySQL
+  MYSQL_HOST: "mysql"
+  MYSQL_PORT: "3306"
+
   # Keycloak
   KEYCLOAK_ISSUER_URI: "http://keycloak:8080/realms/ecommerce"
   KEYCLOAK_JWK_SET_URI: "http://keycloak:8080/realms/ecommerce/protocol/openid-connect/certs"

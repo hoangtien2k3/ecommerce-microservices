@@ -290,6 +290,7 @@ if [ -f .env ]; then
   set -a; source .env; set +a
   mk_secret() { kubectl create secret generic "$@" -n "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f - > /dev/null; }
   mk_secret postgres-secret      --from-literal=POSTGRES_USER="${POSTGRES_USER:-admin}"         --from-literal=POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-admin}"
+  mk_secret mysql-secret         --from-literal=MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD:-admin}" --from-literal=MYSQL_USER="${MYSQL_USER:-admin}" --from-literal=MYSQL_PASSWORD="${MYSQL_PASSWORD:-admin}"
   mk_secret keycloak-secret      --from-literal=KEYCLOAK_ADMIN="${KEYCLOAK_ADMIN:-admin}"           --from-literal=KEYCLOAK_ADMIN_PASSWORD="${KEYCLOAK_ADMIN_PASSWORD:-admin}"
   mk_secret redis-secret         --from-literal=REDIS_PASSWORD="${REDIS_PASSWORD:-admin}"
   mk_secret storage-secret       --from-literal=STORAGE_ACCESS_KEY="${STORAGE_ACCESS_KEY:-admin}"     --from-literal=STORAGE_SECRET_KEY="${STORAGE_SECRET_KEY:-admin}"
@@ -307,6 +308,9 @@ kubectl create configmap keycloak-realm        -n "$NAMESPACE" \
 kubectl create configmap postgres-init-scripts -n "$NAMESPACE" \
   --from-file=create-all-databases.sql=docker/postgres/init/create-all-databases.sql \
   --dry-run=client -o yaml | kubectl apply -f - > /dev/null
+kubectl create configmap mysql-init-scripts -n "$NAMESPACE" \
+  --from-file=create-all-databases.sql=docker/mysql/init/create-all-databases.sql \
+  --dry-run=client -o yaml | kubectl apply -f - > /dev/null
 # Apache APISIX standalone config (data plane reads these two files directly).
 kubectl create configmap apisix-config         -n "$NAMESPACE" \
   --from-file=config.yaml=deploy/apisix/config.yaml \
@@ -321,7 +325,7 @@ step_done
 # its own. Pod ordering is handled by the pods (Keycloak + backends carry
 # wait-for-postgres initContainers), so we do NOT block on readiness.
 step "Deploy infrastructure"
-for f in postgres redis elasticsearch rustfs keycloak; do
+for f in postgres mysql redis elasticsearch rustfs keycloak; do
   kubectl apply -f "k8s/infra/${f}.yaml" > /dev/null
 done
 success "Infrastructure manifests applied (pods start in the background)"

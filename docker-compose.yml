@@ -22,6 +22,30 @@ services:
     networks:
       - ecommerce-network
 
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ecommerce
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    networks:
+      - ecommerce-network
+
   redis:
     image: redis:7.4-alpine
     container_name: redis
@@ -371,6 +395,7 @@ networks:
     driver: bridge
 volumes:
   postgres_data:
+  mysql_data:
   redis_data:
   elasticsearch_data:
   rustfs_data:

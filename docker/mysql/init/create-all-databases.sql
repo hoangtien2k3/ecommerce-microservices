@@ -1,0 +1,26 @@
+CREATE DATABASE IF NOT EXISTS ecommerce CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+CREATE DATABASE IF NOT EXISTS keycloak CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+CREATE DATABASE IF NOT EXISTS authservice CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+CREATE DATABASE IF NOT EXISTS productservice CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+CREATE DATABASE IF NOT EXISTS orderservice CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+CREATE DATABASE IF NOT EXISTS shippingservice CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+CREATE DATABASE IF NOT EXISTS inventoryservice CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+CREATE DATABASE IF NOT EXISTS favouriteservice CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+CREATE DATABASE IF NOT EXISTS ratingservice CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+CREATE DATABASE IF NOT EXISTS mediaservice CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+CREATE DATABASE IF NOT EXISTS taxservice CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+CREATE DATABASE IF NOT EXISTS promotionservice CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+
+GRANT ALL PRIVILEGES ON ecommerce.* TO 'admin'@'%';
+GRANT ALL PRIVILEGES ON keycloak.* TO 'admin'@'%';
+GRANT ALL PRIVILEGES ON authservice.* TO 'admin'@'%';
+GRANT ALL PRIVILEGES ON productservice.* TO 'admin'@'%';
+GRANT ALL PRIVILEGES ON orderservice.* TO 'admin'@'%';
+GRANT ALL PRIVILEGES ON shippingservice.* TO 'admin'@'%';
+GRANT ALL PRIVILEGES ON inventoryservice.* TO 'admin'@'%';
+GRANT ALL PRIVILEGES ON favouriteservice.* TO 'admin'@'%';
+GRANT ALL PRIVILEGES ON ratingservice.* TO 'admin'@'%';
+GRANT ALL PRIVILEGES ON mediaservice.* TO 'admin'@'%';
+GRANT ALL PRIVILEGES ON taxservice.* TO 'admin'@'%';
+GRANT ALL PRIVILEGES ON promotionservice.* TO 'admin'@'%';
+FLUSH PRIVILEGES;
