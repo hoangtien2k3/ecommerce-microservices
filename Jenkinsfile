@@ -48,25 +48,40 @@ pipeline {
           sh 'echo "$HARBOR_PSW" | docker login "$REGISTRY" -u "$HARBOR_USR" --password-stdin'
         }
         script {
+          def result = [:]     // 서비스 이름 -> [tag: 태그, build: 빌드 여부]
           def summary = []
-          def mvnModules = []
           SERVICE_PATHS.each { svc, paths ->
-            def key = svc.toUpperCase()
             // 이 서비스 경로를 마지막으로 바꾼 커밋의 SHA 앞 7자리
             def tag = sh(script: "git log -1 --format=%H -- ${paths} | cut -c1-7",
                          returnStdout: true).trim()
             // Harbor에 이 태그가 이미 있으면 0
             def exists = sh(script: "docker manifest inspect ${env.REGISTRY}/ecommerce/${svc}:${tag} > /dev/null 2>&1",
                             returnStatus: true) == 0
-            def forced = params["FORCE_${key}".toString()]   // GString 키는 Map에서 못 찾으므로 String으로
+            def forced = params["FORCE_${svc.toUpperCase()}".toString()]   // GString 키는 Map에서 못 찾으므로 String으로
             def needBuild = forced || !exists
-
-            env["TAG_${key}".toString()] = tag
-            env["BUILD_${key}".toString()] = needBuild ? 'true' : 'false'
-            if (needBuild && svc != 'web') { mvnModules << "${svc}-service" }
+            result[svc] = [tag: tag, build: needBuild]
             summary << "${svc}:${tag} ${needBuild ? (forced ? '강제 빌드' : '빌드') : '건너뜀'}"
           }
-          env.MVN_MODULES = mvnModules.join(',')
+
+          // Jenkins 보안 샌드박스가 env["이름"] = 값 같은 동적 대입을 막으므로 하나씩 대입한다
+          env.TAG_WEB         = result.web.tag
+          env.TAG_AUTH        = result.auth.tag
+          env.TAG_PRODUCT     = result.product.tag
+          env.TAG_ORDER       = result.order.tag
+          env.TAG_PROMOTION   = result.promotion.tag
+          env.BUILD_WEB       = result.web.build ? 'true' : 'false'
+          env.BUILD_AUTH      = result.auth.build ? 'true' : 'false'
+          env.BUILD_PRODUCT   = result.product.build ? 'true' : 'false'
+          env.BUILD_ORDER     = result.order.build ? 'true' : 'false'
+          env.BUILD_PROMOTION = result.promotion.build ? 'true' : 'false'
+
+          // Maven에 넘길 백엔드 모듈 목록 (예: auth-service,order-service)
+          def modules = []
+          for (svc in ['auth', 'product', 'order', 'promotion']) {
+            if (result[svc].build) { modules << "${svc}-service" }
+          }
+          env.MVN_MODULES = modules.join(',')
+
           currentBuild.description = summary.join(', ')
           echo summary.join('\n')
         }
