@@ -8,7 +8,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."                       # frontend/ 로 이동 (빌드 컨텍스트)
 
 APP="${APP:-web}"                             # web 또는 admin
-TAG="$(git rev-parse --short=7 HEAD)"         # 태그 = 커밋 SHA 앞 7자리, latest 미사용
+TAG="${TAG:-$(git rev-parse --short=7 HEAD)}" # 태그: 밖에서 TAG를 주면 그 값, 없으면 HEAD SHA 7자리
 IMAGE="ecommerce/${APP}:${TAG}"
 
 if [ -n "$(git status --porcelain -- .)" ]; then
