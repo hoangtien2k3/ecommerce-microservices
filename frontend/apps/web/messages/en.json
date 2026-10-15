@@ -42,7 +42,8 @@
     "login": "Log in",
     "register": "Sign up",
     "orders": "Orders",
-    "mobileMenu": "Menu"
+    "mobileMenu": "Menu",
+    "coupons": "Coupons"
   },
   "Footer": {
     "tagline": "Vietnam's leading e-commerce platform. Smart shopping, fast delivery.",
@@ -323,5 +324,35 @@
     "shopNow": "Shop now",
     "orderLabel": "Order #{id}",
     "processing": "Processing"
+  },
+  "Coupons": {
+    "metaTitle": "First-come coupons",
+    "title": "First-come coupons",
+    "subtitle": "Limited quantity, one per customer. Grab yours before they run out!",
+    "nextOpenIn": "Next drop in",
+    "discountLabel": "OFF",
+    "minOrder": "Orders from {amount}",
+    "noMinOrder": "No minimum order",
+    "remaining": "{left} of {total} left",
+    "opensAt": "Opens {time}",
+    "endsAt": "Ends {time}",
+    "endedAt": "Ended {time}",
+    "statusUpcoming": "Opening soon",
+    "statusOpen": "Available",
+    "statusClaimed": "Claimed",
+    "statusSoldOut": "Sold out",
+    "statusEnded": "Ended",
+    "actionIssue": "Get coupon",
+    "actionUpcoming": "Opens in {countdown}",
+    "resultSuccess": "\"{name}\" was added to your coupons.",
+    "resultAlreadyClaimed": "You already have \"{name}\".",
+    "resultSoldOut": "Sorry, \"{name}\" just sold out.",
+    "resultNotOpen": "\"{name}\" is not open right now.",
+    "resultError": "Couldn't get \"{name}\". Please try again.",
+    "retry": "Try again",
+    "dismiss": "Close",
+    "emptyTitle": "No coupons right now",
+    "emptyHint": "Check back soon for the next drop.",
+    "loadError": "Couldn't load coupons. Please refresh the page."
   }
 }

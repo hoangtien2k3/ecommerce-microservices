@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Phone, MapPin, FileText, Store } from "lucide-react";
+import { Phone, MapPin, FileText, Store, TicketPercent } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 
 // Top utility bar (dark red): quick category links on the left, support links on
@@ -29,6 +29,9 @@ export function TopBar() {
           ))}
         </nav>
         <div className="flex items-center gap-4 shrink-0">
+          <Link href="/coupons" className="hover:text-white items-center gap-1 font-medium text-amber-300 hidden sm:flex">
+            <TicketPercent className="h-3.5 w-3.5" /> {t("coupons")}
+          </Link>
           <Link href="/orders" className="hover:text-white items-center gap-1 hidden sm:flex">
             <FileText className="h-3.5 w-3.5" /> {t("topTrackOrder")}
           </Link>

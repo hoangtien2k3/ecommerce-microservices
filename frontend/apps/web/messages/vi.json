@@ -42,7 +42,8 @@
     "login": "Đăng nhập",
     "register": "Đăng ký",
     "orders": "Đơn hàng",
-    "mobileMenu": "Menu"
+    "mobileMenu": "Menu",
+    "coupons": "Mã giảm giá"
   },
   "Footer": {
     "tagline": "Nền tảng thương mại điện tử hàng đầu Việt Nam. Mua sắm thông minh, giao hàng nhanh chóng.",
@@ -323,5 +324,35 @@
     "shopNow": "Mua sắm ngay",
     "orderLabel": "Đơn #{id}",
     "processing": "Đang xử lý"
+  },
+  "Coupons": {
+    "metaTitle": "Mã giảm giá số lượng có hạn",
+    "title": "Săn mã giảm giá",
+    "subtitle": "Số lượng có hạn, mỗi khách một mã. Nhanh tay kẻo hết!",
+    "nextOpenIn": "Đợt tiếp theo sau",
+    "discountLabel": "GIẢM",
+    "minOrder": "Đơn từ {amount}",
+    "noMinOrder": "Không yêu cầu giá trị đơn tối thiểu",
+    "remaining": "Còn {left}/{total}",
+    "opensAt": "Mở lúc {time}",
+    "endsAt": "Kết thúc {time}",
+    "endedAt": "Đã kết thúc {time}",
+    "statusUpcoming": "Sắp mở",
+    "statusOpen": "Đang mở",
+    "statusClaimed": "Đã nhận",
+    "statusSoldOut": "Hết mã",
+    "statusEnded": "Đã kết thúc",
+    "actionIssue": "Nhận mã",
+    "actionUpcoming": "Mở sau {countdown}",
+    "resultSuccess": "Đã thêm \"{name}\" vào mã của bạn.",
+    "resultAlreadyClaimed": "Bạn đã nhận \"{name}\" rồi.",
+    "resultSoldOut": "Rất tiếc, \"{name}\" vừa hết.",
+    "resultNotOpen": "\"{name}\" hiện chưa mở.",
+    "resultError": "Không nhận được \"{name}\". Vui lòng thử lại.",
+    "retry": "Thử lại",
+    "dismiss": "Đóng",
+    "emptyTitle": "Hiện chưa có mã giảm giá",
+    "emptyHint": "Hãy quay lại sau để săn đợt mã tiếp theo.",
+    "loadError": "Không tải được danh sách mã. Vui lòng tải lại trang."
   }
 }
