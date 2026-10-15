@@ -4,6 +4,7 @@
 // Jenkins 준비물:
 //   - 에이전트 라벨 'docker' (jenkins-02, Docker 설치됨)
 //   - Username/Password 자격 증명 'harbor-robot-push' (robot$ecommerce+push)
+//   - Username/Password 자격 증명 'gitops-push' (GitHub fine-grained PAT, gitops Contents RW)
 
 // 서비스별로 이미지 내용에 영향을 주는 경로 (백엔드는 공통 모듈과 루트 pom.xml 포함)
 def SERVICE_PATHS = [
@@ -188,6 +189,56 @@ pipeline {
             }
           }
         }
+      }
+    }
+
+    stage('Update gitops (dev)') {
+      // 앞 단계가 모두 성공했을 때만 실행된다 (빌드나 push가 실패하면 여기까지 오지 않음)
+      environment {
+        GITOPS_REPO = 'https://github.com/osi7layers/gitops.git'
+      }
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'gitops-push',
+                                          usernameVariable: 'GIT_USER',
+                                          passwordVariable: 'GIT_TOKEN')]) {
+          // 토큰을 URL에 넣지 않고 credential helper로 넘긴다 (로그와 .git/config에 남지 않게)
+          // pollSCM이 gitops를 감시하지 않도록 git 스텝이 아니라 sh로 clone 한다
+          sh '''
+            HELPER='!f() { echo "username=$GIT_USER"; echo "password=$GIT_TOKEN"; }; f'
+            rm -rf gitops
+            git -c credential.helper="$HELPER" clone --depth 1 "$GITOPS_REPO" gitops
+            cd gitops
+
+            # 5개 서비스 모두 이번 빌드에서 계산한 태그로 맞춘다 (빠진 갱신이 있어도 다음 빌드가 복구)
+            for svc in web auth product order promotion; do
+              key=$(echo "$svc" | tr a-z A-Z)
+              tag=$(printenv "TAG_$key")
+              [ -n "$tag" ] || { echo "TAG_$key 가 비어 있음" >&2; exit 1; }
+              sed -i "s/newTag: .*/newTag: $tag/" "apps/$svc/overlays/onprem-dev/kustomization.yaml"
+            done
+
+            if git diff --quiet; then
+              echo "onprem-dev 태그 변경 없음"
+              exit 0
+            fi
+            git diff
+
+            APP_SHA=$(git -C .. rev-parse --short=7 HEAD)
+            git -c user.name="osi7-jenkins" -c user.email="jenkins@osi7.shop" \
+              commit -am "chore(onprem-dev): 이미지 태그 갱신 (app $APP_SHA)"
+
+            # 그사이 누가 gitops main에 push했으면 받아서 다시 시도
+            for i in 1 2 3; do
+              git -c credential.helper="$HELPER" push origin HEAD:main && exit 0
+              git -c credential.helper="$HELPER" pull --rebase origin main
+            done
+            echo "gitops push 실패" >&2
+            exit 1
+          '''
+        }
+      }
+      post {
+        always { sh 'rm -rf gitops' }
       }
     }
   }
