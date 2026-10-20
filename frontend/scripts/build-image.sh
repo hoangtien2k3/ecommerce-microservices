@@ -15,7 +15,7 @@ if [ -n "$(git status --porcelain -- .)" ]; then
   echo "경고: frontend/에 커밋 안 된 변경이 있어 이미지 내용과 태그 ${TAG}가 다를 수 있음" >&2
 fi
 
-docker build -f "apps/${APP}/Dockerfile" --build-arg APP_VERSION="${TAG}" -t "${IMAGE}" .
+docker build --provenance=false -f "apps/${APP}/Dockerfile" --build-arg APP_VERSION="${TAG}" -t "${IMAGE}" .
 
 for REGISTRY in ${REGISTRIES:-}; do           # 레지스트리마다 같은 경로·태그로 붙인다
   docker tag "${IMAGE}" "${REGISTRY}/${IMAGE}"

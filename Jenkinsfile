@@ -156,7 +156,7 @@ pipeline {
               when { environment name: 'BUILD_AUTH', value: 'true' }
               steps {
                 sh '''
-                  docker build -t "$REGISTRY/ecommerce/auth:$TAG_AUTH" auth-service
+                  docker build --provenance=false -t "$REGISTRY/ecommerce/auth:$TAG_AUTH" auth-service
                   docker push "$REGISTRY/ecommerce/auth:$TAG_AUTH"
                 '''
               }
@@ -165,7 +165,7 @@ pipeline {
               when { environment name: 'BUILD_PRODUCT', value: 'true' }
               steps {
                 sh '''
-                  docker build -t "$REGISTRY/ecommerce/product:$TAG_PRODUCT" product-service
+                  docker build --provenance=false -t "$REGISTRY/ecommerce/product:$TAG_PRODUCT" product-service
                   docker push "$REGISTRY/ecommerce/product:$TAG_PRODUCT"
                 '''
               }
@@ -174,7 +174,7 @@ pipeline {
               when { environment name: 'BUILD_ORDER', value: 'true' }
               steps {
                 sh '''
-                  docker build -t "$REGISTRY/ecommerce/order:$TAG_ORDER" order-service
+                  docker build --provenance=false -t "$REGISTRY/ecommerce/order:$TAG_ORDER" order-service
                   docker push "$REGISTRY/ecommerce/order:$TAG_ORDER"
                 '''
               }
@@ -183,7 +183,7 @@ pipeline {
               when { environment name: 'BUILD_PROMOTION', value: 'true' }
               steps {
                 sh '''
-                  docker build -t "$REGISTRY/ecommerce/promotion:$TAG_PROMOTION" promotion-service
+                  docker build --provenance=false -t "$REGISTRY/ecommerce/promotion:$TAG_PROMOTION" promotion-service
                   docker push "$REGISTRY/ecommerce/promotion:$TAG_PROMOTION"
                 '''
               }
