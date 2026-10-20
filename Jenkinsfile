@@ -1,10 +1,11 @@
-// app CI: 바뀐 서비스만 이미지 빌드 -> (web은 스모크 테스트) -> Harbor push
+// app CI: 바뀐 서비스만 이미지 빌드 -> (web은 스모크 테스트) -> Harbor push -> gitops dev 태그 갱신 -> (ECR 있으면) ECR push
 // 서비스별 태그 = 그 서비스 경로를 마지막으로 바꾼 커밋 SHA 7자리 (latest 미사용)
 // Harbor에 그 태그가 이미 있으면 빌드를 건너뛴다. 강제 재빌드는 Build with Parameters에서 체크한다.
 // Jenkins 준비물:
 //   - 에이전트 라벨 'docker' (jenkins-02, Docker 설치됨)
 //   - Username/Password 자격 증명 'harbor-robot-push' (robot$ecommerce+push)
 //   - Username/Password 자격 증명 'gitops-push' (GitHub fine-grained PAT, gitops Contents RW)
+//   - Username/Password 자격 증명 'aws-ecr-push' (IAM 사용자 osi7-jenkins-ecr-push의 Access key ID / Secret)
 
 // 서비스별로 이미지 내용에 영향을 주는 경로 (백엔드는 공통 모듈과 루트 pom.xml 포함)
 def SERVICE_PATHS = [
@@ -239,6 +240,66 @@ pipeline {
       }
       post {
         always { sh 'rm -rf gitops' }
+      }
+    }
+
+    stage('Push ECR') {
+      // AWS용 이중 push: Harbor에 올린 같은 이미지에 ECR 이름을 붙여 올린다 (다시 빌드하지 않음)
+      // ECR 리포지토리는 EKS를 띄울 때만 생기므로, 없으면 건너뛴다
+      // 여기서 실패해도 온프레미스 흐름(Harbor, gitops)은 이미 끝났으므로 빌드를 UNSTABLE로만 표시한다
+      environment {
+        ECR_REGISTRY       = '918633123181.dkr.ecr.ap-northeast-2.amazonaws.com'
+        AWS_DEFAULT_REGION = 'ap-northeast-2'
+        AWS_CLI_IMAGE      = 'amazon/aws-cli:2.38.2'   // jenkins-02에 AWS CLI가 없어 컨테이너로 실행
+      }
+      steps {
+        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+          withCredentials([usernamePassword(credentialsId: 'aws-ecr-push',
+                                            usernameVariable: 'AWS_ACCESS_KEY_ID',
+                                            passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+            sh '''
+              # 키는 -e 이름만 넘겨서 명령줄과 로그에 값이 남지 않게 한다
+              aws() {
+                docker run --rm -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_DEFAULT_REGION \
+                  "$AWS_CLI_IMAGE" "$@"
+              }
+
+              # ECR 리포지토리가 없으면 (EKS를 띄우지 않은 날) 건너뛴다. 다른 오류는 실패로 처리
+              if ! out=$(aws ecr describe-repositories --repository-names ecommerce/web 2>&1); then
+                if echo "$out" | grep -q RepositoryNotFoundException; then
+                  echo "ECR 리포지토리가 없어 건너뜀 (EKS 미기동)"
+                  exit 0
+                fi
+                echo "$out" >&2
+                exit 1
+              fi
+
+              aws ecr get-login-password | docker login "$ECR_REGISTRY" -u AWS --password-stdin
+
+              for svc in web auth product order promotion; do
+                key=$(echo "$svc" | tr a-z A-Z)
+                tag=$(printenv "TAG_$key")
+                src="$REGISTRY/ecommerce/$svc:$tag"
+                dst="$ECR_REGISTRY/ecommerce/$svc:$tag"
+
+                # ECR 태그는 IMMUTABLE이라 이미 있으면 건너뛴다
+                if aws ecr describe-images --repository-name "ecommerce/$svc" \
+                     --image-ids imageTag="$tag" > /dev/null 2>&1; then
+                  echo "$svc:$tag ECR에 이미 있음, 건너뜀"
+                  continue
+                fi
+
+                # 이번 빌드에서 만들지 않은 이미지는 로컬에 없으므로 Harbor에서 받는다
+                docker image inspect "$src" > /dev/null 2>&1 || docker pull "$src"
+                docker tag "$src" "$dst"
+                docker push "$dst"
+              done
+            '''
+          }
+        }
+      }
+      post {
+        always { sh 'docker logout "$ECR_REGISTRY" || true' }
       }
     }
   }
