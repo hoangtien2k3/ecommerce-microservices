@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.List;
 
@@ -100,5 +101,23 @@ class UserControllerTest {
 
         assertTrue(response.success());
         assertEquals("User 1 deleted successfully", response.message());
+    }
+
+    @Test
+    void getCurrentUserShouldResolveUserFromJwt() {
+        User user = new User();
+        user.setUsername("testuser");
+        Jwt jwt = Jwt.withTokenValue("token")
+                .header("alg", "none")
+                .subject("6f1c2a4e-keycloak-uuid")
+                .claim("preferred_username", "testuser")
+                .build();
+
+        when(userService.findOrCreateByJwt(jwt)).thenReturn(user);
+
+        ApiResponse<UserResponse> response = userController.getCurrentUser(jwt);
+
+        assertTrue(response.success());
+        assertEquals("testuser", response.data().getUsername());
     }
 }

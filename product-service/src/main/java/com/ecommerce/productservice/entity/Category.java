@@ -40,7 +40,7 @@ public final class Category extends AbstractMappedEntity implements Serializable
     private Category parentCategory;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private Set<Product> products;
 
 }

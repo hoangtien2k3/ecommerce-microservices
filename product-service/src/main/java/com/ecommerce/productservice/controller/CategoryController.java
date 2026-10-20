@@ -1,5 +1,6 @@
 package com.ecommerce.productservice.controller;
 
+import com.ecommerce.commonlib.viewmodel.ApiResponse;
 import com.ecommerce.productservice.dto.CategoryDto;
 import com.ecommerce.productservice.service.CategoryService;
 import jakarta.validation.Valid;
@@ -25,10 +26,15 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
+    private static final int MAX_PAGE_SIZE = 100;
+
     @GetMapping
-    public ResponseEntity<List<CategoryDto>> findAll() {
+    public ResponseEntity<ApiResponse<Page<CategoryDto>>> findAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size) {
         log.info("CategoryDto List, controller; fetch all categories");
-        return ResponseEntity.ok(categoryService.findAll());
+        int pageSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
+        return ResponseEntity.ok(ApiResponse.ok(categoryService.findAllCategory(Math.max(page, 0), pageSize)));
     }
 
     @GetMapping("/paging")

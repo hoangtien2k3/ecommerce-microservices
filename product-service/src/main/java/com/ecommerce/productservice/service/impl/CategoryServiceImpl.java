@@ -1,5 +1,6 @@
 package com.ecommerce.productservice.service.impl;
 
+import com.ecommerce.commonlib.exception.BusinessException;
 import com.ecommerce.productservice.dto.CategoryDto;
 import com.ecommerce.productservice.entity.Category;
 import com.ecommerce.productservice.exception.wrapper.CategoryNotFoundException;
@@ -135,6 +136,9 @@ public class CategoryServiceImpl implements CategoryService {
         log.info("Void Service, delete category by id");
         try {
             categoryRepository.deleteById(categoryId);
+        } catch (DataIntegrityViolationException e) {
+            // Products still reference this category; deleting it must not take the products with it.
+            throw BusinessException.conflict("product.category.has.products", String.valueOf(categoryId));
         } catch (Exception e) {
             log.error("Error deleting category", e);
             throw new CategoryNotFoundException("Error deleting category", e);

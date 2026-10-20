@@ -1,9 +1,9 @@
 package com.ecommerce.productservice.controller;
 
+import com.ecommerce.commonlib.viewmodel.ApiResponse;
 import com.ecommerce.productservice.dto.ProductDto;
 import com.ecommerce.productservice.service.ProductService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,11 +29,9 @@ public class ProductController {
     }
 
     @GetMapping("/{productId}")
-    public ResponseEntity<ProductDto> findById(@PathVariable("productId")
-                                               @NotBlank(message = "Input must not be blank!")
-                                               @Valid final String productId) {
+    public ResponseEntity<ApiResponse<ProductDto>> findById(@PathVariable("productId") final Integer productId) {
         log.info("ProductDto, resource; fetch product by id");
-        return ResponseEntity.ok(productService.findById(Integer.parseInt(productId)));
+        return ResponseEntity.ok(ApiResponse.ok(productService.findById(productId)));
     }
 
     @PostMapping
@@ -53,20 +51,18 @@ public class ProductController {
     }
 
     @PutMapping("/{productId}")
-    public ResponseEntity<ProductDto> update(@PathVariable("productId")
-                                             @NotBlank(message = "Input must not be blank!")
-                                             @Valid final String productId,
+    public ResponseEntity<ProductDto> update(@PathVariable("productId") final Integer productId,
                                              @RequestBody
                                              @NotNull(message = "Input must not be NULL!")
                                              @Valid final ProductDto productDto) {
         log.info("ProductDto, resource; update product with productId");
-        return ResponseEntity.ok(productService.update(Integer.parseInt(productId), productDto));
+        return ResponseEntity.ok(productService.update(productId, productDto));
     }
 
     @DeleteMapping("/{productId}")
-    public ResponseEntity<Boolean> deleteById(@PathVariable("productId") final String productId) {
+    public ResponseEntity<Boolean> deleteById(@PathVariable("productId") final Integer productId) {
         log.info("Boolean, resource; delete product by id");
-        productService.deleteById(Integer.parseInt(productId));
+        productService.deleteById(productId);
         return ResponseEntity.ok(true);
     }
 }

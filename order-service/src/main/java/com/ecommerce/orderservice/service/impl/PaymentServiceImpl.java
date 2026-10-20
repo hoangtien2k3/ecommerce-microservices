@@ -2,7 +2,6 @@ package com.ecommerce.orderservice.service.impl;
 
 import com.ecommerce.commonlib.exception.BusinessException;
 import com.ecommerce.commonlib.exception.ErrorCode;
-import com.ecommerce.orderservice.dto.inventory.InventoryStockDto;
 import com.ecommerce.orderservice.dto.payment.PaymentDto;
 import com.ecommerce.orderservice.dto.product.ProductDto;
 import com.ecommerce.orderservice.entity.Order;
@@ -13,8 +12,6 @@ import com.ecommerce.orderservice.service.CallAPI;
 import com.ecommerce.orderservice.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -58,13 +55,8 @@ public class PaymentServiceImpl implements PaymentService {
         if (order == null || order.getProductId() == null) {
             return false;
         }
-        String authorization = JwtTokenFilter.getTokenFromRequest();
-        ProductDto product = callAPI.receiverProductDto(order.getProductId(), authorization);
-        if (product == null || product.getProductTitle() == null || product.getProductTitle().isBlank()) {
-            return false;
-        }
-        List<InventoryStockDto> stocks = callAPI.receiverInventory(product.getProductTitle(), authorization);
-        return stocks.stream().anyMatch(stock -> !stock.isInStock());
+        ProductDto product = callAPI.receiverProductDto(order.getProductId(), JwtTokenFilter.getTokenFromRequest());
+        return product != null && product.getQuantity() != null && product.getQuantity() <= 0;
     }
 
     private boolean useCoupon(Order order) {

@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
@@ -18,7 +19,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
  * <p>Only activates when there's an {@link EntityManagerFactory} bean — services that
  * don't talk to a relational DB skip this config silently.</p>
  */
-@AutoConfiguration
+// Must run after Hibernate so @ConditionalOnBean can see the EntityManagerFactory.
+@AutoConfiguration(after = HibernateJpaAutoConfiguration.class)
 @ConditionalOnClass(EntityManagerFactory.class)
 @ConditionalOnBean(EntityManagerFactory.class)
 @EnableJpaAuditing(auditorAwareRef = "platformAuditorAware")

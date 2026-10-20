@@ -1,29 +1,34 @@
 package com.ecommerce.orderservice.service;
 
 import com.ecommerce.commonlib.exception.BusinessException;
-import com.ecommerce.orderservice.dto.inventory.InventoryStockDto;
+import com.ecommerce.commonlib.viewmodel.ApiResponse;
 import com.ecommerce.orderservice.dto.product.ProductDto;
 import com.ecommerce.orderservice.dto.promotion.PromotionReleaseCall;
 import com.ecommerce.orderservice.dto.promotion.PromotionUseCall;
 import com.ecommerce.orderservice.dto.promotion.UnusedPromotionIssueResponse;
 import com.ecommerce.orderservice.dto.user.UserDto;
-import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-import java.util.List;
-
 @Component
-@RequiredArgsConstructor
 public class CallAPI {
 
-    private final RestClient.Builder restClientBuilder;
+    private final RestClient authClient;
+    private final RestClient productClient;
+    private final RestClient promotionClient;
+
+    // The injected builder is a shared singleton; clone it so each client keeps its own base URL.
+    public CallAPI(RestClient.Builder restClientBuilder) {
+        this.authClient = restClientBuilder.clone().baseUrl("http://auth-service:8088").build();
+        this.productClient = restClientBuilder.clone().baseUrl("http://product-service:8086").build();
+        this.promotionClient = restClientBuilder.clone().baseUrl("http://promotion-service:8093").build();
+    }
 
     public UserDto receiverUserDto(Long userId, String token) {
-        return restClientBuilder.baseUrl("http://auth-service:8088").build()
+        return authClient
                 .get()
                 .uri("/api/manager/user/{id}", userId)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
@@ -32,38 +37,22 @@ public class CallAPI {
     }
 
     public ProductDto receiverProductDto(Integer productId) {
-        return restClientBuilder.baseUrl("http://product-service:8086").build()
-                .get()
-                .uri("/api/products/{id}", productId)
-                .retrieve()
-                .body(ProductDto.class);
+        return receiverProductDto(productId, null);
     }
 
     public ProductDto receiverProductDto(Integer productId, String authorization) {
-        return restClientBuilder.baseUrl("http://product-service:8086").build()
+        ApiResponse<ProductDto> response = productClient
                 .get()
                 .uri("/product/api/products/{id}", productId)
                 .headers(headers -> applyAuthorization(headers, authorization))
                 .retrieve()
-                .body(ProductDto.class);
-    }
-
-    public List<InventoryStockDto> receiverInventory(String productName, String authorization) {
-        List<InventoryStockDto> stocks = restClientBuilder.baseUrl("http://inventory-service:8082").build()
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/inventory/api/inventory")
-                        .queryParam("productName", productName)
-                        .build())
-                .headers(headers -> applyAuthorization(headers, authorization))
-                .retrieve()
-                .body(new ParameterizedTypeReference<>() {
+                .body(new ParameterizedTypeReference<ApiResponse<ProductDto>>() {
                 });
-        return stocks == null ? List.of() : stocks;
+        return response == null ? null : response.data();
     }
 
     public UnusedPromotionIssueResponse unusedPromotionIssue(Long promotionId, String authorization) {
-        return restClientBuilder.baseUrl("http://promotion-service:8093").build()
+        return promotionClient
                 .get()
                 .uri("/promotion/internal/promotions/{promotionId}/unused-issue", promotionId)
                 .headers(headers -> applyAuthorization(headers, authorization))
@@ -75,7 +64,7 @@ public class CallAPI {
     }
 
     public void usePromotion(Long promotionId, Long orderId, Long productId, String authorization) {
-        restClientBuilder.baseUrl("http://promotion-service:8093").build()
+        promotionClient
                 .post()
                 .uri("/promotion/internal/promotions/{promotionId}/use", promotionId)
                 .headers(headers -> applyAuthorization(headers, authorization))
@@ -88,7 +77,7 @@ public class CallAPI {
     }
 
     public void releasePromotion(Long promotionId, Long orderId, String authorization) {
-        restClientBuilder.baseUrl("http://promotion-service:8093").build()
+        promotionClient
                 .post()
                 .uri("/promotion/internal/promotions/{promotionId}/release", promotionId)
                 .headers(headers -> applyAuthorization(headers, authorization))
