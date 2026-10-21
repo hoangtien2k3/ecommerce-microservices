@@ -44,26 +44,26 @@ function ProductsContent() {
 
   const search = searchParams.get("search") ?? undefined;
 
-  const { data: categoriesData } = useCategories();
+  const { data: categoriesData, isLoading: categoriesLoading } = useCategories();
   const allCategories = categoriesData?.data?.content ?? [];
-  // 상품은 소분류에 붙어 있으므로, 대분류를 고르면 그 아래 소분류 상품까지 함께 보여 준다.
-  const categoryIds =
+  // 홈에서 대분류(categoryId=대분류)로 들어오면 그 대분류의 첫 소분류를 선택한 것으로 본다.
+  // 사이드바 선택 표시와 상품 목록이 같은 소분류를 가리키게 하기 위해서다.
+  const firstChild =
     selectedCategory === undefined
       ? undefined
-      : [
-          selectedCategory,
-          ...allCategories
-            .filter((c) => c.parentCategory?.categoryId === selectedCategory)
-            .map((c) => c.categoryId),
-        ];
+      : allCategories.find((c) => c.parentCategory?.categoryId === selectedCategory);
+  const activeCategory = firstChild?.categoryId ?? selectedCategory;
+  const categoryIds = activeCategory === undefined ? undefined : [activeCategory];
   // 백엔드가 전체 목록만 주므로 필터·정렬은 useProducts(select)에서, 페이지 나누기는 여기서 한다.
-  const { data: productsData, isLoading } = useProducts({
+  const { data: productsData, isLoading: productsLoading } = useProducts({
     sort,
     categoryIds,
     search,
     minPrice: priceRange?.min,
     maxPrice: priceRange?.max,
   });
+
+  const isLoading = productsLoading || categoriesLoading;
 
   // 사이드바에는 소분류(parent id 가 있는 카테고리)만 보여 준다.
   const categories = allCategories.filter((c) => c.parentCategory);
@@ -103,13 +103,13 @@ function ProductsContent() {
       <div className={s.body}>
         <FilterSidebar open={filtersOpen} onClose={() => setFiltersOpen(false)} title={t("filtersTitle")}>
           <FilterGroup title={t("categoriesTitle")}>
-            <FilterButton active={!selectedCategory} onClick={() => changeCategory(undefined)}>
+            <FilterButton active={!activeCategory} onClick={() => changeCategory(undefined)}>
               {t("allCategories")}
             </FilterButton>
             {categories.map((cat) => (
               <FilterButton
                 key={cat.categoryId}
-                active={selectedCategory === cat.categoryId}
+                active={activeCategory === cat.categoryId}
                 onClick={() => changeCategory(cat.categoryId)}
               >
                 {cat.categoryTitle}
