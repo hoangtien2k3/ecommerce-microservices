@@ -215,7 +215,7 @@ pipeline {
               key=$(echo "$svc" | tr a-z A-Z)
               tag=$(printenv "TAG_$key")
               [ -n "$tag" ] || { echo "TAG_$key 가 비어 있음" >&2; exit 1; }
-              sed -i "s/newTag: .*/newTag: $tag/" "apps/$svc/overlays/onprem-dev/kustomization.yaml"
+              sed -i "s/newTag: .*/newTag: \"$tag\"/" "apps/$svc/overlays/onprem-dev/kustomization.yaml"
             done
 
             if git diff --quiet; then
