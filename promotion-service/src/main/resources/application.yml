@@ -23,6 +23,9 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
+        # Store and read timestamps as UTC regardless of the JVM or MySQL session time zone.
+        jdbc:
+          time_zone: UTC
         format_sql: false
     show-sql: false
   liquibase:
