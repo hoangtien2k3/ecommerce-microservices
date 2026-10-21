@@ -3,6 +3,7 @@ package com.ecommerce.promotion.repository;
 import com.ecommerce.promotion.model.PromotionIssue;
 import com.ecommerce.promotion.model.enumeration.PromotionIssueStatus;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -12,6 +13,13 @@ import org.springframework.data.repository.query.Param;
 public interface PromotionIssueRepository extends JpaRepository<PromotionIssue, Long> {
 
     Optional<PromotionIssue> findByPromotion_IdAndUserId(Long promotionId, String userId);
+
+    @Query("SELECT i.userId FROM PromotionIssue i WHERE i.promotion.id = :promotionId")
+    List<String> findUserIdsByPromotionId(@Param("promotionId") Long promotionId);
+
+    @Query("SELECT i.promotion.id FROM PromotionIssue i WHERE i.userId = :userId AND i.promotion.id IN :promotionIds")
+    List<Long> findClaimedPromotionIds(@Param("userId") String userId,
+                                       @Param("promotionIds") List<Long> promotionIds);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""

@@ -362,6 +362,13 @@ routes:
       bearer_only: true
       use_jwks: true
       token_signing_alg_values_expected: RS256
+# Coupon page list. No gateway auth: guests may list, and promotion-service validates
+# a bearer token when one is sent (to fill in "claimed").
+- id: promotion-storefront-coupons
+  upstream_id: 12
+  uri: /promotion/storefront/promotions
+  methods:
+  - GET
 - id: promotion-issue
   upstream_id: 12
   uri: /promotion/storefront/promotions/*/issue

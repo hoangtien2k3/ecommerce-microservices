@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PromotionService {
     private final PromotionRepository promotionRepository;
     private final PromotionUsageRepository promotionUsageRepository;
+    private final CouponStoreSync couponStoreSync;
 
     public PromotionDetailVm createPromotion(PromotionPostVm promotionPostVm) {
         validateIfPromotionExistedSlug(promotionPostVm.getSlug());
@@ -59,7 +60,9 @@ public class PromotionService {
                 PromotionPostVm.createPromotionApplies(promotionPostVm, promotion);
         promotion.setPromotionApplies(promotionApplies);
 
-        return PromotionDetailVm.fromModel(promotionRepository.save(promotion));
+        Promotion saved = promotionRepository.save(promotion);
+        couponStoreSync.created(saved.getId(), saved.getIssueLimit());
+        return PromotionDetailVm.fromModel(saved);
     }
 
     public PromotionDetailVm updatePromotion(PromotionPutVm promotionPutVm) {
@@ -90,6 +93,7 @@ public class PromotionService {
         promotion.setPromotionApplies(PromotionPutVm.createPromotionApplies(promotionPutVm, promotion));
 
         promotion = promotionRepository.save(promotion);
+        couponStoreSync.updated(promotion.getId());
         return PromotionDetailVm.fromModel(promotion);
     }
 
@@ -158,6 +162,7 @@ public class PromotionService {
             throw new BadRequestException(Constants.ErrorCode.PROMOTION_IN_USE_ERROR_MESSAGE, id);
         }
         promotionRepository.deleteById(id);
+        couponStoreSync.deleted(id);
     }
 
     public PromotionDetailVm getPromotion(Long promotionId) {

@@ -4,6 +4,9 @@
 --
 --   kubectl exec -i <mysql-pod> -- mysql -uroot -p"$MYSQL_ROOT_PASSWORD" promotionservice < deploy/seed/promotion-coupon-reset.sql
 --
+-- With the Redis coupon store (promotion.issue.store=redis, the default) run
+-- promotion-coupon-reset-redis.sh right after this, or the coupons stay sold out in Redis.
+--
 -- To reset a single coupon, replace the LIKE with: slug = 'demo-first-come-1000'
 
 START TRANSACTION;
