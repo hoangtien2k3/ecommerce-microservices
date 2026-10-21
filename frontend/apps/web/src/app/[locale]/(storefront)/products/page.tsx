@@ -54,7 +54,8 @@ function ProductsContent() {
     maxPrice: priceRange?.max,
   });
 
-  const categories = categoriesData?.data?.content ?? [];
+  // 사이드바에는 parent id 가 없는 카테고리만 보여 준다.
+  const categories = (categoriesData?.data?.content ?? []).filter((c) => !c.parentCategory);
   const filtered = productsData ?? [];
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   // 검색어가 바뀌어 결과가 줄면 범위를 넘지 않게 맞춘다.

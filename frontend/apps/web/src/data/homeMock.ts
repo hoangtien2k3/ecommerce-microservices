@@ -55,9 +55,9 @@ export interface BrandLogo {
 }
 
 export const heroSlides: HeroSlide[] = [
-  { id: 1, key: "slide1", href: "/products?categoryId=1", gradient: "from-rose-600 via-primary-600 to-primary-700" },
-  { id: 2, key: "slide2", href: "/products?categoryId=2", gradient: "from-indigo-600 via-blue-600 to-sky-600" },
-  { id: 3, key: "slide3", href: "/products?categoryId=3", gradient: "from-emerald-600 via-teal-600 to-cyan-600" },
+  { id: 1, key: "slide1", href: "/products", gradient: "from-rose-600 via-primary-600 to-primary-700" },
+  { id: 2, key: "slide2", href: "/products", gradient: "from-indigo-600 via-blue-600 to-sky-600" },
+  { id: 3, key: "slide3", href: "/products", gradient: "from-emerald-600 via-teal-600 to-cyan-600" },
 ];
 
 export const heroSideBanners = [
@@ -73,17 +73,18 @@ export const quickDeals = [
   { id: 5, key: "deal5", emoji: "🎟️", href: "/products" },
 ];
 
+// 카테고리 데이터가 의류뿐이라 어느 메뉴를 눌러도 전체 상품(=의류)으로 간다.
 export const categoryIcons: CategoryIcon[] = [
-  { id: 1, key: "c1", emoji: "📱", href: "/products?categoryId=1" },
-  { id: 2, key: "c2", emoji: "💻", href: "/products?categoryId=2" },
-  { id: 3, key: "c3", emoji: "📲", href: "/products?categoryId=3" },
-  { id: 4, key: "c4", emoji: "🎧", href: "/products?categoryId=4" },
-  { id: 5, key: "c5", emoji: "⌚", href: "/products?categoryId=5" },
-  { id: 6, key: "c6", emoji: "📷", href: "/products?categoryId=6" },
-  { id: 7, key: "c7", emoji: "🏠", href: "/products?categoryId=7" },
-  { id: 8, key: "c8", emoji: "🖥️", href: "/products?categoryId=8" },
-  { id: 9, key: "c9", emoji: "🔌", href: "/products?categoryId=9" },
-  { id: 10, key: "c10", emoji: "📺", href: "/products?categoryId=10" },
+  { id: 1, key: "c1", emoji: "👕", href: "/products" }, // 의류
+  { id: 2, key: "c2", emoji: "💻", href: "/products" },
+  { id: 3, key: "c3", emoji: "📲", href: "/products" },
+  { id: 4, key: "c4", emoji: "🎧", href: "/products" },
+  { id: 5, key: "c5", emoji: "⌚", href: "/products" },
+  { id: 6, key: "c6", emoji: "📷", href: "/products" },
+  { id: 7, key: "c7", emoji: "🏠", href: "/products" },
+  { id: 8, key: "c8", emoji: "🖥️", href: "/products" },
+  { id: 9, key: "c9", emoji: "🔌", href: "/products" },
+  { id: 10, key: "c10", emoji: "📺", href: "/products" },
 ];
 
 export const brands: BrandLogo[] = [
@@ -120,16 +121,17 @@ export const hotProducts: ShowcaseProduct[] = [
 ];
 
 // Left vertical category list shown in the hero (CellphoneS signature sidebar).
+// 위와 같이 모든 메뉴가 전체 상품(=의류)으로 간다.
 export const heroSidebar: SidebarCategory[] = [
-  { id: 1, emoji: "📱", label: "Điện thoại, Tablet", href: "/products?categoryId=1" },
-  { id: 2, emoji: "💻", label: "Laptop", href: "/products?categoryId=2" },
-  { id: 3, emoji: "🎧", label: "Âm thanh, Mic thu âm", href: "/products?categoryId=4" },
-  { id: 4, emoji: "⌚", label: "Đồng hồ, Camera", href: "/products?categoryId=5" },
-  { id: 5, emoji: "🏠", label: "Đồ gia dụng", href: "/products?categoryId=7" },
-  { id: 6, emoji: "🔌", label: "Phụ kiện", href: "/products?categoryId=9" },
-  { id: 7, emoji: "🖥️", label: "PC, Màn hình, Máy in", href: "/products?categoryId=8" },
-  { id: 8, emoji: "📺", label: "Tivi", href: "/products?categoryId=10" },
-  { id: 9, emoji: "🎮", label: "Tản nhiệt, Gaming Gear", href: "/products?categoryId=9" },
+  { id: 1, emoji: "👕", label: "Quần áo", href: "/products" }, // 의류
+  { id: 2, emoji: "💻", label: "Laptop", href: "/products" },
+  { id: 3, emoji: "🎧", label: "Âm thanh, Mic thu âm", href: "/products" },
+  { id: 4, emoji: "⌚", label: "Đồng hồ, Camera", href: "/products" },
+  { id: 5, emoji: "🏠", label: "Đồ gia dụng", href: "/products" },
+  { id: 6, emoji: "🔌", label: "Phụ kiện", href: "/products" },
+  { id: 7, emoji: "🖥️", label: "PC, Màn hình, Máy in", href: "/products" },
+  { id: 8, emoji: "📺", label: "Tivi", href: "/products" },
+  { id: 9, emoji: "🎮", label: "Tản nhiệt, Gaming Gear", href: "/products" },
   { id: 10, emoji: "♻️", label: "Hàng cũ giá rẻ", href: "/products" },
 ];
 

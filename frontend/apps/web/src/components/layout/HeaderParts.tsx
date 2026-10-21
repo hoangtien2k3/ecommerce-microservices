@@ -6,13 +6,14 @@ import { Link } from "@/i18n/navigation";
 
 // Top utility bar (dark red): quick category links on the left, support links on
 // the right — mirrors the CellphoneS top strip.
+// 카테고리 데이터가 의류뿐이라 어느 링크를 눌러도 전체 상품(=의류)으로 간다.
 const TOP_CATS: Array<[string, string]> = [
-  ["/products?categoryId=1", "c1"],
-  ["/products?categoryId=2", "c2"],
-  ["/products?categoryId=3", "c3"],
-  ["/products?categoryId=4", "c4"],
-  ["/products?categoryId=5", "c5"],
-  ["/products?categoryId=7", "c7"],
+  ["/products", "c1"], // 의류
+  ["/products", "c2"],
+  ["/products", "c3"],
+  ["/products", "c4"],
+  ["/products", "c5"],
+  ["/products", "c7"],
 ];
 
 export function TopBar() {
