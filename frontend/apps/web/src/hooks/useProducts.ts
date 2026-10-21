@@ -6,7 +6,7 @@ import type { ApiResponse, PaginatedResponse, Product } from "@ecommerce/lib/typ
 // 그래서 한 번만 받아 캐시해 두고, 필터·정렬은 화면 쪽(select)에서 한다.
 interface ProductFilters {
   sort?: string; // "priceUnit,asc" 처럼 "필드,방향"
-  categoryId?: number;
+  categoryIds?: number[]; // 이 중 하나에 속한 상품만 (대분류면 자기 + 소분류 id들)
   search?: string;
   minPrice?: number;
   maxPrice?: number;
@@ -22,12 +22,12 @@ async function fetchAllProducts(): Promise<Product[]> {
 }
 
 function applyFilters(products: Product[], filters: ProductFilters): Product[] {
-  const { sort, categoryId, search, minPrice, maxPrice } = filters;
+  const { sort, categoryIds, search, minPrice, maxPrice } = filters;
   const keyword = search?.trim().toLowerCase();
 
   const result = products.filter(
     (p) =>
-      (categoryId === undefined || p.category?.categoryId === categoryId) &&
+      (!categoryIds || (p.category !== undefined && categoryIds.includes(p.category.categoryId))) &&
       (minPrice === undefined || p.priceUnit >= minPrice) &&
       (maxPrice === undefined || p.priceUnit < maxPrice) &&
       (!keyword || p.productTitle.toLowerCase().includes(keyword))

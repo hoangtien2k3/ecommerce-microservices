@@ -19,13 +19,6 @@ export interface ShowcaseProduct {
   category?: { categoryId: number; categoryTitle: string };
 }
 
-export interface SidebarCategory {
-  id: number;
-  emoji: string;
-  label: string;
-  href: string;
-}
-
 export interface BrandChip {
   id: number;
   label: string;
@@ -55,9 +48,9 @@ export interface BrandLogo {
 }
 
 export const heroSlides: HeroSlide[] = [
-  { id: 1, key: "slide1", href: "/products?categoryId=1", gradient: "from-rose-600 via-primary-600 to-primary-700" },
-  { id: 2, key: "slide2", href: "/products?categoryId=2", gradient: "from-indigo-600 via-blue-600 to-sky-600" },
-  { id: 3, key: "slide3", href: "/products?categoryId=3", gradient: "from-emerald-600 via-teal-600 to-cyan-600" },
+  { id: 1, key: "slide1", href: "/products", gradient: "from-rose-600 via-primary-600 to-primary-700" },
+  { id: 2, key: "slide2", href: "/products", gradient: "from-indigo-600 via-blue-600 to-sky-600" },
+  { id: 3, key: "slide3", href: "/products", gradient: "from-emerald-600 via-teal-600 to-cyan-600" },
 ];
 
 export const heroSideBanners = [
@@ -119,19 +112,9 @@ export const hotProducts: ShowcaseProduct[] = [
   { productId: 210, productTitle: "Tivi 4K 55 inch Google TV", priceUnit: 9990000, oldPrice: 13990000, discountPercent: 28, rating: 5, sold: 99, installment: true, category: { categoryId: 10, categoryTitle: "Tivi" } },
 ];
 
-// Left vertical category list shown in the hero (CellphoneS signature sidebar).
-export const heroSidebar: SidebarCategory[] = [
-  { id: 1, emoji: "📱", label: "Điện thoại, Tablet", href: "/products?categoryId=1" },
-  { id: 2, emoji: "💻", label: "Laptop", href: "/products?categoryId=2" },
-  { id: 3, emoji: "🎧", label: "Âm thanh, Mic thu âm", href: "/products?categoryId=4" },
-  { id: 4, emoji: "⌚", label: "Đồng hồ, Camera", href: "/products?categoryId=5" },
-  { id: 5, emoji: "🏠", label: "Đồ gia dụng", href: "/products?categoryId=7" },
-  { id: 6, emoji: "🔌", label: "Phụ kiện", href: "/products?categoryId=9" },
-  { id: 7, emoji: "🖥️", label: "PC, Màn hình, Máy in", href: "/products?categoryId=8" },
-  { id: 8, emoji: "📺", label: "Tivi", href: "/products?categoryId=10" },
-  { id: 9, emoji: "🎮", label: "Tản nhiệt, Gaming Gear", href: "/products?categoryId=9" },
-  { id: 10, emoji: "♻️", label: "Hàng cũ giá rẻ", href: "/products" },
-];
+// 실제 카테고리(대분류)는 API에서 읽고, 메뉴 앞 아이콘만 순서대로 붙인다.
+const CATEGORY_EMOJIS = ["👕", "🧥", "👖", "👗", "👟", "👜"];
+export const categoryEmoji = (index: number) => CATEGORY_EMOJIS[index % CATEGORY_EMOJIS.length];
 
 // Brand filter chips per category section.
 export const phoneBrands: BrandChip[] = [
