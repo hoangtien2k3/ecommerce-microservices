@@ -25,6 +25,6 @@ spec:
         policy: redis
         redis_host: redis
         redis_port: 6379
-        redis_password: "admin"
+        redis_password: "change-me"  # must match redis-secret; real value comes from gitops
         redis_database: 0
         redis_timeout: 1000

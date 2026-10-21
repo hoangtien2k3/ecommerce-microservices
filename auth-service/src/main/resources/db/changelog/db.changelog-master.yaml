@@ -15,3 +15,11 @@ databaseChangeLog:
             path: db/changelog-mysql/data/changelog-0001.sql
             relativeToChangelogFile: false
             splitStatements: true
+  - changeSet:
+      id: auth-mysql-ddl-0002
+      author: ecommerce
+      changes:
+        - sqlFile:
+            path: db/changelog-mysql/ddl/changelog-0002.sql
+            relativeToChangelogFile: false
+            splitStatements: true

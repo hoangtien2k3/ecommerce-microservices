@@ -6,7 +6,6 @@ import com.ecommerce.orderservice.dto.product.ProductDto;
 import com.ecommerce.orderservice.dto.promotion.PromotionReleaseCall;
 import com.ecommerce.orderservice.dto.promotion.PromotionUseCall;
 import com.ecommerce.orderservice.dto.promotion.UnusedPromotionIssueResponse;
-import com.ecommerce.orderservice.dto.user.UserDto;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
@@ -16,24 +15,13 @@ import org.springframework.web.client.RestClient;
 @Component
 public class CallAPI {
 
-    private final RestClient authClient;
     private final RestClient productClient;
     private final RestClient promotionClient;
 
     // The injected builder is a shared singleton; clone it so each client keeps its own base URL.
     public CallAPI(RestClient.Builder restClientBuilder) {
-        this.authClient = restClientBuilder.clone().baseUrl("http://auth-service:8088").build();
         this.productClient = restClientBuilder.clone().baseUrl("http://product-service:8086").build();
         this.promotionClient = restClientBuilder.clone().baseUrl("http://promotion-service:8093").build();
-    }
-
-    public UserDto receiverUserDto(Long userId, String token) {
-        return authClient
-                .get()
-                .uri("/api/manager/user/{id}", userId)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-                .retrieve()
-                .body(UserDto.class);
     }
 
     public ProductDto receiverProductDto(Integer productId) {

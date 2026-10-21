@@ -72,7 +72,7 @@ public class CategoryServiceImpl implements CategoryService {
         log.info("CategoryDto Service, fetch category by id");
         return categoryRepository.findById(categoryId)
                 .map(CategoryMappingHelper::map)
-                .orElseThrow(() -> new CategoryNotFoundException(String.format("Category with id[%d] not found", categoryId)));
+                .orElseThrow(() -> BusinessException.notFound("product.category.not.found", String.valueOf(categoryId)));
     }
 
     @Override
@@ -90,13 +90,13 @@ public class CategoryServiceImpl implements CategoryService {
         log.info("CategoryDto Service, update category");
         try {
             Category existingCategory = categoryRepository.findById(categoryDto.getCategoryId())
-                    .orElseThrow(() -> new CategoryNotFoundException("Category not found with id: " + categoryDto.getCategoryId()));
+                    .orElseThrow(() -> BusinessException.notFound("product.category.not.found", String.valueOf(categoryDto.getCategoryId())));
             BeanUtils.copyProperties(categoryDto, existingCategory, "categoryId", "parentCategoryDto");
             if (categoryDto.getParentCategoryDto() != null) {
                 existingCategory.setParentCategory(CategoryMappingHelper.map(categoryDto.getParentCategoryDto()));
             }
             return CategoryMappingHelper.map(categoryRepository.save(existingCategory));
-        } catch (CategoryNotFoundException e) {
+        } catch (BusinessException | CategoryNotFoundException e) {
             log.error("Error updating category. Category with id [{}] not found.", categoryDto.getCategoryId());
             throw e;
         } catch (DataIntegrityViolationException e) {
@@ -119,7 +119,7 @@ public class CategoryServiceImpl implements CategoryService {
                 existingCategory.setParentCategory(CategoryMappingHelper.map(categoryDto.getParentCategoryDto()));
             }
             return CategoryMappingHelper.map(categoryRepository.save(existingCategory));
-        } catch (CategoryNotFoundException e) {
+        } catch (BusinessException | CategoryNotFoundException e) {
             log.error("Error updating category. Category with id [{}] not found.", categoryId);
             throw e;
         } catch (DataIntegrityViolationException e) {

@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    @LogPerformance(title = "register user", logInput = true)
+    @LogPerformance(title = "register user")
     public User register(RegisterRequest request) {
         if (existsByUsername(request.getUsername())) {
             throw BusinessException.conflict("auth.username.exists", request.getUsername());
