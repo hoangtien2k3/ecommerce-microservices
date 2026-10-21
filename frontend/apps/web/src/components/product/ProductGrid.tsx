@@ -14,7 +14,7 @@ interface ProductGridProps {
 
 export default function ProductGrid({ categoryId, search }: ProductGridProps) {
   const t = useTranslations("ProductGrid");
-  const { data: products, isLoading, isError } = useProducts({ categoryId, search });
+  const { data: products, isLoading, isError } = useProducts({ categoryIds: categoryId === undefined ? undefined : [categoryId], search });
 
   if (isLoading) {
     return (
