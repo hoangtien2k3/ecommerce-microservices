@@ -2,27 +2,53 @@ import { useQuery } from "@tanstack/react-query";
 import { productApi } from "@ecommerce/lib/api";
 import type { ApiResponse, PaginatedResponse, Product } from "@ecommerce/lib/types";
 
+// 백엔드 GET /api/products 는 파라미터 없이 전체 목록을 준다.
+// 그래서 한 번만 받아 캐시해 두고, 필터·정렬은 화면 쪽(select)에서 한다.
 interface ProductFilters {
-  page?: number;
-  size?: number;
-  sort?: string;
+  sort?: string; // "priceUnit,asc" 처럼 "필드,방향"
   categoryId?: number;
   search?: string;
+  minPrice?: number;
+  maxPrice?: number;
+}
+
+async function fetchAllProducts(): Promise<Product[]> {
+  const res = await productApi.getAll();
+  const raw = res.data;
+  if (Array.isArray(raw) && Array.isArray(raw[0])) return raw[0] as Product[];
+  if (Array.isArray(raw)) return raw as Product[];
+  const wrapped = raw as ApiResponse<PaginatedResponse<Product>>;
+  return wrapped?.data?.content ?? [];
+}
+
+function applyFilters(products: Product[], filters: ProductFilters): Product[] {
+  const { sort, categoryId, search, minPrice, maxPrice } = filters;
+  const keyword = search?.trim().toLowerCase();
+
+  const result = products.filter(
+    (p) =>
+      (categoryId === undefined || p.category?.categoryId === categoryId) &&
+      (minPrice === undefined || p.priceUnit >= minPrice) &&
+      (maxPrice === undefined || p.priceUnit < maxPrice) &&
+      (!keyword || p.productTitle.toLowerCase().includes(keyword))
+  );
+
+  if (!sort) return result;
+  const [field, dir] = sort.split(",") as [keyof Product, string];
+  const sign = dir === "desc" ? -1 : 1;
+  return [...result].sort((a, b) => {
+    const x = a[field];
+    const y = b[field];
+    if (typeof x === "number" && typeof y === "number") return (x - y) * sign;
+    return String(x ?? "").localeCompare(String(y ?? "")) * sign;
+  });
 }
 
 export function useProducts(filters: ProductFilters = {}) {
-  const { page = 0, size = 12, sort, categoryId, search } = filters;
-
   return useQuery({
-    queryKey: ["products", { page, size, sort, categoryId, search }],
-    queryFn: async () => {
-      const res = await productApi.getAll({ page, size, sort, categoryId });
-      const raw = res.data;
-      if (Array.isArray(raw) && Array.isArray(raw[0])) return raw[0] as Product[];
-      if (Array.isArray(raw)) return raw as Product[];
-      const wrapped = raw as ApiResponse<PaginatedResponse<Product>>;
-      return wrapped?.data?.content ?? [];
-    },
+    queryKey: ["products"],
+    queryFn: fetchAllProducts,
+    select: (products) => applyFilters(products, filters),
   });
 }
 

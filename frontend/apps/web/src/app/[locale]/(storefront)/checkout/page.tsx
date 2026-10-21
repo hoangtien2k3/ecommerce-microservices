@@ -7,6 +7,7 @@ import { useCartStore } from "@ecommerce/lib/store";
 import { useAuthStore } from "@ecommerce/lib/store";
 import { Button, Input } from "@ecommerce/ui";
 import { orderApi, paymentApi } from "@ecommerce/lib/api";
+import { toBackendDateTime } from "@ecommerce/lib/utils";
 import { useRouter } from "@/i18n/navigation";
 import StepIndicator from "@/components/checkout/StepIndicator";
 import OrderSummary from "@/components/cart/OrderSummary";
@@ -68,7 +69,7 @@ export default function CheckoutPage() {
     try {
       const firstItem = items[0];
       const orderRes = await orderApi.create({
-        orderDate: new Date().toISOString(),
+        orderDate: toBackendDateTime(new Date()), // order-service 날짜 형식에 맞춤
         orderDesc: shipping.note || "EzBuy order",
         orderFee: total,
         productId: firstItem.product.productId,

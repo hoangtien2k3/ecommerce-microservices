@@ -10,13 +10,11 @@ import { productStyles as s } from "./product.styles";
 interface ProductGridProps {
   categoryId?: number;
   search?: string;
-  page?: number;
-  size?: number;
 }
 
-export default function ProductGrid({ categoryId, search, page = 0, size = 12 }: ProductGridProps) {
+export default function ProductGrid({ categoryId, search }: ProductGridProps) {
   const t = useTranslations("ProductGrid");
-  const { data: products, isLoading, isError } = useProducts({ categoryId, search, page, size });
+  const { data: products, isLoading, isError } = useProducts({ categoryId, search });
 
   if (isLoading) {
     return (

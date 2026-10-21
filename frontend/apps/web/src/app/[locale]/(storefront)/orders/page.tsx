@@ -20,7 +20,7 @@ export default function OrdersPage() {
   }, [isAuthenticated, router]);
 
   const { data, isLoading } = useOrders();
-  const orders = data?.data?.content ?? [];
+  const orders = data ?? [];
 
   return (
     <div className={s.page}>
