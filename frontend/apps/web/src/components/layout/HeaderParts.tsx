@@ -3,23 +3,28 @@
 import { useTranslations } from "next-intl";
 import { Phone, MapPin, FileText, Store, TicketPercent } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { useCategoryMenu } from "@/hooks";
 
 // Top utility bar (dark red): quick category links on the left, support links on
 // the right — mirrors the CellphoneS top strip.
-// 카테고리 링크는 DB의 대분류(categories.parent_category_id 가 없는 것)를 보여 준다.
-// 대분류가 없으면 '의류' 하나만 둔다 (useCategoryMenu).
+const TOP_CATS: Array<[string, string]> = [
+  ["/products?categoryId=1", "c1"],
+  ["/products?categoryId=2", "c2"],
+  ["/products?categoryId=3", "c3"],
+  ["/products?categoryId=4", "c4"],
+  ["/products?categoryId=5", "c5"],
+  ["/products?categoryId=7", "c7"],
+];
 
 export function TopBar() {
   const t = useTranslations("Header");
-  const menuItems = useCategoryMenu();
+  const tCat = useTranslations("Category");
   return (
     <div className="bg-primary-700 text-white/90 text-xs">
       <div className="max-w-7xl mx-auto px-4 h-8 flex items-center justify-between">
         <nav className="flex items-center gap-4 overflow-x-auto no-scrollbar">
-          {menuItems.map((item) => (
-            <Link key={item.key} href={item.href} className="hover:text-white whitespace-nowrap transition-colors">
-              {item.label}
+          {TOP_CATS.map(([href, key]) => (
+            <Link key={key} href={href} className="hover:text-white whitespace-nowrap transition-colors">
+              {tCat(key)}
             </Link>
           ))}
         </nav>

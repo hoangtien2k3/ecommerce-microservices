@@ -5,14 +5,12 @@ import { useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight, ChevronRight as Caret, ArrowRight } from "lucide-react";
 import { cn } from "@ecommerce/lib/utils";
 import { Link } from "@/i18n/navigation";
-import { useCategoryMenu } from "@/hooks";
-import { heroSlides, heroSideBanners, categoryEmoji } from "@/data/homeMock";
+import { heroSlides, heroSideBanners, heroSidebar } from "@/data/homeMock";
 import { homeStyles as s } from "./home.styles";
 
 export default function HeroSection() {
   const t = useTranslations("Home");
   const [active, setActive] = useState(0);
-  const menuItems = useCategoryMenu();
   const count = heroSlides.length;
   const go = useCallback((i: number) => setActive((i + count) % count), [count]);
 
@@ -25,10 +23,10 @@ export default function HeroSection() {
     <div className={s.heroWrap}>
       {/* Left vertical category sidebar */}
       <nav className={s.heroSidebar}>
-        {menuItems.map((item, i) => (
-          <Link key={item.key} href={item.href} className={s.heroSidebarItem}>
-            <span className={s.heroSidebarEmoji}>{categoryEmoji(i)}</span>
-            <span className={s.heroSidebarLabel}>{item.label}</span>
+        {heroSidebar.map((cat) => (
+          <Link key={cat.id} href={cat.href} className={s.heroSidebarItem}>
+            <span className={s.heroSidebarEmoji}>{cat.emoji}</span>
+            <span className={s.heroSidebarLabel}>{cat.label}</span>
             <Caret className="h-4 w-4 text-gray-300 group-hover:text-primary-500" />
           </Link>
         ))}
