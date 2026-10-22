@@ -11,6 +11,7 @@ interface OrderSummaryProps {
   items: CartItem[];
   subtotal: number;
   shippingFee: number;
+  discount?: number;
   total: number;
   showShippingPromo?: boolean;
   shippingPromoText?: string;
@@ -20,7 +21,7 @@ interface OrderSummaryProps {
 }
 
 export default function OrderSummary({
-  items, subtotal, shippingFee, total,
+  items, subtotal, shippingFee, discount, total,
   showShippingPromo, shippingPromoText,
   showCoupon, couponPlaceholder,
   children,
@@ -65,6 +66,12 @@ export default function OrderSummary({
             {shippingFee === 0 ? "Free" : formatPrice(shippingFee)}
           </span>
         </div>
+        {discount !== undefined && discount > 0 && (
+          <div className={s.totalRow}>
+            <span>Coupon</span>
+            <span className="text-green-600 font-medium">-{formatPrice(discount)}</span>
+          </div>
+        )}
         {showShippingPromo && shippingPromoText && (
           <p className={s.promo}>{shippingPromoText}</p>
         )}

@@ -317,7 +317,14 @@
     "freeShipping": "Free",
     "total": "Total",
     "validationErr": "Please fill in all required shipping fields",
-    "orderFailed": "Order failed. Please try again."
+    "orderFailed": "Order failed. Please try again.",
+    "coupon": "Coupon",
+    "noCoupon": "Don't use a coupon",
+    "couponMin": "min. order {amount}",
+    "couponEmpty": "You have no coupons to use.",
+    "discount": "Coupon discount",
+    "outOfStock": "This product is out of stock, so payment failed.",
+    "couponUnavailable": "The selected coupon can't be used. Choose another coupon or order without one."
   },
   "Orders": {
     "metaTitle": "My orders",

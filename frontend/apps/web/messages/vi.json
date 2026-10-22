@@ -317,7 +317,14 @@
     "freeShipping": "Miễn phí",
     "total": "Tổng cộng",
     "validationErr": "Vui lòng điền đầy đủ thông tin giao hàng",
-    "orderFailed": "Đặt hàng thất bại. Vui lòng thử lại."
+    "orderFailed": "Đặt hàng thất bại. Vui lòng thử lại.",
+    "coupon": "Mã giảm giá",
+    "noCoupon": "Không dùng mã giảm giá",
+    "couponMin": "đơn tối thiểu {amount}",
+    "couponEmpty": "Bạn chưa có mã giảm giá nào để dùng.",
+    "discount": "Giảm giá",
+    "outOfStock": "Sản phẩm đã hết hàng nên thanh toán không thành công.",
+    "couponUnavailable": "Không thể dùng mã giảm giá đã chọn. Hãy chọn mã khác hoặc đặt hàng không dùng mã."
   },
   "Orders": {
     "metaTitle": "Đơn hàng của tôi",

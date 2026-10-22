@@ -8,6 +8,8 @@ export interface CouponEvent {
   name: string;
   description?: string;
   discountAmount: number; // fixed discount in VND
+  discountType?: "FIXED" | "PERCENTAGE"; // checkout uses it to compute the discount
+  discountPercentage?: number; // PERCENTAGE coupons only
   minimumOrderPurchaseAmount?: number;
   issueLimit: number; // total first-come quantity
   issuedCount: number; // quantity issued so far

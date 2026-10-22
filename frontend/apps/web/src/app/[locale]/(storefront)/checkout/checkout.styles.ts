@@ -23,6 +23,10 @@ export const checkoutPageStyles = {
   payEmoji: "text-2xl",
   payActions: "flex gap-3 mt-6",
 
+  // Coupon
+  couponBox: "mt-6 pt-6 border-t border-gray-100",
+  couponTitle: "text-base font-bold",
+
   // Confirmation
   confirm: "bg-white rounded-xl border border-gray-200 p-8 text-center",
   confirmIcon: "w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4",

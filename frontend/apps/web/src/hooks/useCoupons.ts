@@ -31,6 +31,8 @@ async function fetchCoupons(): Promise<CouponEvent[]> {
     description: c.description,
     // 화면은 정액 할인만 표시한다. 정률 쿠폰은 금액 0 으로 보인다.
     discountAmount: c.discountAmount ?? 0,
+    discountType: c.discountType,
+    discountPercentage: c.discountPercentage,
     minimumOrderPurchaseAmount: c.minimumOrderPurchaseAmount,
     issueLimit: c.issueLimit,
     issuedCount: c.issuedCount,
@@ -61,13 +63,27 @@ async function issueCoupon(promotionId: number): Promise<IssueResult> {
   }
 }
 
-const COUPONS_KEY = ["coupons"] as const;
+export const COUPONS_KEY = ["coupons"] as const;
 
 export function useCoupons() {
   return useQuery({
     queryKey: COUPONS_KEY,
     queryFn: fetchCoupons,
   });
+}
+
+// 체크아웃에서 고를 수 있는 쿠폰: 내가 발급받았고 지금 사용 기간 안에 있는 것.
+// 목록 API는 이미 사용한 쿠폰도 claimed 로 주므로, 사용한 쿠폰은 주문할 때 백엔드가 거부한다.
+export function isUsableCoupon(coupon: CouponEvent, now: number): boolean {
+  return coupon.claimed && now >= Date.parse(coupon.startDate) && now <= Date.parse(coupon.endDate);
+}
+
+// order-service 의 할인 계산과 같게 맞춘다 (정률은 주문 금액의 %, 정액은 그 금액, 주문 금액보다 크지 않게).
+export function couponDiscount(coupon: CouponEvent, amount: number): number {
+  const discount = coupon.discountType === "PERCENTAGE"
+    ? Math.round((amount * (coupon.discountPercentage ?? 0)) / 100)
+    : coupon.discountAmount;
+  return Math.min(discount, amount);
 }
 
 export function useIssueCoupon() {
