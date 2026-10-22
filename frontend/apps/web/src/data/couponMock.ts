@@ -1,9 +1,7 @@
-// Mock data for the first-come coupon page. promotion-service has the issue API
-// (POST /promotion/storefront/promotions/{id}/issue) but no storefront list API
-// yet, so the page renders from these fixtures. Field names follow the Promotion
-// entity (issueLimit, issuedCount, discountAmount, ...). To wire the real API,
-// replace fetchCoupons / issueCoupon in hooks/useCoupons.ts; the page and
-// components already work with these types.
+// Types for the first-come coupon page, plus the fixtures it used before the
+// storefront list API existed. hooks/useCoupons.ts now calls the real API
+// (GET /promotion/storefront/promotions, POST .../{id}/issue); the mock
+// functions below are kept for local work without a backend.
 
 export interface CouponEvent {
   promotionId: number;

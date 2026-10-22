@@ -119,6 +119,12 @@ export const categoryApi = {
   delete: (id: number) => apiClient.delete(`/api/categories/${id}`),
 };
 
+// Coupon API (promotion-service 선착순 쿠폰). 목록은 로그인 없이도 되고, 토큰이 있으면 claimed 가 채워진다.
+export const couponApi = {
+  getAll: () => apiClient.get("/promotion/storefront/promotions"),
+  issue: (promotionId: number) => apiClient.post(`/promotion/storefront/promotions/${promotionId}/issue`),
+};
+
 // Order API
 export const orderApi = {
   getAll: (params?: { page?: number; size?: number }) =>
