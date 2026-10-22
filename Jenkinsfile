@@ -6,6 +6,7 @@
 //   - Username/Password 자격 증명 'harbor-robot-push' (robot$ecommerce+push)
 //   - Username/Password 자격 증명 'gitops-push' (GitHub fine-grained PAT, gitops Contents RW)
 //   - Username/Password 자격 증명 'aws-ecr-push' (IAM 사용자 osi7-jenkins-ecr-push의 Access key ID / Secret)
+//   - Secret text 자격 증명 'slack-webhook' (Slack Webhook URL)
 
 // 서비스별로 이미지 내용에 영향을 주는 경로 (백엔드는 공통 모듈과 루트 pom.xml 포함)
 def SERVICE_PATHS = [
@@ -15,6 +16,28 @@ def SERVICE_PATHS = [
   order    : 'order-service common-lib pom.xml',
   promotion: 'promotion-service common-lib pom.xml',
 ]
+
+// Slack Incoming Webhook으로 빌드 결과를 보낸다 (웹훅 URL은 자격 증명 'slack-webhook', Secret text)
+// 알림 전송이 실패해도 빌드 결과는 바꾸지 않는다
+def notifySlack(String title) {
+  // 이번 빌드의 마지막 커밋 (누구의 어떤 변경에서 깨졌는지 바로 보이게)
+  // (checkout 전에 실패해도 알림은 가도록 || true)
+  def commit = sh(script: "git log -1 --format='%h %an: %s' 2>/dev/null || true", returnStdout: true).trim()
+  def text = "${title}: ${env.JOB_NAME} #${env.BUILD_NUMBER}\n" +
+             "${currentBuild.description ?: ''}\n" +
+             "커밋 ${commit}\n" +
+             "${env.BUILD_URL}console"
+  // 커밋 메시지에 따옴표가 있어도 깨지지 않게 JSON은 Groovy로 만들어 파일로 넘긴다
+  writeFile file: 'slack.json', text: groovy.json.JsonOutput.toJson([text: text])
+  withCredentials([string(credentialsId: 'slack-webhook', variable: 'SLACK_WEBHOOK')]) {
+    sh '''
+      curl -sS --fail --max-time 10 -H 'Content-Type: application/json' \
+        --data @slack.json "$SLACK_WEBHOOK" \
+        || echo "Slack 알림 전송 실패 (빌드 결과에는 영향 없음)"
+      rm -f slack.json
+    '''
+  }
+}
 
 pipeline {
   agent { label 'docker' }
@@ -305,6 +328,10 @@ pipeline {
   }
 
   post {
-    always { sh 'docker logout "$REGISTRY" || true' }
+    // 실패, 불안정(지금은 ECR push 실패가 여기에 해당), 실패 후 첫 성공일 때만 알린다
+    failure  { script { notifySlack(':x: 빌드 실패') } }
+    unstable { script { notifySlack(':warning: 빌드 불안정 (ECR push 등 일부 단계 실패)') } }
+    fixed    { script { notifySlack(':white_check_mark: 빌드 복구') } }
+    always   { sh 'docker logout "$REGISTRY" || true' }
   }
 }
