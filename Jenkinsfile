@@ -47,8 +47,11 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr: '20'))
   }
 
-  // Jenkins가 새싹 PC(tailnet) 안에 있어 GitHub webhook이 닿지 않으므로 폴링한다
-  triggers { pollSCM('H/5 * * * *') }
+  // GitHub webhook(push)으로 바로 시작하고, webhook이 놓친 push는 15분 폴링으로 잡는다
+  triggers {
+    githubPush()
+    pollSCM('H/15 * * * *')
+  }
 
   // 체크한 서비스는 Harbor에 같은 태그가 있어도 다시 빌드한다
   parameters {
