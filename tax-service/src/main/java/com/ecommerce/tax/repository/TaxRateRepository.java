@@ -15,7 +15,7 @@ public interface TaxRateRepository extends JpaRepository<TaxRate, Long> {
         + "AND (tr.state_or_province_id = :stateOrProvinceId OR  tr.state_or_province_id is null) "
         + "AND tr.tax_class_id = :taxClassId "
         + "AND (tr.zip_code = :zipCode OR  trim(tr.zip_code) = '' OR  tr.zip_code is null ) "
-        + "FETCH FIRST 1 ROWS ONLY", nativeQuery = true)
+        + "LIMIT 1", nativeQuery = true)
     Double getTaxPercent(@Param("countryId") Long countryId, @Param("stateOrProvinceId") Long stateOrProvinceId,
                          @Param("zipCode") String zipCode, @Param("taxClassId") Long taxClassId);
 

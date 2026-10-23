@@ -1,18 +1,19 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Phone, MapPin, FileText, Store } from "lucide-react";
+import { Phone, MapPin, FileText, Store, TicketPercent } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 
 // Top utility bar (dark red): quick category links on the left, support links on
 // the right — mirrors the CellphoneS top strip.
+// 카테고리 데이터가 의류뿐이라 어느 링크를 눌러도 전체 상품(=의류)으로 간다.
 const TOP_CATS: Array<[string, string]> = [
-  ["/products?categoryId=1", "c1"],
-  ["/products?categoryId=2", "c2"],
-  ["/products?categoryId=3", "c3"],
-  ["/products?categoryId=4", "c4"],
-  ["/products?categoryId=5", "c5"],
-  ["/products?categoryId=7", "c7"],
+  ["/products", "c1"], // 의류
+  ["/products", "c2"],
+  ["/products", "c3"],
+  ["/products", "c4"],
+  ["/products", "c5"],
+  ["/products", "c7"],
 ];
 
 export function TopBar() {
@@ -29,6 +30,9 @@ export function TopBar() {
           ))}
         </nav>
         <div className="flex items-center gap-4 shrink-0">
+          <Link href="/coupons" className="hover:text-white items-center gap-1 font-medium text-amber-300 hidden sm:flex">
+            <TicketPercent className="h-3.5 w-3.5" /> {t("coupons")}
+          </Link>
           <Link href="/orders" className="hover:text-white items-center gap-1 hidden sm:flex">
             <FileText className="h-3.5 w-3.5" /> {t("topTrackOrder")}
           </Link>

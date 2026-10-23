@@ -4,7 +4,7 @@ NAMESPACE ?= ecommerce
 SHA       := $(shell git rev-parse --short HEAD 2>/dev/null || echo "local")
 
 SERVICES = discovery-service api-gateway auth-service \
-           product-service order-service payment-service \
+           product-service order-service \
            shipping-service inventory-service favourite-service \
            rating-service media-service tax-service \
            promotion-service search-service notification-service
@@ -15,9 +15,9 @@ SERVICES = discovery-service api-gateway auth-service \
 
 .PHONY: up down logs ps restart build-all
 
-## Start infrastructure only (postgres, kafka, redis, keycloak…)
+## Start infrastructure only (mysql, redis, keycloak…)
 infra-up:
-	docker compose up -d postgres mongodb redis kafka elasticsearch minio keycloak
+	docker compose up -d mysql mongodb redis elasticsearch minio keycloak
 
 ## Wait until infra is healthy, then start all backend + frontend
 up:
@@ -112,12 +112,11 @@ k8s-config:
 	kubectl apply -f k8s/secrets.yaml
 	kubectl apply -f k8s/configmap.yaml
 
-## Deploy infrastructure (databases, kafka, etc.)
+## Deploy infrastructure (databases, etc.)
 k8s-infra: k8s-config
-	kubectl apply -f k8s/infra/postgres.yaml
+	kubectl apply -f k8s/infra/mysql.yaml
 	kubectl apply -f k8s/infra/mongodb.yaml
 	kubectl apply -f k8s/infra/redis.yaml
-	kubectl apply -f k8s/infra/kafka.yaml
 	kubectl apply -f k8s/infra/elasticsearch.yaml
 	kubectl apply -f k8s/infra/minio.yaml
 	kubectl apply -f k8s/infra/keycloak.yaml
@@ -133,7 +132,6 @@ k8s-backend:
 	kubectl apply -f k8s/backend/auth-service.yaml
 	kubectl apply -f k8s/backend/product-service.yaml
 	kubectl apply -f k8s/backend/order-service.yaml
-	kubectl apply -f k8s/backend/payment-service.yaml
 	kubectl apply -f k8s/backend/shipping-service.yaml
 	kubectl apply -f k8s/backend/inventory-service.yaml
 	kubectl apply -f k8s/backend/favourite-service.yaml

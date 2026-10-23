@@ -21,6 +21,8 @@ public interface CartMappingHelper {
                                 .orderDate(order.getOrderDate())
                                 .orderDesc(order.getOrderDesc())
                                 .orderFee(order.getOrderFee())
+                                .promotionId(order.getPromotionId())
+                                .discountAmount(order.getDiscountAmount())
                                 .build())
                         .collect(Collectors.toSet()))
                 .userDto(
@@ -42,6 +44,8 @@ public interface CartMappingHelper {
                                 .orderDate(orderDto.getOrderDate())
                                 .orderDesc(orderDto.getOrderDesc())
                                 .orderFee(orderDto.getOrderFee())
+                                .promotionId(orderDto.getPromotionId())
+                                .discountAmount(orderDto.getDiscountAmount())
                                 .build())
                         .collect(Collectors.toSet()))
                 .build();

@@ -219,6 +219,7 @@ function MobileMenu({
       <nav className="space-y-1">
         {([
           ["/products", t("allProducts")],
+          ["/coupons", t("coupons")],
           ["/cart", t("cart")],
           ["/orders", t("orders")],
           ["/favourites", t("favourites")],

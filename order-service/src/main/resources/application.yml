@@ -13,16 +13,19 @@ spring:
   lifecycle:
     timeout-per-shutdown-phase: 30s
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/orderservice}
-    username: ${POSTGRES_USER:admin}
-    password: ${POSTGRES_PASSWORD:admin}
-    driver-class-name: org.postgresql.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/orderservice}
+    username: ${MYSQL_USER:admin}
+    password: ${MYSQL_PASSWORD:admin}
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: validate
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: org.hibernate.dialect.MySQLDialect
+        # Store and read timestamps as UTC regardless of the JVM or MySQL session time zone.
+        jdbc:
+          time_zone: UTC
         format_sql: false
     show-sql: false
   liquibase:
@@ -33,8 +36,6 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${JWT_ISSUER_URI:http://localhost:8080/realms/ecommerce}
-  kafka:
-    bootstrap-servers: ${KAFKA_SERVERS:localhost:9092}
 ---
 management:
   server:

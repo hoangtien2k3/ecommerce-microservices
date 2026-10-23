@@ -1,8 +1,9 @@
 databaseChangeLog:
   - changeSet:
-      id: favourite-service-0001-bootstrap
-      author: codex
-      comment: Bootstrap Liquibase for favourite-service.
+      id: favourite-mysql-ddl-0001
+      author: ecommerce
       changes:
-        - sql:
-            sql: SELECT 1;
+        - sqlFile:
+            path: db/changelog-mysql/ddl/changelog-0001.sql
+            relativeToChangelogFile: false
+            splitStatements: true

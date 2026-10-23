@@ -14,14 +14,14 @@ spec:
         app: keycloak
     spec:
       initContainers:
-        - name: wait-for-postgres
+        - name: wait-for-mysql
           image: busybox
           command:
             - sh
             - -c
             - |
-              until nc -z postgres 5432; do
-                echo "Waiting for postgres..."; sleep 3
+              until nc -z mysql 3306; do
+                echo "Waiting for mysql..."; sleep 3
               done
       containers:
         - name: keycloak
@@ -44,23 +44,23 @@ spec:
                   name: keycloak-secret
                   key: KEYCLOAK_ADMIN_PASSWORD
             - name: KC_DB
-              value: postgres
+              value: mysql
             - name: KC_DB_URL_HOST
-              value: postgres
+              value: mysql
             - name: KC_DB_URL_PORT
-              value: "5432"
+              value: "3306"
             - name: KC_DB_URL_DATABASE
               value: keycloak
             - name: KC_DB_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: postgres-secret
-                  key: POSTGRES_USER
+                  name: mysql-secret
+                  key: MYSQL_USER
             - name: KC_DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: postgres-secret
-                  key: POSTGRES_PASSWORD
+                  name: mysql-secret
+                  key: MYSQL_PASSWORD
           volumeMounts:
             - name: keycloak-import
               mountPath: /opt/keycloak/data/import

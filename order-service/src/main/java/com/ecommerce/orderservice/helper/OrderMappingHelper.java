@@ -13,11 +13,10 @@ public interface OrderMappingHelper {
                 .orderDate(order.getOrderDate())
                 .orderDesc(order.getOrderDesc())
                 .orderFee(order.getOrderFee())
+                .promotionId(order.getPromotionId())
+                .discountAmount(order.getDiscountAmount())
                 .productId(order.getProductId())
-                .cartDto(CartDto.builder()
-                        .cartId(order.getCart().getCartId())
-                        .userId(order.getCart().getUserId())
-                        .build())
+                .cartDto(mapCart(order.getCart()))
                 .build();
     }
 
@@ -28,11 +27,27 @@ public interface OrderMappingHelper {
                 .orderDate(orderDto.getOrderDate())
                 .orderDesc(orderDto.getOrderDesc())
                 .orderFee(orderDto.getOrderFee())
+                .promotionId(orderDto.getPromotionId())
+                .discountAmount(orderDto.getDiscountAmount())
                 .productId(orderDto.getProductId())
-                .cart(Cart.builder()
-                        .cartId(orderDto.getCartDto().getCartId())
-                        .userId(orderDto.getCartDto().getUserId())
-                        .build())
+                .cart(mapCart(orderDto.getCartDto()))
+                .build();
+    }
+
+    private static CartDto mapCart(Cart cart) {
+        if (cart == null) return null;
+        return CartDto.builder()
+                .cartId(cart.getCartId())
+                .userId(cart.getUserId())
+                .build();
+    }
+
+    // Orders can be created without a cart; only link one when an id is given.
+    private static Cart mapCart(CartDto cartDto) {
+        if (cartDto == null || cartDto.getCartId() == null) return null;
+        return Cart.builder()
+                .cartId(cartDto.getCartId())
+                .userId(cartDto.getUserId())
                 .build();
     }
 }

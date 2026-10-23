@@ -24,7 +24,6 @@
         <module>auth-service</module>
         <module>product-service</module>
         <module>order-service</module>
-        <module>payment-service</module>
         <module>inventory-service</module>
         <module>shipping-service</module>
         <module>notification-service</module>
@@ -102,11 +101,6 @@
             <dependency>
                 <groupId>com.ecommerce.microservices</groupId>
                 <artifactId>common-keycloak</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.ecommerce.microservices</groupId>
-                <artifactId>common-kafka</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>

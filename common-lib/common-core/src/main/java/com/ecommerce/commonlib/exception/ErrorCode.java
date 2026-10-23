@@ -57,7 +57,13 @@ public enum ErrorCode {
 
     // ---- Payment domain ----
     PAYMENT_FAILED("PAY-5001", "payment.failed", HttpStatus.BAD_REQUEST),
-    PAYMENT_NOT_FOUND("PAY-5002", "payment.not.found", HttpStatus.NOT_FOUND);
+    PAYMENT_NOT_FOUND("PAY-5002", "payment.not.found", HttpStatus.NOT_FOUND),
+
+    // ---- Promotion domain (first-come coupons) ----
+    COUPON_NOT_OPEN("PRM-6001", "promotion.coupon.not.open", HttpStatus.BAD_REQUEST),
+    COUPON_SOLD_OUT("PRM-6002", "promotion.coupon.sold.out", HttpStatus.CONFLICT),
+    COUPON_ALREADY_CLAIMED("PRM-6003", "promotion.coupon.already.claimed", HttpStatus.CONFLICT),
+    COUPON_STORE_UNAVAILABLE("PRM-6004", "promotion.coupon.store.unavailable", HttpStatus.SERVICE_UNAVAILABLE);
 
     private final String code;
     private final String messageKey;

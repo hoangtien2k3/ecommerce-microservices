@@ -14,7 +14,7 @@ upstreams:
 - id: 4
   type: roundrobin
   nodes:
-    payment-service:8085: 1
+    order-service:8084: 1
 - id: 5
   type: roundrobin
   nodes:
@@ -56,12 +56,42 @@ global_rules:
   plugins:
     prometheus: {}
     cors:
-      allow_origins: http://localhost:3000,http://ecommerce.local,http://ecommerce.local:9090
+      allow_origins: http://localhost:3000,http://localhost:3001,http://ecommerce.local,http://ecommerce.local:9090,http://admin.ecommerce.local,http://admin.ecommerce.local:9090
       allow_methods: GET,POST,PUT,DELETE,PATCH,OPTIONS
       allow_headers: Authorization,Content-Type,X-Requested-With
       max_age: 3600
+    # Per client IP and bearer token, so many signed-in users behind one IP
+    # (a load test machine, a NAT) each get their own 1200/min; anonymous calls stay per IP.
+    # The QA load generator (OCI qa-01) is exempt from both limits.
     limit-count:
+      _meta:
+        filter:
+        -
+          - remote_addr
+          - "!"
+          - ipmatch
+          -
+            - 10.0.1.99/32
       count: 1200
+      time_window: 60
+      rejected_code: 429
+      key_type: var_combination
+      key: $remote_addr $http_authorization
+      policy: local
+# Global rules run before route auth, so the Authorization header above is unverified.
+# This per-IP ceiling stops a client from dodging the limit by sending a new header each time.
+- id: 2
+  plugins:
+    limit-count:
+      _meta:
+        filter:
+        -
+          - remote_addr
+          - "!"
+          - ipmatch
+          -
+            - 10.0.1.99/32
+      count: 12000
       time_window: 60
       rejected_code: 429
       key_type: var
@@ -117,9 +147,6 @@ routes:
 - id: openapi-order
   upstream_id: 3
   uri: /order/v3/api-docs/*
-- id: openapi-payment
-  upstream_id: 4
-  uri: /payment/v3/api-docs/*
 - id: openapi-inventory
   upstream_id: 5
   uri: /inventory/v3/api-docs/*
@@ -236,7 +263,7 @@ routes:
     proxy-rewrite:
       regex_uri:
       - ^/(.*)
-      - /payment/$1
+      - /order/$1
 - id: inventory
   upstream_id: 5
   uris:
@@ -285,33 +312,9 @@ routes:
       bearer_only: true
       use_jwks: true
       token_signing_alg_values_expected: RS256
-- id: notif-email
-  upstream_id: 8
-  uri: /notification/api/email/*
-  plugins:
-    openid-connect:
-      client_id: ecommerce-client
-      client_secret: $env://KEYCLOAK_CLIENT_SECRET
-      discovery: http://keycloak:8080/realms/ecommerce/.well-known/openid-configuration
-      realm: ecommerce
-      bearer_only: true
-      use_jwks: true
-      token_signing_alg_values_expected: RS256
 - id: notif-notifications
   upstream_id: 8
   uri: /notification/api/notifications/*
-  plugins:
-    openid-connect:
-      client_id: ecommerce-client
-      client_secret: $env://KEYCLOAK_CLIENT_SECRET
-      discovery: http://keycloak:8080/realms/ecommerce/.well-known/openid-configuration
-      realm: ecommerce
-      bearer_only: true
-      use_jwks: true
-      token_signing_alg_values_expected: RS256
-- id: notif-payment
-  upstream_id: 8
-  uri: /notification/api/payment-notifications/*
   plugins:
     openid-connect:
       client_id: ecommerce-client
@@ -347,7 +350,28 @@ routes:
       token_signing_alg_values_expected: RS256
 - id: promotion-backoffice
   upstream_id: 12
-  uri: /promotion/backoffice/promotions/*
+  uris:
+  - /promotion/backoffice/promotions
+  - /promotion/backoffice/promotions/*
+  plugins:
+    openid-connect:
+      client_id: ecommerce-client
+      client_secret: $env://KEYCLOAK_CLIENT_SECRET
+      discovery: http://keycloak:8080/realms/ecommerce/.well-known/openid-configuration
+      realm: ecommerce
+      bearer_only: true
+      use_jwks: true
+      token_signing_alg_values_expected: RS256
+# Coupon page list. No gateway auth: guests may list, and promotion-service validates
+# a bearer token when one is sent (to fill in "claimed").
+- id: promotion-storefront-coupons
+  upstream_id: 12
+  uri: /promotion/storefront/promotions
+  methods:
+  - GET
+- id: promotion-issue
+  upstream_id: 12
+  uri: /promotion/storefront/promotions/*/issue
   plugins:
     openid-connect:
       client_id: ecommerce-client

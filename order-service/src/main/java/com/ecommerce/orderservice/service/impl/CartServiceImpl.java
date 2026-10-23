@@ -6,8 +6,6 @@ import com.ecommerce.orderservice.exception.wrapper.CartNotFoundException;
 import com.ecommerce.orderservice.helper.CartMappingHelper;
 import com.ecommerce.orderservice.repository.CartRepository;
 import com.ecommerce.orderservice.repository.OrderRepository;
-import com.ecommerce.orderservice.security.JwtTokenFilter;
-import com.ecommerce.orderservice.service.CallAPI;
 import com.ecommerce.orderservice.service.CartService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -28,7 +26,6 @@ public class CartServiceImpl implements CartService {
     private final OrderServiceImpl orderService;
     private final OrderRepository orderRepository;
     private final ModelMapper modelMapper;
-    private final CallAPI callAPI;
 
     @Override
     public List<CartDto> findAll() {
@@ -36,13 +33,6 @@ public class CartServiceImpl implements CartService {
         return cartRepository.findAll()
                 .stream()
                 .map(CartMappingHelper::map)
-                .peek(cartDto -> {
-                    try {
-                        cartDto.setUserDto(callAPI.receiverUserDto(cartDto.getUserDto().getId(), JwtTokenFilter.getTokenFromRequest()));
-                    } catch (Exception e) {
-                        log.error("Error fetching user info: {}", e.getMessage());
-                    }
-                })
                 .toList();
     }
 
@@ -55,13 +45,6 @@ public class CartServiceImpl implements CartService {
         List<CartDto> cartDtos = cartRepository.findAll(pageable)
                 .stream()
                 .map(CartMappingHelper::map)
-                .peek(cartDto -> {
-                    try {
-                        cartDto.setUserDto(callAPI.receiverUserDto(cartDto.getUserDto().getId(), JwtTokenFilter.getTokenFromRequest()));
-                    } catch (Exception e) {
-                        log.error("Error fetching user info: {}", e.getMessage());
-                    }
-                })
                 .toList();
         return new PageImpl<>(cartDtos, pageable, cartDtos.size());
     }
@@ -72,11 +55,6 @@ public class CartServiceImpl implements CartService {
         CartDto cartDto = cartRepository.findById(cartId)
                 .map(CartMappingHelper::map)
                 .orElseThrow(() -> new CartNotFoundException(String.format("Cart with id: %d not found", cartId)));
-        try {
-            cartDto.setUserDto(callAPI.receiverUserDto(cartDto.getUserDto().getId(), JwtTokenFilter.getTokenFromRequest()));
-        } catch (Exception e) {
-            log.error("Error fetching user info: {}", e.getMessage());
-        }
         return cartDto;
     }
 

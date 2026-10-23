@@ -16,28 +16,17 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/ecommerce}
-    username: ${POSTGRES_USER:admin}
-    password: ${POSTGRES_PASSWORD:admin}
-    driver-class-name: org.postgresql.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/ecommerce}
+    username: ${MYSQL_USER:admin}
+    password: ${MYSQL_PASSWORD:admin}
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: org.hibernate.dialect.MySQLDialect
         format_sql: false
     show-sql: false
   security:
@@ -45,16 +34,6 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${JWT_ISSUER_URI:http://localhost:8080/realms/ecommerce}
-  kafka:
-    bootstrap-servers: ${KAFKA_SERVERS:localhost:9092}
-    producer:
-      retries: 3
-      batch-size: 16384
-      buffer-memory: 33554432
----
-notification:
-  kafka:
-    consumer-group-id: notification-groupId
 ---
 management:
   server:
@@ -137,4 +116,4 @@ ecommerce:
   openapi:
     title: Notification Service API
     version: ${APP_VERSION:v1}
-    description: Email and push notification delivery
+    description: In-app notification delivery

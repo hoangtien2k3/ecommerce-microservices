@@ -3,10 +3,13 @@ package com.ecommerce.authservice.service;
 import com.ecommerce.authservice.dto.request.RegisterRequest;
 import com.ecommerce.authservice.dto.request.UpdateUserRequest;
 import com.ecommerce.authservice.dto.response.UserResponse;
+import com.ecommerce.authservice.entity.Role;
+import com.ecommerce.authservice.entity.RoleName;
 import com.ecommerce.authservice.entity.User;
 import com.ecommerce.authservice.mapper.UserMapper;
 import com.ecommerce.authservice.repository.UserRepository;
 import com.ecommerce.commonlib.exception.BusinessException;
+import com.ecommerce.commonlib.keycloak.KeycloakAuthClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,9 +19,12 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -33,13 +39,16 @@ class UserServiceImplTest {
     @Mock
     private RoleService roleService;
 
+    @Mock
+    private KeycloakAuthClient keycloakAuthClient;
+
     private UserMapper userMapper;
     private UserServiceImpl userService;
 
     @BeforeEach
     void setUp() {
         userMapper = new UserMapper(new ModelMapper());
-        userService = new UserServiceImpl(userRepository, userMapper, roleService, null);
+        userService = new UserServiceImpl(userRepository, userMapper, roleService, keycloakAuthClient);
     }
 
     @Test
@@ -110,5 +119,62 @@ class UserServiceImplTest {
 
         assertThrows(BusinessException.class, () -> userService.register(request));
         verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void registerShouldIgnoreRequestedRolesAndAssignUser() {
+        RegisterRequest request = new RegisterRequest();
+        request.setUsername("newuser");
+        request.setEmail("new@test.com");
+        request.setPhone("0123456789");
+        request.setPassword("password");
+        request.setRoles(Set.of("ADMIN"));
+
+        Role userRole = new Role();
+        userRole.setName(RoleName.USER);
+        when(keycloakAuthClient.createUser(any(), any(), any(), any(), any())).thenReturn("kc-id");
+        when(roleService.findByName(RoleName.USER)).thenReturn(Optional.of(userRole));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        User saved = userService.register(request);
+
+        verify(keycloakAuthClient).createUser("newuser", "new@test.com", null, "password", List.of("USER"));
+        assertEquals(Set.of(userRole), saved.getRoles());
+    }
+
+    @Test
+    void findOrCreateByJwtShouldReturnExistingUser() {
+        User existing = new User();
+        existing.setKeycloakUserId("kc-id");
+        when(userRepository.findByKeycloakUserId("kc-id")).thenReturn(Optional.of(existing));
+
+        assertSame(existing, userService.findOrCreateByJwt(jwt("kc-id", List.of("USER"))));
+        verify(userRepository, never()).saveAndFlush(any());
+    }
+
+    @Test
+    void findOrCreateByJwtShouldCreateUserWithRealmRoles() {
+        Role adminRole = new Role();
+        adminRole.setName(RoleName.ADMIN);
+        when(userRepository.findByKeycloakUserId("kc-id")).thenReturn(Optional.empty());
+        when(roleService.findByName(RoleName.ADMIN)).thenReturn(Optional.of(adminRole));
+        when(userRepository.saveAndFlush(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        User created = userService.findOrCreateByJwt(jwt("kc-id", List.of("ADMIN", "default-roles-ecommerce")));
+
+        assertEquals("kc-id", created.getKeycloakUserId());
+        assertEquals("adminuser", created.getUsername());
+        assertEquals("adminuser@local.dev", created.getEmail());
+        assertEquals(Set.of(adminRole), created.getRoles());
+    }
+
+    private static Jwt jwt(String subject, List<String> realmRoles) {
+        return Jwt.withTokenValue("token")
+                .header("alg", "none")
+                .subject(subject)
+                .claim("preferred_username", "adminuser")
+                .claim("email", "adminuser@local.dev")
+                .claim("realm_access", Map.of("roles", realmRoles))
+                .build();
     }
 }

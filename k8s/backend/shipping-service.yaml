@@ -21,9 +21,9 @@ spec:
         app: shipping-service
     spec:
       initContainers:
-        - name: wait-for-postgres
+        - name: wait-for-mysql
           image: busybox
-          command: ["sh", "-c", "until nc -z postgres 5432; do sleep 3; done"]
+          command: ["sh", "-c", "until nc -z mysql 3306; do sleep 3; done"]
           securityContext:
             runAsUser: 65534
             allowPrivilegeEscalation: false
@@ -49,17 +49,17 @@ spec:
                 name: ecommerce-config
           env:
             - name: SPRING_DATASOURCE_URL
-              value: jdbc:postgresql://postgres:5432/shippingservice
-            - name: POSTGRES_USER
+              value: jdbc:mysql://mysql:3306/shippingservice
+            - name: MYSQL_USER
               valueFrom:
                 secretKeyRef:
-                  name: postgres-secret
-                  key: POSTGRES_USER
-            - name: POSTGRES_PASSWORD
+                  name: mysql-secret
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: postgres-secret
-                  key: POSTGRES_PASSWORD
+                  name: mysql-secret
+                  key: MYSQL_PASSWORD
           startupProbe:
             httpGet:
               path: /actuator/health

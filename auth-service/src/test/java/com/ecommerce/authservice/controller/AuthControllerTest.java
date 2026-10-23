@@ -3,11 +3,13 @@ package com.ecommerce.authservice.controller;
 import com.ecommerce.authservice.config.SsoProperties;
 import com.ecommerce.authservice.dto.request.RefreshTokenRequest;
 import com.ecommerce.authservice.dto.request.RegisterRequest;
+import com.ecommerce.authservice.repository.SsoHandshakeRepository;
 import com.ecommerce.authservice.service.SsoSessionStore;
 import com.ecommerce.authservice.service.UserService;
 import com.ecommerce.commonlib.keycloak.KeycloakAuthClient;
 import com.ecommerce.commonlib.keycloak.KeycloakClientProperties;
 import com.ecommerce.commonlib.viewmodel.ApiResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +35,9 @@ class AuthControllerTest {
     @Mock
     private UserService userService;
 
+    @Mock
+    private SsoHandshakeRepository ssoHandshakeRepository;
+
     private KeycloakClientProperties keycloakProperties;
     private SsoProperties ssoProperties;
     private KeycloakAuthClient keycloakAuthClient;
@@ -49,7 +54,7 @@ class AuthControllerTest {
         keycloakProperties.setAdminPassword("admin");
 
         ssoProperties = new SsoProperties();
-        ssoSessionStore = new SsoSessionStore(ssoProperties);
+        ssoSessionStore = new SsoSessionStore(ssoProperties, ssoHandshakeRepository, new ObjectMapper());
         keycloakAuthClient = new KeycloakAuthClient(RestClient.builder(), keycloakProperties);
         authController = new AuthController(
                 userService, keycloakAuthClient, keycloakProperties, ssoProperties, ssoSessionStore);

@@ -5,12 +5,10 @@ import com.ecommerce.promotion.exception.DuplicatedException;
 import com.ecommerce.promotion.exception.NotFoundException;
 import com.ecommerce.promotion.model.Promotion;
 import com.ecommerce.promotion.model.PromotionApply;
+import com.ecommerce.promotion.model.enumeration.DiscountType;
 import com.ecommerce.promotion.repository.PromotionRepository;
 import com.ecommerce.promotion.repository.PromotionUsageRepository;
 import com.ecommerce.promotion.utils.Constants;
-import com.ecommerce.promotion.viewmodel.BrandVm;
-import com.ecommerce.promotion.viewmodel.CategoryGetVm;
-import com.ecommerce.promotion.viewmodel.ProductVm;
 import com.ecommerce.promotion.viewmodel.PromotionDetailVm;
 import com.ecommerce.promotion.viewmodel.PromotionListVm;
 import com.ecommerce.promotion.viewmodel.PromotionPostVm;
@@ -31,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PromotionService {
     private final PromotionRepository promotionRepository;
     private final PromotionUsageRepository promotionUsageRepository;
-    private final ProductService productService;
+    private final CouponStoreSync couponStoreSync;
 
     public PromotionDetailVm createPromotion(PromotionPostVm promotionPostVm) {
         validateIfPromotionExistedSlug(promotionPostVm.getSlug());
@@ -54,13 +52,17 @@ public class PromotionService {
                 .startDate(promotionPostVm.getStartDate().toInstant())
                 .endDate(promotionPostVm.getEndDate().toInstant())
                 .minimumOrderPurchaseAmount(promotionPostVm.getMinimumOrderPurchaseAmount())
+                .issueLimit(promotionPostVm.getIssueLimit())
                 .build();
+        keepMatchingDiscount(promotion);
 
         List<PromotionApply> promotionApplies =
                 PromotionPostVm.createPromotionApplies(promotionPostVm, promotion);
         promotion.setPromotionApplies(promotionApplies);
 
-        return PromotionDetailVm.fromModel(promotionRepository.save(promotion));
+        Promotion saved = promotionRepository.save(promotion);
+        couponStoreSync.created(saved.getId(), saved.getIssueLimit());
+        return PromotionDetailVm.fromModel(saved);
     }
 
     public PromotionDetailVm updatePromotion(PromotionPutVm promotionPutVm) {
@@ -86,10 +88,12 @@ public class PromotionService {
         promotion.setStartDate(promotionPutVm.getStartDate().toInstant());
         promotion.setEndDate(promotionPutVm.getEndDate().toInstant());
         promotion.setMinimumOrderPurchaseAmount(promotionPutVm.getMinimumOrderPurchaseAmount());
+        keepMatchingDiscount(promotion);
 
         promotion.setPromotionApplies(PromotionPutVm.createPromotionApplies(promotionPutVm, promotion));
 
         promotion = promotionRepository.save(promotion);
+        couponStoreSync.updated(promotion.getId());
         return PromotionDetailVm.fromModel(promotion);
     }
 
@@ -128,26 +132,17 @@ public class PromotionService {
                 .build();
     }
 
+    // product-service has no by-ids lookup APIs, so details only carry the promotion itself.
     private PromotionDetailVm toPromotionDetail(Promotion promotion) {
-        List<BrandVm> brandVms = null;
-        List<CategoryGetVm> categoryGetVms = null;
-        List<ProductVm> productVms = null;
-        List<PromotionApply> promotionApplies = promotion.getPromotionApplies();
-        switch (promotion.getApplyTo()) {
-            case CATEGORY ->
-                categoryGetVms = productService.getCategoryByIds(promotionApplies.stream()
-                    .map(PromotionApply::getCategoryId).toList());
-            case BRAND ->
-                brandVms = productService.getBrandByIds(promotionApplies.stream()
-                    .map(PromotionApply::getBrandId).toList());
-            case PRODUCT ->
-                productVms = productService.getProductByIds(promotionApplies.stream()
-                    .map(PromotionApply::getProductId).toList());
-            default -> {
-                break;
-            }
+        return PromotionDetailVm.fromModel(promotion);
+    }
+
+    private void keepMatchingDiscount(Promotion promotion) {
+        if (DiscountType.FIXED.equals(promotion.getDiscountType())) {
+            promotion.setDiscountPercentage(null);
+        } else if (DiscountType.PERCENTAGE.equals(promotion.getDiscountType())) {
+            promotion.setDiscountAmount(null);
         }
-        return PromotionDetailVm.fromModel(promotion, brandVms, categoryGetVms, productVms);
     }
 
     private void validateIfPromotionExistedSlug(String slug) {
@@ -167,6 +162,7 @@ public class PromotionService {
             throw new BadRequestException(Constants.ErrorCode.PROMOTION_IN_USE_ERROR_MESSAGE, id);
         }
         promotionRepository.deleteById(id);
+        couponStoreSync.deleted(id);
     }
 
     public PromotionDetailVm getPromotion(Long promotionId) {

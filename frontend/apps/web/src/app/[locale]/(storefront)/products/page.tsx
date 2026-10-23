@@ -1,35 +1,38 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { SlidersHorizontal } from "lucide-react";
 import { useProducts, useCategories } from "@/hooks";
 import { Button, Pagination, EmptyState } from "@ecommerce/ui";
-import { cn } from "@ecommerce/lib/utils";
 import ProductCard from "@/components/product/ProductCard";
 import { SortSelect } from "@/components/ui/SortSelect";
 import { FilterSidebar, FilterGroup, FilterButton } from "@/components/ui/FilterSidebar";
 import { productsStyles as s } from "./products.styles";
 
+const PAGE_SIZE = 12;
+
+// 라벨은 messages 의 Products.sort* / price* 키
 const SORT_OPTIONS = [
-  { label: "Newest", value: "productId,desc" },
-  { label: "Price: Low-High", value: "priceUnit,asc" },
-  { label: "Price: High-Low", value: "priceUnit,desc" },
-  { label: "Name: A-Z", value: "productTitle,asc" },
-];
+  { labelKey: "sortNewest", value: "productId,desc" },
+  { labelKey: "sortPriceLow", value: "priceUnit,asc" },
+  { labelKey: "sortPriceHigh", value: "priceUnit,desc" },
+  { labelKey: "sortNameAZ", value: "productTitle,asc" },
+] as const;
 
 const PRICE_RANGES = [
-  [0, 100000, "Under 100,000"] as const,
-  [100000, 500000, "100,000 - 500,000"] as const,
-  [500000, 1000000, "500,000 - 1,000,000"] as const,
-  [1000000, 5000000, "1,000,000 - 5,000,000"] as const,
-  [5000000, 50000000, "Above 5,000,000"] as const,
-];
+  { labelKey: "price1", min: 0, max: 100000 },
+  { labelKey: "price2", min: 100000, max: 500000 },
+  { labelKey: "price3", min: 500000, max: 1000000 },
+  { labelKey: "price4", min: 1000000, max: 5000000 },
+  { labelKey: "price5", min: 5000000, max: undefined },
+] as const;
+
+type PriceRange = (typeof PRICE_RANGES)[number];
 
 function ProductsContent() {
   const t = useTranslations("Products");
-  const tCommon = useTranslations("Common");
   const searchParams = useSearchParams();
   const [page, setPage] = useState(0);
   const [sort, setSort] = useState("productId,desc");
@@ -37,18 +40,43 @@ function ProductsContent() {
     searchParams.get("categoryId") ? Number(searchParams.get("categoryId")) : undefined
   );
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000000]);
+  const [priceRange, setPriceRange] = useState<PriceRange | undefined>(undefined);
 
   const search = searchParams.get("search") ?? undefined;
 
-  const { data: categoriesData } = useCategories();
-  const { data: productsData, isLoading } = useProducts({ page, sort, categoryId: selectedCategory, search });
+  const { data: categoriesData, isLoading: categoriesLoading } = useCategories();
+  const allCategories = categoriesData?.data?.content ?? [];
+  // 홈에서 대분류(categoryId=대분류)로 들어오면 그 대분류의 첫 소분류를 선택한 것으로 본다.
+  // 사이드바 선택 표시와 상품 목록이 같은 소분류를 가리키게 하기 위해서다.
+  const firstChild =
+    selectedCategory === undefined
+      ? undefined
+      : allCategories.find((c) => c.parentCategory?.categoryId === selectedCategory);
+  const activeCategory = firstChild?.categoryId ?? selectedCategory;
+  const categoryIds = activeCategory === undefined ? undefined : [activeCategory];
+  // 백엔드가 전체 목록만 주므로 필터·정렬은 useProducts(select)에서, 페이지 나누기는 여기서 한다.
+  const { data: productsData, isLoading: productsLoading } = useProducts({
+    sort,
+    categoryIds,
+    search,
+    minPrice: priceRange?.min,
+    maxPrice: priceRange?.max,
+  });
 
-  const categories = categoriesData?.data?.content ?? [];
-  const products = productsData ?? [];
-  const totalPages = productsData?.length ? Math.ceil(productsData.length / 12) : 0;
+  const isLoading = productsLoading || categoriesLoading;
 
-  useEffect(() => { setPage(0); }, [selectedCategory, sort, search]);
+  // 사이드바에는 소분류(parent id 가 있는 카테고리)만 보여 준다.
+  const categories = allCategories.filter((c) => c.parentCategory);
+  const filtered = productsData ?? [];
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  // 검색어가 바뀌어 결과가 줄면 범위를 넘지 않게 맞춘다.
+  const currentPage = Math.min(page, Math.max(totalPages - 1, 0));
+  const products = filtered.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
+
+  // 필터를 바꾸면 첫 페이지로
+  const changeSort = (value: string) => { setSort(value); setPage(0); };
+  const changeCategory = (id: number | undefined) => { setSelectedCategory(id); setPage(0); };
+  const changePrice = (range: PriceRange | undefined) => { setPriceRange(range); setPage(0); };
 
   return (
     <div className={s.page}>
@@ -57,9 +85,14 @@ function ProductsContent() {
           <h1 className={s.title}>
             {search ? t("searchResults", { query: search }) : t("title")}
           </h1>
+          {!isLoading && <p className="text-sm text-gray-500">{t("count", { count: filtered.length })}</p>}
         </div>
         <div className={s.toolbar}>
-          <SortSelect options={SORT_OPTIONS} value={sort} onChange={setSort} />
+          <SortSelect
+            options={SORT_OPTIONS.map((o) => ({ label: t(o.labelKey), value: o.value }))}
+            value={sort}
+            onChange={changeSort}
+          />
           <Button variant="outline" size="sm" onClick={() => setFiltersOpen(!filtersOpen)} className="md:hidden">
             <SlidersHorizontal className="h-4 w-4" />
             {t("filter")}
@@ -70,14 +103,14 @@ function ProductsContent() {
       <div className={s.body}>
         <FilterSidebar open={filtersOpen} onClose={() => setFiltersOpen(false)} title={t("filtersTitle")}>
           <FilterGroup title={t("categoriesTitle")}>
-            <FilterButton active={!selectedCategory} onClick={() => setSelectedCategory(undefined)}>
+            <FilterButton active={!activeCategory} onClick={() => changeCategory(undefined)}>
               {t("allCategories")}
             </FilterButton>
             {categories.map((cat) => (
               <FilterButton
                 key={cat.categoryId}
-                active={selectedCategory === cat.categoryId}
-                onClick={() => setSelectedCategory(cat.categoryId)}
+                active={activeCategory === cat.categoryId}
+                onClick={() => changeCategory(cat.categoryId)}
               >
                 {cat.categoryTitle}
               </FilterButton>
@@ -85,13 +118,16 @@ function ProductsContent() {
           </FilterGroup>
 
           <FilterGroup title={t("priceTitle")}>
-            {PRICE_RANGES.map(([min, max, label]) => (
+            <FilterButton active={!priceRange} onClick={() => changePrice(undefined)}>
+              {t("allCategories")}
+            </FilterButton>
+            {PRICE_RANGES.map((range) => (
               <FilterButton
-                key={label}
-                active={priceRange[0] === min && priceRange[1] === max}
-                onClick={() => setPriceRange([min, max])}
+                key={range.labelKey}
+                active={priceRange?.labelKey === range.labelKey}
+                onClick={() => changePrice(range)}
               >
-                {label}
+                {t(range.labelKey)}
               </FilterButton>
             ))}
           </FilterGroup>
@@ -100,7 +136,7 @@ function ProductsContent() {
         <div className={s.main}>
           {isLoading ? (
             <div className={s.grid}>
-              {[...Array(12)].map((_, i) => (
+              {[...Array(PAGE_SIZE)].map((_, i) => (
                 <div key={i} className={s.skeletonCard}>
                   <div className={s.skeletonImage} />
                   <div className={s.skeletonBody}>
@@ -124,7 +160,7 @@ function ProductsContent() {
                 ))}
               </div>
               <Pagination
-                current={page}
+                current={currentPage}
                 total={totalPages}
                 onChange={setPage}
                 className="mt-8"

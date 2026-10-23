@@ -109,20 +109,14 @@ spec:
       match:
         paths: [ /api/payments, /api/payments/* ]
       backends:
-        - serviceName: payment-service
-          servicePort: 8085
+        - serviceName: order-service
+          servicePort: 8084
       plugin_config_name: jwt-auth
       plugins:
         - name: proxy-rewrite
           enable: true
           config:
-            regex_uri: [ "^/(.*)", "/payment/$1" ]
-    - name: docs
-      match:
-        paths: [ /payment/v3/api-docs/* ]
-      backends:
-        - serviceName: payment-service
-          servicePort: 8085
+            regex_uri: [ "^/(.*)", "/order/$1" ]
 ---
 apiVersion: apisix.apache.org/v2
 kind: ApisixRoute
@@ -183,23 +177,9 @@ metadata:
   namespace: ecommerce
 spec:
   http:
-    - name: email
-      match:
-        paths: [ /notification/api/email/* ]
-      backends:
-        - serviceName: notification-service
-          servicePort: 8090
-      plugin_config_name: jwt-auth
     - name: notifications
       match:
         paths: [ /notification/api/notifications/* ]
-      backends:
-        - serviceName: notification-service
-          servicePort: 8090
-      plugin_config_name: jwt-auth
-    - name: payment-notifications
-      match:
-        paths: [ /notification/api/payment-notifications/* ]
       backends:
         - serviceName: notification-service
           servicePort: 8090
@@ -299,6 +279,13 @@ spec:
     - name: backoffice
       match:
         paths: [ /promotion/backoffice/promotions/* ]
+      backends:
+        - serviceName: promotion-service
+          servicePort: 8093
+      plugin_config_name: jwt-auth
+    - name: issue
+      match:
+        paths: [ /promotion/storefront/promotions/*/issue ]
       backends:
         - serviceName: promotion-service
           servicePort: 8093

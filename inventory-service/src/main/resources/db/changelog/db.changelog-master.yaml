@@ -1,8 +1,9 @@
 databaseChangeLog:
   - changeSet:
-      id: inventory-service-0001-bootstrap
-      author: codex
-      comment: Bootstrap Liquibase for inventory-service.
+      id: inventory-mysql-ddl-0001
+      author: ecommerce
       changes:
-        - sql:
-            sql: SELECT 1;
+        - sqlFile:
+            path: db/changelog-mysql/ddl/changelog-0001.sql
+            relativeToChangelogFile: false
+            splitStatements: true

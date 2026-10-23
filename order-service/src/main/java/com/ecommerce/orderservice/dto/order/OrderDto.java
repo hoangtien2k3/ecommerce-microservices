@@ -39,6 +39,10 @@ public class OrderDto implements Serializable {
     private String orderDesc;
     private Double orderFee;
 
+    private Long promotionId;
+
+    private Double discountAmount;
+
     private Integer productId;
 
     @JsonProperty("product")

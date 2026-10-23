@@ -2,12 +2,16 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { CheckCircle, CreditCard, Truck, MapPin } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { CheckCircle, CreditCard, Truck, MapPin, Ticket } from "lucide-react";
 import { useCartStore } from "@ecommerce/lib/store";
 import { useAuthStore } from "@ecommerce/lib/store";
 import { Button, Input } from "@ecommerce/ui";
 import { orderApi, paymentApi } from "@ecommerce/lib/api";
+import { formatPrice, toBackendDateTime } from "@ecommerce/lib/utils";
 import { useRouter } from "@/i18n/navigation";
+import { COUPONS_KEY, couponDiscount, isUsableCoupon, useCoupons } from "@/hooks/useCoupons";
+import type { CouponEvent } from "@/data/couponMock";
 import StepIndicator from "@/components/checkout/StepIndicator";
 import OrderSummary from "@/components/cart/OrderSummary";
 import { checkoutPageStyles as s } from "./checkout.styles";
@@ -46,6 +50,11 @@ export default function CheckoutPage() {
 
   const [paymentMethod, setPaymentMethod] = useState<"COD" | "BANK_TRANSFER" | "PAYPAL">("COD");
 
+  const queryClient = useQueryClient();
+  const { data: couponList } = useCoupons();
+  const [couponId, setCouponId] = useState<number | null>(null);
+  const [now] = useState(() => Date.now()); // 쿠폰 사용 기간 판단 기준 (화면을 연 시각)
+
   if (!isAuthenticated) {
     router.replace("/login?redirect=/checkout");
     return null;
@@ -57,7 +66,12 @@ export default function CheckoutPage() {
   }
 
   const shippingFee = totalPrice() >= 500000 ? 0 : 30000;
-  const total = totalPrice() + shippingFee;
+  // order-service 는 orderFee(배송비 포함)에서 쿠폰 할인을 뺀다. 화면도 같은 기준으로 보여 준다.
+  const orderFee = totalPrice() + shippingFee;
+  const coupons = (couponList ?? []).filter((c) => isUsableCoupon(c, now));
+  const selectedCoupon = coupons.find((c) => c.promotionId === couponId);
+  const discount = selectedCoupon ? couponDiscount(selectedCoupon, orderFee) : 0;
+  const total = orderFee - discount;
 
   const handlePlaceOrder = async () => {
     if (!shipping.fullName || !shipping.phone || !shipping.address || !shipping.city) {
@@ -65,14 +79,17 @@ export default function CheckoutPage() {
       return;
     }
     setLoading(true);
+    let ordered = false;
     try {
       const firstItem = items[0];
       const orderRes = await orderApi.create({
-        orderDate: new Date().toISOString(),
+        orderDate: toBackendDateTime(new Date()), // order-service 날짜 형식에 맞춤
         orderDesc: shipping.note || "EzBuy order",
-        orderFee: total,
+        orderFee, // 할인 전 금액. 쿠폰이 있으면 order-service 가 할인을 적용한다
         productId: firstItem.product.productId,
+        promotionId: selectedCoupon?.promotionId,
       });
+      ordered = true;
       const newOrderId = orderRes.data?.data?.orderId;
       await paymentApi.create({
         isPayed: paymentMethod !== "COD",
@@ -82,9 +99,21 @@ export default function CheckoutPage() {
       setOrderId(newOrderId);
       clearCart();
       setStep(3);
-    } catch {
-      alert(t("orderFailed"));
+    } catch (e) {
+      // axios 오류면 response.data 에 ApiResponse 오류 본문(code)이 있다.
+      const res = (e as { response?: { status?: number; data?: { code?: string } } }).response;
+      if (res?.data?.code === "INV-3002") {
+        alert(t("outOfStock")); // 결제 단계에서 품절 (STOCK_INSUFFICIENT)
+      } else if (!ordered && selectedCoupon && [400, 404, 409].includes(res?.status ?? 0)) {
+        // 주문 생성 4xx: 쿠폰 확인(이미 사용, 기간 지남, 미발급)에서 막힌 경우
+        setCouponId(null);
+        alert(t("couponUnavailable"));
+      } else {
+        alert(t("orderFailed"));
+      }
     } finally {
+      // 쿠폰 사용 여부와 발급 수량이 바뀌었을 수 있다
+      if (selectedCoupon) queryClient.invalidateQueries({ queryKey: COUPONS_KEY });
       setLoading(false);
     }
   };
@@ -103,6 +132,10 @@ export default function CheckoutPage() {
             <PaymentStep
               paymentMethod={paymentMethod}
               onPaymentChange={setPaymentMethod}
+              coupons={coupons}
+              couponId={selectedCoupon?.promotionId ?? null}
+              onCouponChange={setCouponId}
+              orderFee={orderFee}
               loading={loading}
               onBack={() => setStep(1)}
               onPlaceOrder={handlePlaceOrder}
@@ -117,6 +150,7 @@ export default function CheckoutPage() {
               items={items}
               subtotal={totalPrice()}
               shippingFee={shippingFee}
+              discount={discount}
               total={total}
             />
           </div>
@@ -187,10 +221,14 @@ function ShippingStep({
 }
 
 function PaymentStep({
-  paymentMethod, onPaymentChange, loading, onBack, onPlaceOrder,
+  paymentMethod, onPaymentChange, coupons, couponId, onCouponChange, orderFee, loading, onBack, onPlaceOrder,
 }: {
   paymentMethod: string;
   onPaymentChange: (m: "COD" | "BANK_TRANSFER" | "PAYPAL") => void;
+  coupons: CouponEvent[];
+  couponId: number | null;
+  onCouponChange: (id: number | null) => void;
+  orderFee: number;
   loading: boolean;
   onBack: () => void;
   onPlaceOrder: () => void;
@@ -220,6 +258,33 @@ function PaymentStep({
             </div>
           </label>
         ))}
+      </div>
+      <div className={s.couponBox}>
+        <div className={s.cardHead}>
+          <Ticket className="h-5 w-5 text-primary-500" />
+          <h3 className={s.couponTitle}>{t("coupon")}</h3>
+        </div>
+        {coupons.length === 0 ? (
+          <p className={s.payDesc}>{t("couponEmpty")}</p>
+        ) : (
+          <select
+            value={couponId ?? ""}
+            onChange={(e) => onCouponChange(e.target.value ? Number(e.target.value) : null)}
+            className={s.select}
+          >
+            <option value="">{t("noCoupon")}</option>
+            {coupons.map((c) => {
+              // 최소 주문 금액은 백엔드가 확인하지 않아서 화면에서 막는다
+              const belowMin = (c.minimumOrderPurchaseAmount ?? 0) > orderFee;
+              return (
+                <option key={c.promotionId} value={c.promotionId} disabled={belowMin}>
+                  {`${c.name} (-${formatPrice(couponDiscount(c, orderFee))})`
+                    + (belowMin ? ` · ${t("couponMin", { amount: formatPrice(c.minimumOrderPurchaseAmount ?? 0) })}` : "")}
+                </option>
+              );
+            })}
+          </select>
+        )}
       </div>
       <div className={s.payActions}>
         <Button variant="outline" onClick={onBack} className="flex-1">{t("back")}</Button>

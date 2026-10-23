@@ -14,12 +14,7 @@ public interface ProductMappingHelper {
                 .sku(product.getSku())
                 .priceUnit(product.getPriceUnit())
                 .quantity(product.getQuantity())
-                .categoryDto(
-                        CategoryDto.builder()
-                                .categoryId(product.getCategory().getCategoryId())
-                                .categoryTitle(product.getCategory().getCategoryTitle())
-                                .imageUrl(product.getCategory().getImageUrl())
-                                .build())
+                .categoryDto(mapCategory(product.getCategory()))
                 .build();
     }
 
@@ -31,12 +26,26 @@ public interface ProductMappingHelper {
                 .sku(productDto.getSku())
                 .priceUnit(productDto.getPriceUnit())
                 .quantity(productDto.getQuantity())
-                .category(
-                        Category.builder()
-                                .categoryId(productDto.getCategoryDto().getCategoryId())
-                                .categoryTitle(productDto.getCategoryDto().getCategoryTitle())
-                                .imageUrl(productDto.getCategoryDto().getImageUrl())
-                                .build())
+                .category(mapCategory(productDto.getCategoryDto()))
+                .build();
+    }
+
+    // products.category_id is nullable, so a product may have no category.
+    private static CategoryDto mapCategory(final Category category) {
+        if (category == null) return null;
+        return CategoryDto.builder()
+                .categoryId(category.getCategoryId())
+                .categoryTitle(category.getCategoryTitle())
+                .imageUrl(category.getImageUrl())
+                .build();
+    }
+
+    private static Category mapCategory(final CategoryDto categoryDto) {
+        if (categoryDto == null || categoryDto.getCategoryId() == null) return null;
+        return Category.builder()
+                .categoryId(categoryDto.getCategoryId())
+                .categoryTitle(categoryDto.getCategoryTitle())
+                .imageUrl(categoryDto.getImageUrl())
                 .build();
     }
 

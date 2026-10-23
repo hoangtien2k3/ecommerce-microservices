@@ -1,9 +1,9 @@
 package com.ecommerce.productservice.controller;
 
+import com.ecommerce.commonlib.viewmodel.ApiResponse;
 import com.ecommerce.productservice.dto.CategoryDto;
 import com.ecommerce.productservice.service.CategoryService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,10 +25,15 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
+    private static final int MAX_PAGE_SIZE = 100;
+
     @GetMapping
-    public ResponseEntity<List<CategoryDto>> findAll() {
+    public ResponseEntity<ApiResponse<Page<CategoryDto>>> findAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size) {
         log.info("CategoryDto List, controller; fetch all categories");
-        return ResponseEntity.ok(categoryService.findAll());
+        int pageSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
+        return ResponseEntity.ok(ApiResponse.ok(categoryService.findAllCategory(Math.max(page, 0), pageSize)));
     }
 
     @GetMapping("/paging")
@@ -47,11 +52,9 @@ public class CategoryController {
     }
 
     @GetMapping("/{categoryId}")
-    public ResponseEntity<CategoryDto> findById(@PathVariable("categoryId")
-                                                @NotBlank(message = "Input must not be blank")
-                                                @Valid final String categoryId) {
+    public ResponseEntity<CategoryDto> findById(@PathVariable("categoryId") final Integer categoryId) {
         log.info("CategoryDto, resource; fetch category by id");
-        return ResponseEntity.ok(categoryService.findById(Integer.parseInt(categoryId)));
+        return ResponseEntity.ok(categoryService.findById(categoryId));
     }
 
     @PostMapping
@@ -71,20 +74,18 @@ public class CategoryController {
     }
 
     @PutMapping("/{categoryId}")
-    public ResponseEntity<CategoryDto> update(@PathVariable("categoryId")
-                                              @NotBlank(message = "Input must not be blank")
-                                              @Valid final String categoryId,
+    public ResponseEntity<CategoryDto> update(@PathVariable("categoryId") final Integer categoryId,
                                               @RequestBody
                                               @NotNull(message = "Input must not be NULL")
                                               @Valid final CategoryDto categoryDto) {
         log.info("CategoryDto, resource; update category with categoryId");
-        return ResponseEntity.ok(categoryService.update(Integer.parseInt(categoryId), categoryDto));
+        return ResponseEntity.ok(categoryService.update(categoryId, categoryDto));
     }
 
     @DeleteMapping("/{categoryId}")
-    public ResponseEntity<Boolean> deleteById(@PathVariable("categoryId") final String categoryId) {
+    public ResponseEntity<Boolean> deleteById(@PathVariable("categoryId") final Integer categoryId) {
         log.info("Boolean, resource; delete category by id");
-        categoryService.deleteById(Integer.parseInt(categoryId));
+        categoryService.deleteById(categoryId);
         return ResponseEntity.ok(true);
     }
 }

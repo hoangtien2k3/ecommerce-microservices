@@ -74,7 +74,7 @@ HOSTS_ENTRY="127.0.0.1 ecommerce.local admin.ecommerce.local api.ecommerce.local
 
 SERVICES=(
   auth-service product-service order-service
-  payment-service shipping-service inventory-service favourite-service
+  shipping-service inventory-service favourite-service
   rating-service media-service tax-service promotion-service
   search-service notification-service
 )
@@ -278,9 +278,9 @@ kubectl apply -f k8s/namespace.yaml > /dev/null
 success "Namespace '${NAMESPACE}'"
 
 # Remove workloads that were dropped from the project so re-runs on an existing
-# cluster don't leave zombie pods holding memory (api-gateway, MinIO and Zipkin
-# are gone; MinIO was replaced by RustFS).
-kubectl delete deploy,svc,statefulset api-gateway minio zipkin \
+# cluster don't leave zombie pods holding memory (api-gateway, MinIO, Zipkin
+# and Postgres are gone; MinIO was replaced by RustFS).
+kubectl delete deploy,svc,statefulset api-gateway minio zipkin postgres \
   -n "$NAMESPACE" --ignore-not-found > /dev/null 2>&1 || true
 
 # Secrets — idempotent (apply, never skip) so secrets added later (e.g. storage-secret)
@@ -289,12 +289,11 @@ if [ -f .env ]; then
   info "Loading secrets from .env..."
   set -a; source .env; set +a
   mk_secret() { kubectl create secret generic "$@" -n "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f - > /dev/null; }
-  mk_secret postgres-secret      --from-literal=POSTGRES_USER="${POSTGRES_USER:-admin}"         --from-literal=POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-admin}"
+  mk_secret mysql-secret         --from-literal=MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD:-admin}" --from-literal=MYSQL_USER="${MYSQL_USER:-admin}" --from-literal=MYSQL_PASSWORD="${MYSQL_PASSWORD:-admin}"
   mk_secret keycloak-secret      --from-literal=KEYCLOAK_ADMIN="${KEYCLOAK_ADMIN:-admin}"           --from-literal=KEYCLOAK_ADMIN_PASSWORD="${KEYCLOAK_ADMIN_PASSWORD:-admin}"
   mk_secret redis-secret         --from-literal=REDIS_PASSWORD="${REDIS_PASSWORD:-admin}"
   mk_secret storage-secret       --from-literal=STORAGE_ACCESS_KEY="${STORAGE_ACCESS_KEY:-admin}"     --from-literal=STORAGE_SECRET_KEY="${STORAGE_SECRET_KEY:-admin}"
   mk_secret elasticsearch-secret --from-literal=ELASTIC_PASSWORD="${ELASTIC_PASSWORD:-admin}"
-  mk_secret mail-secret          --from-literal=MAIL_USERNAME="${MAIL_USERNAME:-}"                  --from-literal=MAIL_PASSWORD="${MAIL_PASSWORD:-}"
 else
   info "No .env found — applying k8s/secrets.yaml (default dev values)"
   kubectl apply -f k8s/secrets.yaml > /dev/null
@@ -305,8 +304,8 @@ kubectl apply -f k8s/configmap.yaml > /dev/null
 kubectl create configmap keycloak-realm        -n "$NAMESPACE" \
   --from-file=ecommerce-realm.json=docker/keycloak/import/ecommerce-realm.json \
   --dry-run=client -o yaml | kubectl apply -f - > /dev/null
-kubectl create configmap postgres-init-scripts -n "$NAMESPACE" \
-  --from-file=create-all-databases.sql=docker/postgres/init/create-all-databases.sql \
+kubectl create configmap mysql-init-scripts -n "$NAMESPACE" \
+  --from-file=create-all-databases.sql=docker/mysql/init/create-all-databases.sql \
   --dry-run=client -o yaml | kubectl apply -f - > /dev/null
 # Apache APISIX standalone config (data plane reads these two files directly).
 kubectl create configmap apisix-config         -n "$NAMESPACE" \
@@ -319,10 +318,10 @@ success "ConfigMaps applied"
 step_done
 
 # 8. Infrastructure — fire-and-forget: apply everything, let Kubernetes converge on
-# its own. Pod ordering is handled by the pods (Keycloak + backends carry
-# wait-for-postgres / wait-for-kafka initContainers), so we do NOT block on readiness.
+# its own. Pod ordering is handled by the pods (Keycloak and backends wait
+# for MySQL), so we do NOT block on readiness.
 step "Deploy infrastructure"
-for f in postgres redis kafka elasticsearch rustfs keycloak; do
+for f in mysql redis elasticsearch rustfs keycloak; do
   kubectl apply -f "k8s/infra/${f}.yaml" > /dev/null
 done
 success "Infrastructure manifests applied (pods start in the background)"

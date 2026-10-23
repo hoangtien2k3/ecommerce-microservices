@@ -2,13 +2,13 @@ import { getTranslations } from "next-intl/server";
 import { ShieldCheck, Truck, RefreshCw, Headphones } from "lucide-react";
 import HeroSection from "@/components/home/HeroSection";
 import QuickDeals from "@/components/home/QuickDeals";
-import FlashSale from "@/components/home/FlashSale";
 import ProductRail from "@/components/home/ProductRail";
 import CategorySection from "@/components/home/CategorySection";
+import ClothingSection from "@/components/home/ClothingSection";
 import BrandStrip from "@/components/home/BrandStrip";
 import { homeStyles as s } from "@/components/home/home.styles";
 import {
-  hotProducts, phoneProducts, laptopProducts, phoneBrands, laptopBrands,
+  hotProducts, laptopProducts, laptopBrands,
 } from "@/data/homeMock";
 
 export async function generateMetadata() {
@@ -19,7 +19,6 @@ export async function generateMetadata() {
 export default async function HomePage() {
   const t = await getTranslations("Home");
 
-  const hotTrend = hotProducts.slice(0, 5);
   const newArrivals = hotProducts.slice(5, 10);
 
   const usp = [
@@ -34,21 +33,8 @@ export default async function HomePage() {
       <div className="max-w-7xl mx-auto px-3 md:px-4 py-4 space-y-4">
         <HeroSection />
         <QuickDeals />
-        <FlashSale />
 
-        <ProductRail title={t("hotProducts")} icon="🔥" products={hotTrend} viewAllLabel={t("viewAll")} />
-
-        <CategorySection
-          title={t("catPhones")}
-          icon="📱"
-          viewAllLabel={t("viewAll")}
-          bannerTitle={t("phoneBannerTitle")}
-          bannerSub={t("phoneBannerSub")}
-          bannerCta={t("heroCta")}
-          bannerGradient="from-primary-600 to-primary-700"
-          brands={phoneBrands}
-          products={phoneProducts}
-        />
+        <ClothingSection />
 
         <CategorySection
           title={t("catLaptops")}

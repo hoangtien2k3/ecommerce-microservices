@@ -116,15 +116,15 @@ public class HttpLoggingFilter extends OncePerRequestFilter implements Ordered {
         String uri = req.getRequestURI();
         String query = req.getQueryString();
         String path = uri.startsWith("/") ? uri.substring(1) : uri;
-        return query != null ? path + "?" + query : path;
+        return query != null ? path + "?" + SensitiveDataMasker.mask(query) : path;
     }
 
     private static void appendBody(StringBuilder sb, String label, byte[] body, int maxBytes) {
         if (body == null || body.length == 0) return;
         int len = Math.min(body.length, maxBytes);
-        String content = new String(body, 0, len, StandardCharsets.UTF_8)
+        String content = SensitiveDataMasker.mask(new String(body, 0, len, StandardCharsets.UTF_8)
                 .replaceAll("\\s+", " ")
-                .trim();
+                .trim());
         sb.append(" | ").append(label).append("=").append(content);
         if (body.length > maxBytes) {
             sb.append("...[truncated]");

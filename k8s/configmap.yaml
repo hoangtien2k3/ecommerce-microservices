@@ -4,10 +4,9 @@ metadata:
   name: ecommerce-config
   namespace: ecommerce
 data:
-  # PostgresSQL
-  POSTGRES_HOST: "postgres"
-  POSTGRES_PORT: "5432"
-  POSTGRES_DB: "ecommerce"
+  # MySQL
+  MYSQL_HOST: "mysql"
+  MYSQL_PORT: "3306"
 
   # Keycloak
   KEYCLOAK_ISSUER_URI: "http://keycloak:8080/realms/ecommerce"
@@ -15,9 +14,6 @@ data:
   JWT_ISSUER_URI: "http://keycloak:8080/realms/ecommerce"
   KEYCLOAK_SERVER_URL: "http://keycloak:8080"
   KEYCLOAK_PUBLIC_SERVER_URL: "http://keycloak.ecommerce.local"
-
-  # Kafka
-  KAFKA_SERVERS: "kafka:9092"
 
   # Redis
   REDIS_HOST: "redis"
