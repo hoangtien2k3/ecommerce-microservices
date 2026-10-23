@@ -13,6 +13,7 @@ export const couponStyles = {
 
   // ---- Coupon grid ----
   grid: "grid grid-cols-1 md:grid-cols-2 gap-4",
+  gridSingle: "grid grid-cols-1",
 
   // ---- Ticket card: coloured stub on the left, details on the right ----
   card: "flex bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow",
@@ -35,6 +36,20 @@ export const couponStyles = {
   footer: "mt-auto flex items-center justify-between gap-2 pt-1",
   time: "text-xs text-gray-500 flex items-center gap-1 whitespace-nowrap",
   action: "shrink-0 min-w-28",
+
+  // ---- Featured: the only coupon on the page, shown full width and larger ----
+  stubFeatured: "sm:w-56 py-8",
+  stubAmountFeatured: "text-xl sm:text-4xl",
+  stubLabelFeatured: "text-xs sm:text-sm",
+  bodyFeatured: "p-5 sm:p-6 gap-3",
+  nameFeatured: "text-lg sm:text-xl font-bold",
+  descFeatured: "text-sm",
+  minOrderFeatured: "text-sm",
+  barFeatured: "h-6",
+  barLabelFeatured: "text-xs",
+  timeFeatured: "text-sm",
+  footerFeatured: "flex-wrap",
+  actionFeatured: "w-full sm:w-auto sm:min-w-40",
 
   // ---- Issue result notice ----
   notice: "flex items-center gap-3 rounded-xl border px-4 py-3 text-sm",

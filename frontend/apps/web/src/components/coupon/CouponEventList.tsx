@@ -80,7 +80,7 @@ export default function CouponEventList() {
           description={t("emptyHint")}
         />
       ) : (
-        <div className={s.grid}>
+        <div className={coupons.length === 1 ? s.gridSingle : s.grid}>
           {coupons.map((coupon) => (
             <CouponCard
               key={coupon.promotionId}
@@ -89,6 +89,7 @@ export default function CouponEventList() {
               now={now}
               issuing={issue.isPending && issue.variables === coupon.promotionId}
               onIssue={handleIssue}
+              featured={coupons.length === 1}
             />
           ))}
         </div>
